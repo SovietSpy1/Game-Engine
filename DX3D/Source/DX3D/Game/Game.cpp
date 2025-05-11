@@ -3,6 +3,10 @@
 #include <DX3D/Graphics/GraphicsEngine.h>
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Game/Display.h>
+std::chrono::steady_clock::time_point dx3d::Time::startTime = std::chrono::steady_clock::now();
+std::chrono::steady_clock::time_point dx3d::Time::lastTime = dx3d::Time::startTime;
+float dx3d::Time::deltaTime{};
+float dx3d::Time::elapsedTime{};
 dx3d::Game::Game(const GameDesc& desc) : Base({ *std::make_unique<Logger>(desc.logLevel).release() }), m_loggerPtr{ &m_logger }
 {
 	m_graphicsEngine = std::make_unique<GraphicsEngine>(GraphicsEngineDesc{m_logger});

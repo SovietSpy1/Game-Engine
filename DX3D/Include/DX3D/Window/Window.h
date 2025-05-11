@@ -7,6 +7,7 @@ namespace dx3d {
 	public:
 	explicit Window(const WindowDesc& desc);
 	virtual ~Window() override;
+	virtual void onUpdate();
 	protected:
 		void* m_handle{};
 		Rect m_size{};

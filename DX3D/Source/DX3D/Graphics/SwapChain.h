@@ -5,8 +5,12 @@ namespace dx3d {
 	{
 	public:
 		explicit SwapChain(const SwapChainDesc& desc, const GraphicsResourceDesc& gDesc);
+		bool present(bool vysnc);
 	private:
 		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain{};
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv{};
+	private:
+		friend class DeviceContext;
 	};
 }
 

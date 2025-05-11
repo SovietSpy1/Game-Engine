@@ -1,6 +1,7 @@
 #include "DX3D/Graphics/RenderSystem.h"
 #include <DX3D/Graphics/GraphicsLogUtils.h>
 #include <DX3D/Graphics/SwapChain.h>
+#include <DX3D/Graphics/DeviceContext.h>
 using namespace dx3d;
 dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
 {
@@ -22,6 +23,11 @@ dx3d::RenderSystem::~RenderSystem()
 SwapChainPtr dx3d::RenderSystem::createSwapChain(const SwapChainDesc& desc) const
 {
 	return std::make_shared<SwapChain>(desc, getGraphicsResourceDesc());
+}
+
+std::shared_ptr<DeviceContext> dx3d::RenderSystem::createDeviceContext() const
+{
+	return std::make_shared<DeviceContext>(DeviceContextDesc(*m_d3dContext.Get()), getGraphicsResourceDesc());
 }
 
 GraphicsResourceDesc dx3d::RenderSystem::getGraphicsResourceDesc() const noexcept
