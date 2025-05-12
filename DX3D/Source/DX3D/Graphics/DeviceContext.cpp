@@ -27,6 +27,12 @@ void dx3d::DeviceContext::drawTriangleList(UINT vertex_count, UINT start_vertex_
 	m_device_context.Draw(vertex_count, start_vertex_index);
 }
 
+void dx3d::DeviceContext::drawTriangleStrip(UINT vertex_count, UINT start_vertex_index)
+{
+	m_device_context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	m_device_context.Draw(vertex_count, start_vertex_index);
+}
+
 void dx3d::DeviceContext::SetViewportSize(UINT width, UINT height)
 {
 	D3D11_VIEWPORT vp{};
@@ -79,9 +85,9 @@ void dx3d::DeviceContext::setBlendState()
 	m_device_context.OMSetBlendState(blendState.Get(), blendFactor, sample_mask);
 }
 
-ID3DBlob* dx3d::DeviceContext::loadShaderBlob(const WCHAR * path)
+Microsoft::WRL::ComPtr<ID3DBlob> dx3d::DeviceContext::loadShaderBlob(const WCHAR * path)
 {
-	ID3DBlob* shader_blob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> shader_blob = nullptr;
 	ID3DBlob* error_blob = nullptr;
 	DX3DGraphicsLogErrorAndThrow(D3DCompileFromFile(
 		path,      // shader file name
@@ -91,7 +97,7 @@ ID3DBlob* dx3d::DeviceContext::loadShaderBlob(const WCHAR * path)
 		"vs_5_0",                        // shader model
 		0,                               // compile flags
 		0,                               // effect flags
-		&shader_blob,                    // compiled shader
+		shader_blob.GetAddressOf(),                    // compiled shader
 		&error_blob                      // errors
 	), "failed to extract shader.");
 	if (error_blob != nullptr) {
@@ -100,9 +106,9 @@ ID3DBlob* dx3d::DeviceContext::loadShaderBlob(const WCHAR * path)
 	return shader_blob;
 }
 
-ID3DBlob* dx3d::DeviceContext::loadPixelShaderBlob(const WCHAR* path)
+Microsoft::WRL::ComPtr<ID3DBlob> dx3d::DeviceContext::loadPixelShaderBlob(const WCHAR* path)
 {
-	ID3DBlob* shader_blob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> shader_blob = nullptr;
 	ID3DBlob* error_blob = nullptr;
 	DX3DGraphicsLogErrorAndThrow(D3DCompileFromFile(
 		path,      // shader file name
@@ -112,7 +118,7 @@ ID3DBlob* dx3d::DeviceContext::loadPixelShaderBlob(const WCHAR* path)
 		"ps_5_0",                        // shader model
 		0,                               // compile flags
 		0,                               // effect flags
-		&shader_blob,                    // compiled shader
+		shader_blob.GetAddressOf(),                    // compiled shader
 		&error_blob                      // errors
 	), "failed to extract shader.");
 	if (error_blob != nullptr) {

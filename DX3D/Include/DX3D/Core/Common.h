@@ -56,7 +56,7 @@ namespace dx3d {
 		vec4 operator*(const float& other) const {
 			return vec4(r *other, g * other, b *other, a * other);
 		}
-		float magnitude() {
+		float magnitude() const{
 			return std::sqrt(std::pow(r, 2) + std::pow(g, 2) + std::pow(b, 2) + std::pow(a, 2));
 		}
 	};

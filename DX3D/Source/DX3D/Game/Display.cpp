@@ -12,17 +12,20 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(desc.window)
 	startColV1 = RandColor(1);
 	startColV2 = RandColor(1);
 	startColV3 = RandColor(1);
-	list[0] = { {0.0f, 0.5f, 0.0f}, startColV1.rgba, {0.5f,0.0f} };
-	list[1] = { {0.5f, -0.5f, 0.0f}, startColV2.rgba, {1.0f,1.0f} };
-	list[2] = { {-0.5f,-0.5f,0.0f}, startColV3.rgba, {0.0f,1.0f} };
+	Color startColV4 = RandColor(1);
+	list[0] = { {-0.5f, -0.5f, 0.0f}, startColV2.rgba, {0.0f,1.0f} };
+	list[1] = { {-0.5f,0.5f,0.0f}, startColV3.rgba, {0.0f,0.0f} };
+	list[2] = { {0.5f, -0.5f, 0.0f}, startColV1.rgba, {1.0f,1.0f} };
+	list[3] = { {0.5f,0.5f,0.0f}, startColV4.rgba, {1.0f,0.0f} };
+
 	size_list = ARRAYSIZE(list);
 	const WCHAR* vertexShaderPath = L"DX3D/Source/DX3D/Graphics/VertexShader.hlsl";
 	shader_blob = m_device_context->loadShaderBlob(vertexShaderPath);
 	m_vb->load(list, sizeof(vertex), size_list, shader_blob->GetBufferPointer(), shader_blob->GetBufferSize());
-	m_device_context->createVertexShader(shader_blob);
+	m_device_context->createVertexShader(shader_blob.Get());
 	const WCHAR* pixelShaderPath = L"DX3D/Source/DX3D/Graphics/PixelShader.hlsl";
 	pixelshader_blob = m_device_context->loadPixelShaderBlob(pixelShaderPath);
-	m_device_context->createPixelShader(pixelshader_blob);
+	m_device_context->createPixelShader(pixelshader_blob.Get());
 	m_device_context->createTransparentBlendState();
 	currentCol = Color{ 0.01f,0.01f,0.01f,1.0f };
 	endColV1 = RandColor(1);
@@ -51,6 +54,10 @@ void dx3d::Display::onUpdate()
 	m_device_context->SetViewportSize(m_size.width, m_size.height);
 	m_device_context->setVertexBuffer(m_vb);
 	m_device_context->setBlendState();
-	m_device_context->drawTriangleList(m_vb->getSizeVertexList(), 0);
+	m_device_context->drawTriangleStrip(m_vb->getSizeVertexList(), 0);
 	m_swapChain->present(false);
+}
+
+dx3d::Display::~Display()
+{
 }
