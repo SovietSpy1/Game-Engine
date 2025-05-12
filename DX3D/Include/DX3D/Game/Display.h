@@ -9,11 +9,23 @@ namespace dx3d {
 		virtual void onUpdate() override;
 	private:
 		SwapChainPtr m_swapChain{};
-		std::shared_ptr<DeviceContext> m_device_context{};
+		std::shared_ptr<DeviceContext> m_device_context;
+		std::shared_ptr<VertexBuffer> m_vb;
+	private:
+		UINT size_list;
+		ID3DBlob* shader_blob;
+		ID3DBlob* pixelshader_blob;
+		vertex list[3];
 		Color startCol;
 		Color endCol;
+		Color startColV1;
+		Color endColV1;
+		Color startColV2;
+		Color endColV2;
+		Color startColV3;
+		Color endColV3;
 		Color currentCol;
-		float u{0};
+		float u;
 	};
 }
 

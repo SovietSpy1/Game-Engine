@@ -10,9 +10,9 @@ namespace dx3d {
 	public:
 		explicit RenderSystem(const RenderSystemDesc& desc);
 		virtual ~RenderSystem() override;
-
 		SwapChainPtr createSwapChain(const SwapChainDesc& desc) const;
 		std::shared_ptr<DeviceContext> createDeviceContext() const;
+		std::shared_ptr<VertexBuffer> createVertexBuffer() const;
 	private:
 		GraphicsResourceDesc getGraphicsResourceDesc() const noexcept;
 	private:

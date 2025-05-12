@@ -51,6 +51,12 @@
     <ClCompile Include="DX3D\Source\DX3D\Math\GameMath.h">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\VertexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Math\GameMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -98,5 +104,12 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\DeviceContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DX3D\Source\DX3D\Graphics\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Source\DX3D\Graphics\PixelShader.hlsl" />
   </ItemGroup>
 </Project>

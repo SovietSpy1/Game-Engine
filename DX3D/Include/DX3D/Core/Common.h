@@ -39,5 +39,30 @@ namespace dx3d {
 		static float deltaTime;
 		static float elapsedTime;
 	};
-
+	struct vec2 {
+		float u, v;
+	};
+	struct vec3 {
+		float x, y, z;
+	};
+	struct vec4 {
+		float r, g, b, a;
+		vec4 operator+(const vec4& other) const {
+			return vec4(r + other.r, g + other.g, b + other.b, a + other.a);
+		}
+		vec4 operator-(const vec4& other) const {
+			return vec4(r - other.r, g - other.g, b - other.b, a - other.a);
+		}
+		vec4 operator*(const float& other) const {
+			return vec4(r *other, g * other, b *other, a * other);
+		}
+		float magnitude() {
+			return std::sqrt(std::pow(r, 2) + std::pow(g, 2) + std::pow(b, 2) + std::pow(a, 2));
+		}
+	};
+	struct vertex {
+		vec3 position;
+		vec4 color;
+		vec2 uvs;
+	};
 }

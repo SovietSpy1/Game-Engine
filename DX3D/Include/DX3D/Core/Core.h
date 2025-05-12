@@ -11,6 +11,7 @@ namespace dx3d {
 	class SwapChain;
 	class Display;
 	class DeviceContext;
+	class VertexBuffer;
 
 	using i32 = int;
 	using ui32 = unsigned int;
