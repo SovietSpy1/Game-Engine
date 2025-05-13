@@ -19,8 +19,8 @@ namespace dx3d {
 #define DX3DLogError(message)\
 	getLogger().log((Logger::LogLevel::Error), message);
 #define DX3DLogErrorAndThrow(message)\
-	{\
+	do{\
 		DX3DLogError(message);\
 		throw std::runtime_error(message);\
-	}
+	} while (0)
 }

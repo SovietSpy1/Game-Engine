@@ -3,6 +3,8 @@
 #include <DX3D/Graphics/SwapChain.h>
 #include <DX3D/Graphics/DeviceContext.h>
 #include <DX3D/Graphics/VertexBuffer.h>
+#include <DX3D/Object/Mesh.h>
+#include <d3dcompiler.h>
 using namespace dx3d;
 dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
 {
@@ -34,6 +36,59 @@ std::shared_ptr<DeviceContext> dx3d::RenderSystem::createDeviceContext() const
 std::shared_ptr<VertexBuffer> dx3d::RenderSystem::createVertexBuffer() const
 {
 	return std::make_shared<VertexBuffer>(getGraphicsResourceDesc());
+}
+
+std::shared_ptr<Mesh> dx3d::RenderSystem::createMesh() const
+{
+	return std::make_shared<Mesh>(getGraphicsResourceDesc());
+}
+
+void dx3d::RenderSystem::compileVertexShader(const WCHAR* vertexShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob) const
+{
+	ID3DBlob* error_blob = nullptr;
+	DX3DGraphicsLogErrorAndThrow(D3DCompileFromFile(
+		vertexShaderPath,      // shader file name
+		nullptr,                         // optional macros
+		nullptr,                         // include interface
+		"main",                          // entry point function
+		"vs_5_0",                        // shader model
+		0,                               // compile flags
+		0,                               // effect flags
+		vertexBlob.GetAddressOf(),                    // compiled shader
+		&error_blob                      // errors
+	), "compileVertexShader failed.");
+	if (error_blob != nullptr) {
+		error_blob->Release();
+	}
+}
+
+void dx3d::RenderSystem::compilePixelShader(const WCHAR* pixelShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pixelBlob) const
+{
+	ID3DBlob* error_blob = nullptr;
+	DX3DGraphicsLogErrorAndThrow(D3DCompileFromFile(
+		pixelShaderPath,      // shader file name
+		nullptr,                         // optional macros
+		nullptr,                         // include interface
+		"main",                          // entry point function
+		"ps_5_0",                        // shader model
+		0,                               // compile flags
+		0,                               // effect flags
+		pixelBlob.GetAddressOf(),                    // compiled shader
+		&error_blob                      // errors
+	), "compilePixelShader failed.");
+	if (error_blob != nullptr) {
+		error_blob->Release();
+	}
+}
+
+void dx3d::RenderSystem::createVertexShader(Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob, Microsoft::WRL::ComPtr<ID3D11VertexShader> &vertexShader) const
+{
+	DX3DGraphicsLogErrorAndThrow(m_d3dDevice->CreateVertexShader(vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), nullptr, vertexShader.GetAddressOf()), "createVertexShader failed.");
+}
+
+void dx3d::RenderSystem::createPixelShader(Microsoft::WRL::ComPtr<ID3DBlob>& pixelBlob, Microsoft::WRL::ComPtr<ID3D11PixelShader>& pixelShader) const
+{
+	DX3DGraphicsLogErrorAndThrow(m_d3dDevice->CreatePixelShader(pixelBlob->GetBufferPointer(), pixelBlob->GetBufferSize(), nullptr, pixelShader.GetAddressOf()), "createPixelShader failed.");
 }
 
 GraphicsResourceDesc dx3d::RenderSystem::getGraphicsResourceDesc() const noexcept

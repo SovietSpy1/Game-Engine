@@ -13,6 +13,11 @@ namespace dx3d {
 		SwapChainPtr createSwapChain(const SwapChainDesc& desc) const;
 		std::shared_ptr<DeviceContext> createDeviceContext() const;
 		std::shared_ptr<VertexBuffer> createVertexBuffer() const;
+		std::shared_ptr<Mesh> createMesh() const;
+		void compileVertexShader(const WCHAR* vertexShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob) const;
+		void compilePixelShader(const WCHAR* pixelShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pixelBlob) const;
+		void createVertexShader(Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob, Microsoft::WRL::ComPtr<ID3D11VertexShader>& vertexShader) const;
+		void createPixelShader(Microsoft::WRL::ComPtr<ID3DBlob>& pixelBlob, Microsoft::WRL::ComPtr<ID3D11PixelShader>& pixelShader) const;
 	private:
 		GraphicsResourceDesc getGraphicsResourceDesc() const noexcept;
 	private:

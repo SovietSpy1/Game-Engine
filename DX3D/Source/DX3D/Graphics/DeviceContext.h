@@ -9,17 +9,17 @@ namespace dx3d {
 		void drawTriangleList(UINT vertex_count, UINT start_vertex_index);
 		void drawTriangleStrip(UINT vertex_count, UINT start_vertex_index);
 		void SetViewportSize(UINT width, UINT height);
-		void createVertexShader(ID3DBlob* shaderBlob);
-		void createPixelShader(ID3DBlob* shaderBlob);
-		void loadShaders();
+		void loadShaders(Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader, Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader);
 		void createTransparentBlendState();
 		void setBlendState();
-		Microsoft::WRL::ComPtr<ID3DBlob> loadShaderBlob(const WCHAR* path);
-		Microsoft::WRL::ComPtr<ID3DBlob> loadPixelShaderBlob(const WCHAR* path);
+		void createBackfaceRasterizerState();
+		void setRasterState();
+		void createConstantBuffer();
+		void setConstantBuffer(ConstantBuffer cBuffer);
 	private:
 		ID3D11DeviceContext& m_device_context;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
 		Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 	};
 }

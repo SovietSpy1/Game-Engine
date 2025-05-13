@@ -204,6 +204,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\Win32Game\Win32Game.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Math\GameMath.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Math\GameMath.h" />
+    <ClCompile Include="DX3D\Source\DX3D\Object\Mesh.cpp" />
     <ClCompile Include="Game\main.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsEngine.cpp" />

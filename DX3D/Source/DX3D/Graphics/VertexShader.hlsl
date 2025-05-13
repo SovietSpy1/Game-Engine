@@ -9,6 +9,7 @@ struct VSOutput
     float4 position : SV_Position;
     float4 color : COLOR;
     float2 uvs : TexCOORD0;
+    float4 screenPos : TEXCOORD1;
 };
 VSOutput main( VSInput input ) 
 {
@@ -16,5 +17,6 @@ VSOutput main( VSInput input )
     output.position = float4(input.position, 1.0);
     output.color = input.color;
     output.uvs = input.uvs;
+    output.screenPos = float4(input.position, 1.0);
     return output;
 }

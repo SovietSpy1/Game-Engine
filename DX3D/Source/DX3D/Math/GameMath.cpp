@@ -10,4 +10,8 @@ namespace dx3d {
 	Color RandColor(float alpha) {
 		return Color{ ((float)std::rand()) / RAND_MAX, ((float)std::rand()) / RAND_MAX , ((float)std::rand()) / RAND_MAX , alpha == 10.0f ? ((float)std::rand()) / RAND_MAX : alpha };
 	}
+	void FillInPosAndUV(vertex& vertex, vec3 pos)
+	{
+		vertex.position = pos;
+	}
 }

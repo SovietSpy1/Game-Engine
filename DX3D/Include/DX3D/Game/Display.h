@@ -13,17 +13,13 @@ namespace dx3d {
 		SwapChainPtr m_swapChain;
 		std::shared_ptr<DeviceContext> m_device_context;
 		std::shared_ptr<VertexBuffer> m_vb;
+		std::shared_ptr<Mesh> m_mesh;
 	private:
 		UINT size_list;
-		Microsoft::WRL::ComPtr<ID3DBlob> shader_blob;
-		Microsoft::WRL::ComPtr<ID3DBlob> pixelshader_blob;
-		vertex list[6];
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
+		std::vector<vertex> list;
 		Color startColV1;
-		Color endColV1;
-		Color startColV2;
-		Color endColV2;
-		Color startColV3;
-		Color endColV3;
 		Color currentCol;
 		float u;
 	};

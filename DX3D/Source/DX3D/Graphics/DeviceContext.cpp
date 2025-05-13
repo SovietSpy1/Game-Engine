@@ -45,17 +45,7 @@ void dx3d::DeviceContext::SetViewportSize(UINT width, UINT height)
 	m_device_context.RSSetViewports(1, &vp);
 }
 
-void dx3d::DeviceContext::createVertexShader(ID3DBlob* shaderBlob)
-{
-	m_device.CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
-}
-
-void dx3d::DeviceContext::createPixelShader(ID3DBlob* shaderBlob)
-{
-	m_device.CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
-}
-
-void dx3d::DeviceContext::loadShaders()
+void dx3d::DeviceContext::loadShaders(Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader, Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader)
 {
 	m_device_context.VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_device_context.PSSetShader(m_pixelShader.Get(), nullptr, 0);
@@ -85,44 +75,38 @@ void dx3d::DeviceContext::setBlendState()
 	m_device_context.OMSetBlendState(blendState.Get(), blendFactor, sample_mask);
 }
 
-Microsoft::WRL::ComPtr<ID3DBlob> dx3d::DeviceContext::loadShaderBlob(const WCHAR * path)
+void dx3d::DeviceContext::createBackfaceRasterizerState()
 {
-	Microsoft::WRL::ComPtr<ID3DBlob> shader_blob = nullptr;
-	ID3DBlob* error_blob = nullptr;
-	DX3DGraphicsLogErrorAndThrow(D3DCompileFromFile(
-		path,      // shader file name
-		nullptr,                         // optional macros
-		nullptr,                         // include interface
-		"main",                          // entry point function
-		"vs_5_0",                        // shader model
-		0,                               // compile flags
-		0,                               // effect flags
-		shader_blob.GetAddressOf(),                    // compiled shader
-		&error_blob                      // errors
-	), "failed to extract shader.");
-	if (error_blob != nullptr) {
-		error_blob->Release();
-	}
-	return shader_blob;
+	D3D11_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.CullMode = D3D11_CULL_NONE; // Disables backface culling
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.DepthClipEnable = true;
+
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateRasterizerState(&rasterDesc, rasterizerState.GetAddressOf()), "rasterstate creation failed.");
 }
 
-Microsoft::WRL::ComPtr<ID3DBlob> dx3d::DeviceContext::loadPixelShaderBlob(const WCHAR* path)
+void dx3d::DeviceContext::setRasterState()
 {
-	Microsoft::WRL::ComPtr<ID3DBlob> shader_blob = nullptr;
-	ID3DBlob* error_blob = nullptr;
-	DX3DGraphicsLogErrorAndThrow(D3DCompileFromFile(
-		path,      // shader file name
-		nullptr,                         // optional macros
-		nullptr,                         // include interface
-		"main",                          // entry point function
-		"ps_5_0",                        // shader model
-		0,                               // compile flags
-		0,                               // effect flags
-		shader_blob.GetAddressOf(),                    // compiled shader
-		&error_blob                      // errors
-	), "failed to extract shader.");
-	if (error_blob != nullptr) {
-		error_blob->Release();
-	}
-	return shader_blob;
+	m_device_context.RSSetState(rasterizerState.Get());
+}
+
+void dx3d::DeviceContext::createConstantBuffer()
+{
+	D3D11_BUFFER_DESC desc{};
+	desc.ByteWidth = sizeof(ConstantBuffer);
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+	desc.StructureByteStride = 0;
+	D3D11_SUBRESOURCE_DATA initData{};
+	ConstantBuffer cBuffer{};
+	initData.pSysMem = &cBuffer;
+	m_device.CreateBuffer(&desc, &initData, constantBuffer.GetAddressOf());
+}
+void dx3d::DeviceContext::setConstantBuffer(ConstantBuffer cBuffer)
+{
+	m_device_context.UpdateSubresource(constantBuffer.Get(), 0, nullptr, &cBuffer, 0, 0);
+	m_device_context.PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 }

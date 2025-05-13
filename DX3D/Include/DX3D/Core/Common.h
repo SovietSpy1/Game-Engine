@@ -5,6 +5,7 @@
 #include <d3d11.h>
 #include <chrono>
 #include <cmath>
+#include <vector>
 namespace dx3d {
 	struct BaseDesc {
 		Logger& logger;
@@ -44,6 +45,12 @@ namespace dx3d {
 	};
 	struct vec3 {
 		float x, y, z;
+		vec3 operator+(const vec3& other) const {
+			return vec3(x + other.x, y + other.y, z + other.z);
+		}
+		vec3 operator-(const vec3& other) const {
+			return vec3(x - other.x, y - other.y, z - other.z);
+		}
 	};
 	struct vec4 {
 		float r, g, b, a;
@@ -60,9 +67,32 @@ namespace dx3d {
 			return std::sqrt(std::pow(r, 2) + std::pow(g, 2) + std::pow(b, 2) + std::pow(a, 2));
 		}
 	};
+	struct Color {
+		vec4 rgba;
+		Color operator+(const Color& other) const {
+			return Color(rgba + other.rgba);
+		}
+		Color operator-(const Color& other) const {
+			return Color(rgba - other.rgba);
+		}
+		Color operator*(const float& n) const {
+			return Color(rgba * n);
+		}
+		float magnitude() {
+			return rgba.magnitude();
+		}
+	};
+	_declspec(align(16)) struct ConstantBuffer {
+		float elapsedTime;
+	};
 	struct vertex {
 		vec3 position;
 		vec4 color;
 		vec2 uvs;
+	};
+	struct MeshDesc {
+		std::vector<vertex> vertices;
+		WCHAR* vectorShaderPath;
+		WCHAR* pixelShaderPath;
 	};
 }
