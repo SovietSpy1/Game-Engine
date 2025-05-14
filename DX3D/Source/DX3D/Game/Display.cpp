@@ -29,14 +29,25 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(desc.window)
 	m_device_context->setRasterState();
 	m_device_context->createConstantBuffer();
 	currentCol = Color{ 0.01f,0.01f,0.01f,1.0f };
+	//set constant buffer with values 
 }
 void dx3d::Display::onUpdate()
 {
 	Window::onUpdate();
 	m_device_context->clearRenderTargetColor(m_swapChain,currentCol.rgba);
-	m_device_context->setConstantBuffer(ConstantBuffer{ Time::elapsedTime });
+	UpdateQuadPosition();
 	m_device_context->drawTriangleList(m_vb->getSizeVertexList(), 0);
 	m_swapChain->present(false);
+}
+
+void dx3d::Display::UpdateQuadPosition()
+{
+	ConstantBuffer cBuff{};
+	cBuff.elapsedTime = Time::elapsedTime;
+	cBuff.m_world.SetScale(Vector3D(1 + 0.1f * std::sin(2 * std::_Pi_val * Time::elapsedTime), 1 + 0.1f * std::sin(2 * std::_Pi_val * Time::elapsedTime), 0));
+	cBuff.m_view.SetIdentity();
+	cBuff.m_proj.SetIdentity();
+	m_device_context->setConstantBuffer(cBuff);
 }
 
 dx3d::Display::~Display()

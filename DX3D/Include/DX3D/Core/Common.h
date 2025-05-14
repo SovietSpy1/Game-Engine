@@ -2,6 +2,8 @@
 #include <DX3D/Core/Core.h>
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Math/Rect.h>
+#include <DX3D/Math/Vector3D.h>
+#include <DX3D/Math/Matrix.h>
 #include <d3d11.h>
 #include <chrono>
 #include <cmath>
@@ -43,15 +45,6 @@ namespace dx3d {
 	struct vec2 {
 		float u, v;
 	};
-	struct vec3 {
-		float x, y, z;
-		vec3 operator+(const vec3& other) const {
-			return vec3(x + other.x, y + other.y, z + other.z);
-		}
-		vec3 operator-(const vec3& other) const {
-			return vec3(x - other.x, y - other.y, z - other.z);
-		}
-	};
 	struct vec4 {
 		float r, g, b, a;
 		vec4 operator+(const vec4& other) const {
@@ -82,11 +75,8 @@ namespace dx3d {
 			return rgba.magnitude();
 		}
 	};
-	_declspec(align(16)) struct ConstantBuffer {
-		float elapsedTime;
-	};
 	struct vertex {
-		vec3 position;
+		Vector3D position;
 		vec4 color;
 		vec2 uvs;
 	};
@@ -94,5 +84,11 @@ namespace dx3d {
 		std::vector<vertex> vertices;
 		WCHAR* vectorShaderPath;
 		WCHAR* pixelShaderPath;
+	};
+	_declspec(align(16)) struct ConstantBuffer {
+		Matrix4X4 m_world;
+		Matrix4X4 m_view;
+		Matrix4X4 m_proj;
+		float elapsedTime;
 	};
 }

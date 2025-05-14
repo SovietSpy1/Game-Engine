@@ -109,4 +109,5 @@ void dx3d::DeviceContext::setConstantBuffer(ConstantBuffer cBuffer)
 {
 	m_device_context.UpdateSubresource(constantBuffer.Get(), 0, nullptr, &cBuffer, 0, 0);
 	m_device_context.PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+	m_device_context.VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 }

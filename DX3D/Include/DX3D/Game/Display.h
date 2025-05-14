@@ -8,6 +8,7 @@ namespace dx3d {
 	public:
 		explicit Display(const DisplayDesc& desc);
 		virtual void onUpdate() override;
+		void UpdateQuadPosition();
 		virtual ~Display() override;
 	private:
 		SwapChainPtr m_swapChain;

@@ -9,16 +9,22 @@ void dx3d::Game::run()
 		currentTime = std::chrono::steady_clock::now();
 		Time::deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - Time::lastTime).count() / 1000.0f;
 		Time::lastTime = currentTime;
-		DX3DLogInfo(std::to_string((1.0f/Time::deltaTime)).c_str())
+		//DX3DLogInfo(std::to_string((1.0f/Time::deltaTime)).c_str())
 		Time::elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(Time::lastTime - Time::startTime).count() / 1000.0f;
 		m_display->onUpdate();
+		const int maxMessages = 10;
+		int messageCount = 0;
 		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (msg.message == WM_QUIT) {
 				m_isRunning = false;
 				break;
 			}
+
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+			if (++messageCount > maxMessages) {
+				break;
+			}
 		}
 		Sleep(1);
 	}
