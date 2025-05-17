@@ -67,3 +67,20 @@ void dx3d::Mesh::LoadCubeMesh()
 	vertices[6].position = Vector3D(-0.5f, 0.5f, 0.5f);
 	vertices[7].position = Vector3D(-0.5f, -0.5f, 0.5f);
 }
+
+void dx3d::Mesh::LoadQuadMesh()
+{
+	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Cube/VertexShader.hlsl";
+	const WCHAR* pixelShaderPath = L"DX3D/Shaders/Cube/PixelShader.hlsl";
+	m_renderSystem->compilePixelShader(pixelShaderPath, pixelBlob);
+	m_renderSystem->compileVertexShader(vertexShaderPath, vertexBlob);
+	m_renderSystem->createVertexShader(vertexBlob, vertexShader);
+	m_renderSystem->createPixelShader(pixelBlob, pixelShader);
+	vertices.clear();
+	for (int i = 0; i < 6; i++) {
+		vertices.push_back(vertex(Vector3D(0, 0, 0), RandColor(1).rgba, vec2(0, 0)));
+	}
+	vertices[0].position = Vector3D(-0.5f, -0.5f, 0);
+	vertices[1].position = Vector3D(0.5f, -0.5f, 0);
+	vertices[2].position = Vector3D(-0.5f, 0.5f, 0);
+}

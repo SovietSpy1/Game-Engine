@@ -51,6 +51,7 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(desc.window)
 	m_device_context->createTransparentBlendState();
 	m_device_context->SetViewportSize(m_size.width, m_size.height);
 	m_device_context->setVertexBuffer(m_vb);
+	//index buffer
 	m_device_context->setIndexBuffer(*indexBuffer);
 	m_device_context->setBlendState();
 	m_device_context->createBackfaceRasterizerState();
@@ -77,13 +78,17 @@ void dx3d::Display::UpdateQuadPosition()
 	ConstantBufferDesc cBuff{};
 	cBuff.elapsedTime = Time::elapsedTime;
 	cBuff.m_world.SetScale(Vector3D(1,1,1));
+	temp.SetRotationX(Time::elapsedTime);
+	cBuff.m_world *= temp;
+	temp.SetRotationZ(Time::elapsedTime);
+	cBuff.m_world *= temp;
 	temp.SetRotationY(Time::elapsedTime);
 	cBuff.m_world *= temp;
 	temp.SetTranslate(Vector3D(0, 0, 3));
 	cBuff.m_world *= temp;
 	cBuff.m_view.SetIdentity();
 	float orthoSize = 3;
-	cBuff.m_proj.SetOrthoLH(orthoSize * (float)m_size.width/m_size.height, orthoSize, 0, 10);
+	cBuff.m_proj.SetOrthoLH(orthoSize * (float)m_size.width / m_size.height, orthoSize, 0.1f, 10);
 	constantBuffer->load(cBuff);
 	m_device_context->setConstantBuffer(*constantBuffer);
 }

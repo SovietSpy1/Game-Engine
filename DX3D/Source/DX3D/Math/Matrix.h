@@ -45,10 +45,29 @@ namespace dx3d {
 			mat[1][0] = -sin(z);
 			mat[1][1] = cos(z);
 		}
+		void SetPerspectiveFovLH(float fov, float aspect, float znear, float zfar) {
+			SetIdentity();
+			float tan_half_fov = tan(fov / 2.0f);
+			mat[0][0] = 1.0f / (aspect * tan_half_fov);
+			mat[1][1] = 1.0f / tan_half_fov;
+			mat[2][2] = zfar / (zfar - znear);
+			mat[2][3] = 1.0f;
+			mat[3][2] = (-znear * zfar) / (zfar - znear);
+			mat[3][3] = 0.0f;
+		}
 		void operator*=(const Matrix4X4& other) {
+			float temp[4][4];
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					mat[i][j] = mat[i][0] * other.mat[0][j]+ mat[i][1] * other.mat[1][j] + mat[i][2]*other.mat[2][j]+mat[i][3]*other.mat[3][j];
+					temp[i][j] = mat[i][0] * other.mat[0][j]+ mat[i][1] * other.mat[1][j] + mat[i][2]*other.mat[2][j]+mat[i][3]*other.mat[3][j];
+				}
+			}
+			setMatrix(temp);
+		}
+		void setMatrix(float temp[4][4]) {
+			for (int i = 0; i < 4; i++) {
+				for (int j = 0; j < 4; j++) {
+					mat[i][j] = temp[i][j];
 				}
 			}
 		}

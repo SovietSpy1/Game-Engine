@@ -87,7 +87,7 @@ void dx3d::DeviceContext::createBackfaceRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterDesc = {};
 	rasterDesc.FillMode = D3D11_FILL_SOLID;
-	rasterDesc.CullMode = D3D11_CULL_NONE; // Disables backface culling
+	rasterDesc.CullMode = D3D11_CULL_BACK; // Disables backface culling
 	rasterDesc.FrontCounterClockwise = false;
 	rasterDesc.DepthClipEnable = true;
 

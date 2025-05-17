@@ -8,6 +8,7 @@ namespace dx3d {
 		Mesh(const GraphicsResourceDesc& gDesc);
 		void LoadHeartMesh();
 		void LoadCubeMesh();
+		void LoadQuadMesh();
 		std::vector<vertex> vertices;
 		Microsoft::WRL::ComPtr<ID3DBlob> vertexBlob;
 		Microsoft::WRL::ComPtr<ID3DBlob> pixelBlob;
