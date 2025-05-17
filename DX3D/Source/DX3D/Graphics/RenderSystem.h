@@ -14,6 +14,8 @@ namespace dx3d {
 		std::shared_ptr<DeviceContext> createDeviceContext() const;
 		std::shared_ptr<VertexBuffer> createVertexBuffer() const;
 		std::shared_ptr<Mesh> createMesh() const;
+		std::shared_ptr<IndexBuffer> createIndexBuffer() const;
+		std::shared_ptr<ConstantBuffer> createConstantBuffer() const;
 		void compileVertexShader(const WCHAR* vertexShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob) const;
 		void compilePixelShader(const WCHAR* pixelShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pixelBlob) const;
 		void createVertexShader(Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob, Microsoft::WRL::ComPtr<ID3D11VertexShader>& vertexShader) const;

@@ -60,6 +60,12 @@
     <ClCompile Include="DX3D\Source\DX3D\Object\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\IndexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -116,9 +122,17 @@
     <ClInclude Include="DX3D\Source\DX3D\Math\Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\IndexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="DX3D\Source\DX3D\Graphics\VertexShader.hlsl" />
-    <FxCompile Include="DX3D\Source\DX3D\Graphics\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Heart\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Heart\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Cube\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Cube\PixelShader.hlsl" />
   </ItemGroup>
 </Project>

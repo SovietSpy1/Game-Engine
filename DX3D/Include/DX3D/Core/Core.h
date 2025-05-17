@@ -13,6 +13,8 @@ namespace dx3d {
 	class DeviceContext;
 	class VertexBuffer;
 	class Mesh;
+	class IndexBuffer;
+	class ConstantBuffer;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

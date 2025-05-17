@@ -19,7 +19,10 @@ namespace dx3d {
 		UINT size_list;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
+		std::shared_ptr<ConstantBuffer> constantBuffer;
+		std::shared_ptr<IndexBuffer> indexBuffer;
 		std::vector<vertex> list;
+	private:
 		Color startColV1;
 		Color currentCol;
 		float u;

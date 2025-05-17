@@ -85,7 +85,7 @@ namespace dx3d {
 		WCHAR* vectorShaderPath;
 		WCHAR* pixelShaderPath;
 	};
-	_declspec(align(16)) struct ConstantBuffer {
+	_declspec(align(16)) struct ConstantBufferDesc {
 		Matrix4X4 m_world;
 		Matrix4X4 m_view;
 		Matrix4X4 m_proj;

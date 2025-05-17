@@ -2,6 +2,8 @@
 #include <DX3D/Graphics/SwapChain.h>
 #include <DX3D/Graphics/VertexBuffer.h>
 #include <d3dcompiler.h>
+#include <DX3D/Graphics/ConstantBuffer.h>
+#include <DX3D/Graphics/IndexBuffer.h>
 dx3d::DeviceContext::DeviceContext(const DeviceContextDesc& desc, const GraphicsResourceDesc& gDesc) : GraphicsResource(gDesc), m_device_context(desc.context)
 {
 }
@@ -31,6 +33,12 @@ void dx3d::DeviceContext::drawTriangleStrip(UINT vertex_count, UINT start_vertex
 {
 	m_device_context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	m_device_context.Draw(vertex_count, start_vertex_index);
+}
+
+void dx3d::DeviceContext::drawIndexedTriangleList(UINT index_count, UINT start_vertex_index, UINT start_index_location)
+{
+	m_device_context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_device_context.DrawIndexed(index_count, start_vertex_index, start_index_location);
 }
 
 void dx3d::DeviceContext::SetViewportSize(UINT width, UINT height)
@@ -90,24 +98,13 @@ void dx3d::DeviceContext::setRasterState()
 {
 	m_device_context.RSSetState(rasterizerState.Get());
 }
-
-void dx3d::DeviceContext::createConstantBuffer()
+void dx3d::DeviceContext::setConstantBuffer(const ConstantBuffer& cBuffer)
 {
-	D3D11_BUFFER_DESC desc{};
-	desc.ByteWidth = sizeof(ConstantBuffer);
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = 0;
-	desc.StructureByteStride = 0;
-	D3D11_SUBRESOURCE_DATA initData{};
-	ConstantBuffer cBuffer{};
-	initData.pSysMem = &cBuffer;
-	m_device.CreateBuffer(&desc, &initData, constantBuffer.GetAddressOf());
+	m_device_context.PSSetConstantBuffers(0, 1, cBuffer.m_buffer.GetAddressOf());
+	m_device_context.VSSetConstantBuffers(0, 1, cBuffer.m_buffer.GetAddressOf());
 }
-void dx3d::DeviceContext::setConstantBuffer(ConstantBuffer cBuffer)
+
+void dx3d::DeviceContext::setIndexBuffer(const IndexBuffer& iBuffer)
 {
-	m_device_context.UpdateSubresource(constantBuffer.Get(), 0, nullptr, &cBuffer, 0, 0);
-	m_device_context.PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
-	m_device_context.VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+	m_device_context.IASetIndexBuffer(iBuffer.m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }

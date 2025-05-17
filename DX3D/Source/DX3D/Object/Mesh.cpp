@@ -1,13 +1,14 @@
 #include "DX3D/Object/Mesh.h"
 #include <DX3D/Graphics/RenderSystem.h>
+#include <DX3D/Math/GameMath.h>
 dx3d::Mesh::Mesh(const GraphicsResourceDesc& gDesc) : GraphicsResource(gDesc)
 {
 }
 
 void dx3d::Mesh::LoadHeartMesh()
 {
-	const WCHAR* vertexShaderPath = L"DX3D/Source/DX3D/Graphics/VertexShader.hlsl";
-	const WCHAR* pixelShaderPath = L"DX3D/Source/DX3D/Graphics/PixelShader.hlsl";
+	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Heart/VertexShader.hlsl";
+	const WCHAR* pixelShaderPath = L"DX3D/Shaders/Heart/PixelShader.hlsl";
 	vertices.clear();
 	for (int i = 0; i < 48; i++) {
 		vertices.push_back(vertex{ Vector3D{0,0,0}, vec4{(0.1f + (float)std::rand()) / RAND_MAX * 0.8f, 0, 0,1}, vec2{0,0} });
@@ -43,4 +44,26 @@ void dx3d::Mesh::LoadHeartMesh()
 	m_renderSystem->compileVertexShader(vertexShaderPath, vertexBlob);
 	m_renderSystem->createVertexShader(vertexBlob, vertexShader);
 	m_renderSystem->createPixelShader(pixelBlob, pixelShader);
+}
+
+void dx3d::Mesh::LoadCubeMesh()
+{
+	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Cube/VertexShader.hlsl";
+	const WCHAR* pixelShaderPath = L"DX3D/Shaders/Cube/PixelShader.hlsl";
+	m_renderSystem->compilePixelShader(pixelShaderPath, pixelBlob);
+	m_renderSystem->compileVertexShader(vertexShaderPath, vertexBlob);
+	m_renderSystem->createVertexShader(vertexBlob, vertexShader);
+	m_renderSystem->createPixelShader(pixelBlob, pixelShader);
+	vertices.clear();
+	for (int i = 0; i < 8; i++) {
+		vertices.push_back(vertex(Vector3D(0, 0, 0), RandColor(1).rgba, vec2(0, 0)));
+	}
+	vertices[0].position = Vector3D(-0.5f, -0.5f, -0.5f);
+	vertices[1].position = Vector3D(-0.5f, 0.5f, -0.5f);
+	vertices[2].position = Vector3D(0.5f, 0.5f, -0.5f);
+	vertices[3].position = Vector3D(0.5f, -0.5f, -0.5f);
+	vertices[4].position = Vector3D(0.5f, -0.5f, 0.5f);
+	vertices[5].position = Vector3D(0.5f, 0.5f, 0.5f);
+	vertices[6].position = Vector3D(-0.5f, 0.5f, 0.5f);
+	vertices[7].position = Vector3D(-0.5f, -0.5f, 0.5f);
 }

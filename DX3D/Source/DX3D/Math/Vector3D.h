@@ -15,6 +15,12 @@ namespace dx3d {
 		Vector3D operator-(const Vector3D& other) const {
 			return Vector3D(x - other.x, y - other.y, z - other.z);
 		}
+		Vector3D operator*(const float& other) const {
+			return Vector3D(x * other, y * other, z * other);
+		}
+		static Vector3D lerp(const Vector3D& start, const Vector3D& end, float u) {
+			return start * (1.0f - u) + end * (u);
+		}
 		float x, y, z;
 	private:
 		

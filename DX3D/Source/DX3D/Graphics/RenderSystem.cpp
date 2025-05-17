@@ -4,6 +4,8 @@
 #include <DX3D/Graphics/DeviceContext.h>
 #include <DX3D/Graphics/VertexBuffer.h>
 #include <DX3D/Object/Mesh.h>
+#include <DX3D/Graphics/ConstantBuffer.h>
+#include <DX3D/Graphics/IndexBuffer.h>
 #include <d3dcompiler.h>
 using namespace dx3d;
 dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
@@ -41,6 +43,16 @@ std::shared_ptr<VertexBuffer> dx3d::RenderSystem::createVertexBuffer() const
 std::shared_ptr<Mesh> dx3d::RenderSystem::createMesh() const
 {
 	return std::make_shared<Mesh>(getGraphicsResourceDesc());
+}
+
+std::shared_ptr<IndexBuffer> dx3d::RenderSystem::createIndexBuffer() const
+{
+	return std::make_shared<IndexBuffer>(getGraphicsResourceDesc());
+}
+
+std::shared_ptr<ConstantBuffer> dx3d::RenderSystem::createConstantBuffer() const
+{
+	return std::make_shared<ConstantBuffer>(getGraphicsResourceDesc());
 }
 
 void dx3d::RenderSystem::compileVertexShader(const WCHAR* vertexShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob) const
