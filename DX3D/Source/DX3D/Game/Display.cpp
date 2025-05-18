@@ -7,13 +7,16 @@
 #include <DX3D/Object/Mesh.h>
 #include <DX3D/Graphics/IndexBuffer.h>
 #include <DX3D/Graphics/ConstantBuffer.h>
-dx3d::Display::Display(const DisplayDesc& desc) : Window(desc.window)
+#include <DX3D/Input/InputSystem.h>
+dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size, this))
 {
 	m_swapChain = desc.rendererSystem.createSwapChain({ m_handle, m_size });
 	m_device_context = desc.rendererSystem.createDeviceContext();
 	m_vb = desc.rendererSystem.createVertexBuffer();
 	constantBuffer = desc.rendererSystem.createConstantBuffer();
 	indexBuffer = desc.rendererSystem.createIndexBuffer();
+	inputSystem = std::make_shared<InputSystem>();
+	inputSystem->addListener(this);
 	//setting up mesh with the heart vertices and heart shaders
 	m_mesh = desc.rendererSystem.createMesh();
 	m_mesh->LoadCubeMesh();
@@ -58,37 +61,43 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(desc.window)
 	m_device_context->setRasterState();
 	currentCol = Color{ 0.01f,0.01f,0.01f,1.0f };
 	//set constant buffer with values 
+	initialized = true;
 }
 void dx3d::Display::onUpdate()
 {
 	UpdateQuadPosition();
+	inputSystem->onUpdate();
 	Window::onUpdate();
 	m_device_context->clearRenderTargetColor(m_swapChain,currentCol.rgba);
 	m_device_context->drawIndexedTriangleList(indexBuffer->getSizeIndexList(), 0, 0);
 	m_swapChain->present(false);
 }
 
+void dx3d::Display::onFocus()
+{
+	inputSystem->addListener(this);
+}
+
+void dx3d::Display::onKillFocus()
+{
+	inputSystem->removeListener(this);
+}
+
 void dx3d::Display::UpdateQuadPosition()
 {
-	u += Time::deltaTime / 10.0f;
-	if (u >= 1) {
-		u = 0;
-	}
 	Matrix4X4 temp{};
 	ConstantBufferDesc cBuff{};
 	cBuff.elapsedTime = Time::elapsedTime;
 	cBuff.m_world.SetScale(Vector3D(1,1,1));
-	temp.SetRotationX(Time::elapsedTime);
+	temp.SetRotationX(xRot);
 	cBuff.m_world *= temp;
-	temp.SetRotationZ(Time::elapsedTime);
-	cBuff.m_world *= temp;
-	temp.SetRotationY(Time::elapsedTime);
+	temp.SetRotationY(yRot);
 	cBuff.m_world *= temp;
 	temp.SetTranslate(Vector3D(0, 0, 3));
 	cBuff.m_world *= temp;
 	cBuff.m_view.SetIdentity();
 	float orthoSize = 3;
-	cBuff.m_proj.SetOrthoLH(orthoSize * (float)m_size.width / m_size.height, orthoSize, 0.1f, 10);
+	cBuff.m_proj.SetOrthoLH(orthoSize * (float) m_size.width / m_size.height, orthoSize, 0.1f, 10);
 	constantBuffer->load(cBuff);
 	m_device_context->setConstantBuffer(*constantBuffer);
 }
@@ -96,3 +105,30 @@ void dx3d::Display::UpdateQuadPosition()
 dx3d::Display::~Display()
 {
 }
+
+void dx3d::Display::onKeyDown(int key)
+{
+	if (key == 'W') {
+		xRot += Time::deltaTime * PI;
+	}
+	if (key == 'S') {
+		xRot -= Time::deltaTime * PI;
+	}
+	if (key == 'A') {
+		yRot -= Time::deltaTime * PI;
+	}
+	if (key == 'D') {
+		yRot += Time::deltaTime * PI;
+	}
+}
+
+void dx3d::Display::onKeyUp(int key)
+{
+	
+}
+
+void dx3d::Display::onMouseMove(const Point& delta_mouse_pos)
+{
+
+}
+

@@ -15,6 +15,8 @@ namespace dx3d {
 	class Mesh;
 	class IndexBuffer;
 	class ConstantBuffer;
+	class InputSystem;
+	class InputListener;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

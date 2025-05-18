@@ -15,6 +15,7 @@ namespace dx3d {
 	struct WindowDesc {
 		BaseDesc base;
 		Rect size{};
+		Display* display = nullptr;
 	};
 	struct DisplayDesc {
 		WindowDesc window;
@@ -92,3 +93,4 @@ namespace dx3d {
 		float elapsedTime;
 	};
 }
+#define PI 3.141594265f
