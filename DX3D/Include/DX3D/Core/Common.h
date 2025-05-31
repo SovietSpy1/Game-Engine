@@ -87,10 +87,10 @@ namespace dx3d {
 		WCHAR* pixelShaderPath;
 	};
 	_declspec(align(16)) struct ConstantBufferDesc {
-		Matrix4X4 m_world;
-		Matrix4X4 m_view;
-		Matrix4X4 m_proj;
-		float elapsedTime;
-	};
+		Matrix4X4 m_world{};
+		Matrix4X4 m_view{};
+		Matrix4X4 m_proj{};
+        float elapsedTime = 0.0f;  
+    };
 }
 #define PI 3.141594265f

@@ -10,6 +10,10 @@
 #include <DX3D/Input/InputSystem.h>
 dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size, this))
 {
+	m_worldCam.SetTranslate(Vector3D(0.0f, 0.0f, -2.0f));
+	aspectRatio = static_cast<float>(m_size.width) / static_cast<float>(m_size.height);
+	HWND console = GetConsoleWindow();
+	ShowWindow(console, SW_MINIMIZE);
 	m_swapChain = desc.rendererSystem.createSwapChain({ m_handle, m_size });
 	m_device_context = desc.rendererSystem.createDeviceContext();
 	m_vb = desc.rendererSystem.createVertexBuffer();
@@ -17,6 +21,7 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	indexBuffer = desc.rendererSystem.createIndexBuffer();
 	inputSystem = std::make_shared<InputSystem>();
 	inputSystem->addListener(this);
+	inputSystem->showCursor(false);
 	//setting up mesh with the heart vertices and heart shaders
 	m_mesh = desc.rendererSystem.createMesh();
 	m_mesh->LoadCubeMesh();
@@ -65,7 +70,7 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 }
 void dx3d::Display::onUpdate()
 {
-	UpdateQuadPosition();
+	Update();
 	inputSystem->onUpdate();
 	Window::onUpdate();
 	m_device_context->clearRenderTargetColor(m_swapChain,currentCol.rgba);
@@ -83,21 +88,31 @@ void dx3d::Display::onKillFocus()
 	inputSystem->removeListener(this);
 }
 
-void dx3d::Display::UpdateQuadPosition()
+void dx3d::Display::Update()
 {
+	Matrix4X4 worldCam{};
 	Matrix4X4 temp{};
+	worldCam.SetIdentity();
+	temp.SetIdentity();
+	temp.SetRotationX(xRot);
+	worldCam *= temp;
+
+	temp.SetIdentity();
+	temp.SetRotationY(yRot);
+	worldCam *= temp;
+
+	Vector3D new_pos = m_worldCam.getTranslation() + worldCam.getZDirection() * forward * 0.3f;
+	new_pos = new_pos + worldCam.getXDirection() * rightward * 0.3f;
+	worldCam.SetTranslate(new_pos);
+	m_worldCam = worldCam;
+	worldCam.inverse();
+
 	ConstantBufferDesc cBuff{};
 	cBuff.elapsedTime = Time::elapsedTime;
-	cBuff.m_world.SetScale(Vector3D(1,1,1));
-	temp.SetRotationX(xRot);
-	cBuff.m_world *= temp;
-	temp.SetRotationY(yRot);
-	cBuff.m_world *= temp;
-	temp.SetTranslate(Vector3D(0, 0, 3));
-	cBuff.m_world *= temp;
-	cBuff.m_view.SetIdentity();
-	float orthoSize = 3;
-	cBuff.m_proj.SetOrthoLH(orthoSize * (float) m_size.width / m_size.height, orthoSize, 0.1f, 10);
+	cBuff.m_world.SetIdentity();	
+	cBuff.m_view = worldCam;
+	//cBuff.m_proj.SetOrthoLH(5.0f * aspectRatio, 5.0f, 0.0f, 10.0f);
+	cBuff.m_proj.SetPerspectiveFovLH(1.57f, aspectRatio, 0.1f, 100.0f);
 	constantBuffer->load(cBuff);
 	m_device_context->setConstantBuffer(*constantBuffer);
 }
@@ -109,26 +124,44 @@ dx3d::Display::~Display()
 void dx3d::Display::onKeyDown(int key)
 {
 	if (key == 'W') {
-		xRot += Time::deltaTime * PI;
+		//xRot += Time::deltaTime * PI;
+		forward = 1.0f;
 	}
 	if (key == 'S') {
-		xRot -= Time::deltaTime * PI;
+		//xRot -= Time::deltaTime * PI;
+		forward = -1.0f;
 	}
 	if (key == 'A') {
-		yRot -= Time::deltaTime * PI;
+		//yRot += Time::deltaTime * PI;
+		rightward = -1.0f;
 	}
 	if (key == 'D') {
-		yRot += Time::deltaTime * PI;
+		//yRot -= Time::deltaTime * PI;
+		rightward = 1.0f;
 	}
 }
 
 void dx3d::Display::onKeyUp(int key)
 {
-	
+	forward = 0.0f;
+	rightward = 0.0f;
 }
 
-void dx3d::Display::onMouseMove(const Point& delta_mouse_pos)
+void dx3d::Display::onMouseMove(const Point& mouse_pos)
 {
+	xRot -= (mouse_pos.y-(m_size.height/2.0f)) * Time::deltaTime * 0.1f;
+	yRot -= (mouse_pos.x-(m_size.width/2.0f)) * Time::deltaTime * 0.1f;
 
+	InputSystem::get()->setCursorPosition(Point(m_size.width / 2.0f, m_size.height / 2.0f));
+}
+
+void dx3d::Display::onLeftMouseDown(const Point& mouse_pos)
+{
+	scale = scale * 1.5f;
+}
+
+void dx3d::Display::onRightMouseDown(const Point& mouse_pos)
+{
+	scale = scale * (2.0f / 3.0f);
 }
 

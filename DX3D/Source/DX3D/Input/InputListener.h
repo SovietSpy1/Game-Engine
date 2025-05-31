@@ -4,8 +4,11 @@ namespace dx3d {
 	class InputListener {
 	public:
 		InputListener() {}
-		virtual void onKeyDown(int key) = 0;
-		virtual void onKeyUp(int key) = 0;
-		virtual void onMouseMove(const Point& delta_mouse_pos) = 0;
+		virtual void onKeyDown(int key) {};
+		virtual void onKeyUp(int key) {};
+		virtual void onMouseMove(const Point& mouse_pos) {};
+		virtual void onLeftMouseDown(const Point& mouse_pos) {};
+		virtual void onRightMouseDown(const Point& mouse_pos) {};
+		virtual void onKeyDownFirst(int key) {};
 	};
 }

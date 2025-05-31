@@ -11,7 +11,11 @@ namespace dx3d {
 		static InputSystem* get();
 		void addListener(InputListener* listener);
 		void removeListener(InputListener* listener);
+		void setCursorPosition(const Point& pos);
 		void onUpdate();
+		void showCursor(bool show) {
+			::ShowCursor(show);
+		}
 	private:
 		static inline InputSystem* S = nullptr;
 	private:

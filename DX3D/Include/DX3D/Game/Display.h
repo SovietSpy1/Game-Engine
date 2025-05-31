@@ -11,7 +11,7 @@ namespace dx3d {
 		virtual void onUpdate() override;
 		virtual void onFocus() override;
 		virtual void onKillFocus() override;
-		void UpdateQuadPosition();
+		void Update();
 		virtual ~Display() override;
 	public:
 		bool initialized = false;
@@ -33,12 +33,20 @@ namespace dx3d {
 		float xRot{};
 		float yRot{};
 		float fov = PI;
+		float aspectRatio = 1.0f;	
+		Vector3D scale = Vector3D(1.0f,1.0f,1.0f);
+		Matrix4X4 m_worldCam{};
+		float forward = 0.0f;
+		float rightward = 0.0f;
+	private:
 		// Inherited via InputListener
 		void onKeyDown(int key) override;
 		void onKeyUp(int key) override;
 
 		// Inherited via InputListener
-		void onMouseMove(const Point& delta_mouse_pos) override;
+		void onMouseMove(const Point& mouse_pos) override;
+		void onLeftMouseDown(const Point& mouse_pos) override;
+		void onRightMouseDown(const Point& mouse_pos) override;
 	};
 }
 

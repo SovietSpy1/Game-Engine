@@ -239,6 +239,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Math\Vector3D.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\IndexBuffer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Input\InputSystem.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Math\Vector4D.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DX3D\Shaders\Cube\PixelShader.hlsl">

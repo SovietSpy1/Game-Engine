@@ -140,6 +140,9 @@
     <ClInclude Include="DX3D\Source\DX3D\Math\Point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Math\Vector4D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DX3D\Shaders\Heart\VertexShader.hlsl" />
