@@ -1,6 +1,6 @@
 #include "DX3D/Input/InputSystem.h"
 #include <DX3D/Input/InputListener.h>
-dx3d::InputSystem::InputSystem()
+dx3d::InputSystem::InputSystem(const InputSystemDesc& desc) : Base(desc.base), m_desc(desc)
 {
 	S = this;
 }

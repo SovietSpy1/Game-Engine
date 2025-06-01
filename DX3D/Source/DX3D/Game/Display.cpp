@@ -8,7 +8,7 @@
 #include <DX3D/Graphics/IndexBuffer.h>
 #include <DX3D/Graphics/ConstantBuffer.h>
 #include <DX3D/Input/InputSystem.h>
-dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size, this))
+dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size))
 {
 	m_worldCam.SetTranslate(Vector3D(0.0f, 0.0f, -2.0f));
 	aspectRatio = static_cast<float>(m_size.width) / static_cast<float>(m_size.height);
@@ -19,7 +19,7 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	m_vb = desc.rendererSystem.createVertexBuffer();
 	constantBuffer = desc.rendererSystem.createConstantBuffer();
 	indexBuffer = desc.rendererSystem.createIndexBuffer();
-	inputSystem = std::make_shared<InputSystem>();
+	inputSystem = std::make_shared<InputSystem>(InputSystemDesc(desc.window.base, (HWND)m_handle));
 	inputSystem->addListener(this);
 	inputSystem->showCursor(false);
 	//setting up mesh with the heart vertices and heart shaders
@@ -75,7 +75,7 @@ void dx3d::Display::onUpdate()
 	Window::onUpdate();
 	m_device_context->clearRenderTargetColor(m_swapChain,currentCol.rgba);
 	m_device_context->drawIndexedTriangleList(indexBuffer->getSizeIndexList(), 0, 0);
-	m_swapChain->present(false);
+	m_swapChain->present(true);
 }
 
 void dx3d::Display::onFocus()
@@ -151,6 +151,8 @@ void dx3d::Display::onMouseMove(const Point& mouse_pos)
 {
 	xRot -= (mouse_pos.y-(m_size.height/2.0f)) * Time::deltaTime * 0.1f;
 	yRot -= (mouse_pos.x-(m_size.width/2.0f)) * Time::deltaTime * 0.1f;
+	if (xRot > PI / 2.0f) xRot = PI / 2.0f;
+	if (xRot < -PI / 2.0f) xRot = -PI / 2.0f;
 
 	InputSystem::get()->setCursorPosition(Point(m_size.width / 2.0f, m_size.height / 2.0f));
 }

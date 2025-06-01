@@ -11,6 +11,9 @@ namespace dx3d {
 		virtual void onUpdate() override;
 		virtual void onFocus() override;
 		virtual void onKillFocus() override;
+		std::shared_ptr<InputSystem>& getInputSystem() {
+			return inputSystem;
+		}
 		void Update();
 		virtual ~Display() override;
 	public:

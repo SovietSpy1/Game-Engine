@@ -13,7 +13,5 @@ namespace dx3d {
 	protected:  
 		void* m_handle{};  
 		Rect m_size{};  
-	private:  
-		Display* m_display = nullptr;  
 	};  
 }

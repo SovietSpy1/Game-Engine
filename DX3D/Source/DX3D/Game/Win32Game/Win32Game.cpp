@@ -1,17 +1,11 @@
 #include <DX3D/Game/Game.h>
 #include <Windows.h>
 #include <DX3D/Game/Display.h>
+#include <DX3D/Input/InputSystem.h>
 void dx3d::Game::run()
 {
-	std::chrono::steady_clock::time_point currentTime;
 	MSG msg{};
 	while (m_isRunning) {
-		currentTime = std::chrono::steady_clock::now();
-		Time::deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - Time::lastTime).count() / 1000.0f;
-		Time::lastTime = currentTime;
-		//DX3DLogInfo(std::to_string((1.0f/Time::deltaTime)).c_str())
-		Time::elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(Time::lastTime - Time::startTime).count() / 1000.0f;
-		m_display->onUpdate();
 		const int maxMessages = 10;
 		int messageCount = 0;
 		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -19,13 +13,40 @@ void dx3d::Game::run()
 				m_isRunning = false;
 				break;
 			}
-
+			if (msg.message == WM_KEYDOWN) {
+				if (msg.wParam == VK_ESCAPE) {
+					m_isRunning = false;
+				}
+				if (msg.wParam == VK_SPACE) {
+					m_paused = !m_paused;
+					m_display->getInputSystem()->showCursor(m_paused);
+				}
+			}
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 			if (++messageCount > maxMessages) {
 				break;
 			}
 		}
-		Sleep(1);
+		if (m_paused) {
+			continue;
+		}
+		LARGE_INTEGER counter;
+		QueryPerformanceCounter(&counter);
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		if (frequency.QuadPart == 0) {
+			DX3DLogErrorAndThrow("QueryPerformanceFrequency returned zero.");
+		}
+		else {
+			if (Time::endCounter != 0) {
+				Time::deltaCounter = static_cast<float>(counter.QuadPart - Time::endCounter);
+				Time::deltaTime = Time::deltaCounter / static_cast<float>(frequency.QuadPart);
+			}
+			Time::endCounter = static_cast<float>(counter.QuadPart);
+			Time::elapsedTime = (Time::endCounter - Time::startCounter) / static_cast<float>(frequency.QuadPart);
+		}
+		DX3DLogInfo(std::to_string((1.0f/Time::deltaTime)).c_str())
+		m_display->onUpdate();
 	}
 }

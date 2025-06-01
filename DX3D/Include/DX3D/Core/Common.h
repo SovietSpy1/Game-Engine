@@ -15,7 +15,6 @@ namespace dx3d {
 	struct WindowDesc {
 		BaseDesc base;
 		Rect size{};
-		Display* display = nullptr;
 	};
 	struct DisplayDesc {
 		WindowDesc window;
@@ -34,14 +33,20 @@ namespace dx3d {
 		void* winHandle{};
 		Rect winSize{};
 	};
+	struct InputSystemDesc {
+		BaseDesc base;
+		HWND windowHandle{};
+	};
 	struct DeviceContextDesc {
 		ID3D11DeviceContext& context;
 	};
 	struct Time {
-		static std::chrono::steady_clock::time_point startTime;
-		static std::chrono::steady_clock::time_point lastTime;
+		static float deltaCounter;
 		static float deltaTime;
+		static float endCounter;
 		static float elapsedTime;
+		static float startCounter;
+		static float startTime;
 	};
 	struct vec2 {
 		float u, v;
@@ -94,3 +99,5 @@ namespace dx3d {
     };
 }
 #define PI 3.141594265f
+#define DEG2RAD(deg) ((deg) * (PI /180.0f))
+#define WM_CUSTOM WM_USER + 1

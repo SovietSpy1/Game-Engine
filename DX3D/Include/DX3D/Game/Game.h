@@ -13,6 +13,7 @@ namespace dx3d {
 		std::unique_ptr<GraphicsEngine> m_graphicsEngine{};
 		std::unique_ptr<Display> m_display{};
 		bool m_isRunning{true};
+		bool m_paused{ false };
 	};
 }
 
