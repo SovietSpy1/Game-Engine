@@ -17,6 +17,8 @@ namespace dx3d {
 	class ConstantBuffer;
 	class InputSystem;
 	class InputListener;
+	class ResourceManager;
+	class Resource;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

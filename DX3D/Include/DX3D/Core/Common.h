@@ -41,13 +41,15 @@ namespace dx3d {
 		ID3D11DeviceContext& context;
 	};
 	struct Time {
-		static float deltaCounter;
-		static float deltaTime;
-		static float endCounter;
-		static float elapsedTime;
-		static float startCounter;
-		static float startTime;
+		inline static LARGE_INTEGER start{};
+		inline static LARGE_INTEGER end{};
+		inline static LARGE_INTEGER frequency{};
+		inline static LARGE_INTEGER temp{};
+		inline static float deltaTime{};
+		inline static float elapsedTime{};
+		inline static float currentTime{};
 	};
+
 	struct vec2 {
 		float u, v;
 	};

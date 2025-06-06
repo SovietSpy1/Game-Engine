@@ -2,8 +2,14 @@
 #include <Windows.h>
 #include <DX3D/Game/Display.h>
 #include <DX3D/Input/InputSystem.h>
+#include <iostream>
+#include <thread>
 void dx3d::Game::run()
 {
+	QueryPerformanceFrequency(&Time::frequency);  // Get timer frequency
+	QueryPerformanceCounter(&Time::start);
+	double nextTime{};
+	QueryPerformanceCounter(&Time::end);// End time
 	MSG msg{};
 	while (m_isRunning) {
 		const int maxMessages = 10;
@@ -31,22 +37,18 @@ void dx3d::Game::run()
 		if (m_paused) {
 			continue;
 		}
-		LARGE_INTEGER counter;
-		QueryPerformanceCounter(&counter);
-		LARGE_INTEGER frequency;
-		QueryPerformanceFrequency(&frequency);
-		if (frequency.QuadPart == 0) {
-			DX3DLogErrorAndThrow("QueryPerformanceFrequency returned zero.");
-		}
-		else {
-			if (Time::endCounter != 0) {
-				Time::deltaCounter = static_cast<float>(counter.QuadPart - Time::endCounter);
-				Time::deltaTime = Time::deltaCounter / static_cast<float>(frequency.QuadPart);
-			}
-			Time::endCounter = static_cast<float>(counter.QuadPart);
-			Time::elapsedTime = (Time::endCounter - Time::startCounter) / static_cast<float>(frequency.QuadPart);
-		}
-		DX3DLogInfo(std::to_string((1.0f/Time::deltaTime)).c_str())
 		m_display->onUpdate();
+		QueryPerformanceCounter(&Time::temp);
+		Time::deltaTime = static_cast<float>(Time::temp.QuadPart - Time::end.QuadPart) / Time::frequency.QuadPart;
+		while (Time::deltaTime < 1.0f / 60.0f) {
+			QueryPerformanceCounter(&Time::temp);
+			Time::deltaTime = static_cast<float>(Time::temp.QuadPart - Time::end.QuadPart) / Time::frequency.QuadPart;
+		}
+		Time::end = Time::temp;
+		Time::currentTime = static_cast<float>(Time::end.QuadPart) / Time::frequency.QuadPart;
+		/*if (currentTime > nextTime) {
+			std::clog << 1.0f/Time::deltaTime << "\n";
+			nextTime = currentTime + 0.5f; // Update every 0.5 seconds
+		}*/
 	}
 }

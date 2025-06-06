@@ -62,16 +62,6 @@ namespace dx3d {
 			mat[1][0] = sinf(z);
 			mat[1][1] = cosf(z);
 		}
-		void SetPerspectiveFovLH(float fov, float aspect, float znear, float zfar) {
-			SetIdentity();
-			float tan_half_fov = tanf(fov / 2.0f);
-			mat[0][0] = 1.0f / (aspect * tan_half_fov);
-			mat[1][1] = 1.0f / tan_half_fov;
-			mat[2][2] = zfar / (zfar - znear);
-			mat[2][3] = 1.0f;
-			mat[3][2] = (-znear * zfar) / (zfar - znear);
-			mat[3][3] = 0.0f;
-		}
 		Matrix4X4 operator*(float other) {
 			Matrix4X4 temp;
 			for (int i = 0; i < 4; i++) {

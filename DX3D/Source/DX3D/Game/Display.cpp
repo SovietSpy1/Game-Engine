@@ -112,7 +112,7 @@ void dx3d::Display::Update()
 	cBuff.m_world.SetIdentity();	
 	cBuff.m_view = worldCam;
 	//cBuff.m_proj.SetOrthoLH(5.0f * aspectRatio, 5.0f, 0.0f, 10.0f);
-	cBuff.m_proj.SetPerspectiveFovLH(1.57f, aspectRatio, 0.1f, 100.0f);
+	cBuff.m_proj.SetPerspectiveLH(1.57f, aspectRatio, 0.1f, 100.0f);
 	constantBuffer->load(cBuff);
 	m_device_context->setConstantBuffer(*constantBuffer);
 }
