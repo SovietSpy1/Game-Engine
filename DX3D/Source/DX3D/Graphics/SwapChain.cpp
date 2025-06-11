@@ -17,6 +17,21 @@ dx3d::SwapChain::SwapChain(const SwapChainDesc& desc, const GraphicsResourceDesc
 	DX3DGraphicsLogErrorAndThrow(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer), "GetBackBuffer failed.");
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateRenderTargetView(buffer, NULL, m_rtv.GetAddressOf()), "CreateRenderTargetView failed.");
 	buffer->Release();
+	D3D11_TEXTURE2D_DESC tex_desc{};
+	tex_desc.Width = desc.winSize.width;
+	tex_desc.Height = desc.winSize.height;
+	tex_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	tex_desc.SampleDesc.Count = 1;
+	tex_desc.SampleDesc.Quality = 0;
+	tex_desc.MiscFlags = 0;
+	tex_desc.ArraySize = 1;
+	tex_desc.CPUAccessFlags = 0;
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateTexture2D(&tex_desc, nullptr, &buffer), "Create depth buffer texture failed.");
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateDepthStencilView(buffer, NULL, &m_dsv), "Create Depth Stencil View Failed.");
+
+
 }
 
 bool dx3d::SwapChain::present(bool vsync)

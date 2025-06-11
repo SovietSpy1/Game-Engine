@@ -4,10 +4,12 @@ namespace dx3d {
 	class TextureManager : public ResourceManager
 	{
 	public:
-		TextureManager(const BaseDesc& desc) : ResourceManager(desc)
+		TextureManager(const GraphicsResourceDesc& desc) : ResourceManager(desc)
 		{
 			// Initialization code for the texture manager
 		}
+		std::shared_ptr<Texture> createTextureFromFile(const wchar_t* file_path);
+	protected:
 		Resource* createResourceFromFileConcrete(const wchar_t* file_path);
 	};
 }

@@ -4,6 +4,7 @@
 #include <d3dcompiler.h>
 #include <DX3D/Graphics/ConstantBuffer.h>
 #include <DX3D/Graphics/IndexBuffer.h>
+#include <DX3D/Graphics/ResourceManager/TextureManager/Texture.h>
 dx3d::DeviceContext::DeviceContext(const DeviceContextDesc& desc, const GraphicsResourceDesc& gDesc) : GraphicsResource(gDesc), m_device_context(desc.context)
 {
 }
@@ -12,7 +13,8 @@ void dx3d::DeviceContext::clearRenderTargetColor(std::shared_ptr<SwapChain> swap
 {
 	FLOAT clear_color[] = { rgba.r, rgba.g, rgba.b, rgba.a};
 	m_device_context.ClearRenderTargetView(swap_chain->m_rtv.Get(), clear_color);
-	m_device_context.OMSetRenderTargets(1, swap_chain->m_rtv.GetAddressOf(), NULL);
+	m_device_context.ClearDepthStencilView(swap_chain->m_dsv.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_device_context.OMSetRenderTargets(1, swap_chain->m_rtv.GetAddressOf(), swap_chain->m_dsv.Get());
 }
 
 void dx3d::DeviceContext::setVertexBuffer(std::shared_ptr<VertexBuffer> vertex_buffer)
@@ -39,6 +41,12 @@ void dx3d::DeviceContext::drawIndexedTriangleList(UINT index_count, UINT start_v
 {
 	m_device_context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_device_context.DrawIndexed(index_count, start_vertex_index, start_index_location);
+}
+
+void dx3d::DeviceContext::DrawLines(UINT vertex_count, UINT start_vertex_index)
+{
+	m_device_context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	m_device_context.Draw(vertex_count, start_vertex_index);
 }
 
 void dx3d::DeviceContext::SetViewportSize(UINT width, UINT height)
@@ -107,4 +115,9 @@ void dx3d::DeviceContext::setConstantBuffer(const ConstantBuffer& cBuffer)
 void dx3d::DeviceContext::setIndexBuffer(const IndexBuffer& iBuffer)
 {
 	m_device_context.IASetIndexBuffer(iBuffer.m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+}
+
+void dx3d::DeviceContext::setTexture(std::shared_ptr<Texture> texture)
+{
+	m_device_context.PSSetShaderResources(0, 1, texture->m_srv.GetAddressOf());
 }

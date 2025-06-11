@@ -1,7 +1,7 @@
 #include "DX3D/Graphics/ResourceManager/ResourceManager.h"
 #include <DX3D/Graphics/ResourceManager/Resource.h>
 #include <filesystem>
-dx3d::ResourceManager::ResourceManager(const BaseDesc& desc) : Base(desc)
+dx3d::ResourceManager::ResourceManager(const GraphicsResourceDesc& desc) : GraphicsResource(desc)
 {
 }
 std::shared_ptr<dx3d::Resource> dx3d::ResourceManager::createResourceFromFile(const wchar_t* file_path)

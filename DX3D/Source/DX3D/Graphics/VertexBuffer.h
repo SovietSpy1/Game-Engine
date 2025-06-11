@@ -6,6 +6,7 @@ namespace dx3d {
 	public:
 		explicit VertexBuffer(const GraphicsResourceDesc& desc);
 		void load(void* list_vertices, UINT size_vertex, UINT size_list, void* shader_byte_code, UINT size_byte_shader);
+		void loadWithColor(void* list_vertices, UINT size_vertex, UINT size_list, void* shader_byte_code, UINT size_byte_shader);
 		UINT getSizeVertexList();
 	private:
 		UINT m_size_vertex{};

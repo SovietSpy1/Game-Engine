@@ -1,8 +1,11 @@
 struct VSOutput
 {
     float4 position : SV_Position;
-    float4 color : COLOR;
+    float2 texcoord : TEXCOORD0;
 };
+Texture2D Texture : register(t0);
+sampler TextureSampler : register(s0);
+
 cbuffer constant : register(b0)
 {
     row_major float4x4 m_world;
@@ -13,5 +16,6 @@ cbuffer constant : register(b0)
 
 float4 main(VSOutput input) : SV_TARGET
 {
-    return input.color;
+    float2 uv = float2(input.texcoord.x, 1.0f - input.texcoord.y);
+    return Texture.Sample(TextureSampler, uv);
 }

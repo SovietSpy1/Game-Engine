@@ -57,7 +57,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Math\GameMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX3D\Source\DX3D\Object\Mesh.cpp">
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DX3D\Source\DX3D\Graphics\IndexBuffer.cpp">
@@ -79,6 +79,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\TextureManager\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Object\GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\MeshManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -167,11 +173,23 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ResourceManager\TextureManager\TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Math\Vector2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Object\GameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\MeshManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DX3D\Shaders\Heart\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Heart\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Cube\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Cube\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\VertexMeshLayout\VertexMeshLayoutShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Axis\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Axis\PixelShader.hlsl" />
   </ItemGroup>
 </Project>

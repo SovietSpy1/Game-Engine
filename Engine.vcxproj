@@ -103,7 +103,8 @@
     <IncludePath>DX3D/Include;DX3D/Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>DX3D/Include;DX3D/Source;$(IncludePath)</IncludePath>
+    <IncludePath>DX3D/Include;DX3D/Source;Libs/DirectXTex/include;C:\Program Files (x86)\Visual Leak Detector\include;Libs/tinyobjloader/include;$(IncludePath)</IncludePath>
+    <LibraryPath>Libs/DirectXTex/bin;C:\Program Files (x86)\Visual Leak Detector\lib\Win64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>DX3D/Source;DX3D/Include;$(IncludePath)</IncludePath>
@@ -148,7 +149,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTexD.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -211,7 +212,8 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\Win32Game\Win32Game.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Math\GameMath.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Math\GameMath.h" />
-    <ClCompile Include="DX3D\Source\DX3D\Object\Mesh.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\Mesh.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Object\GameObject.cpp" />
     <ClCompile Include="Game\main.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsEngine.cpp" />
@@ -224,6 +226,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\ResourceManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\TextureManager\Texture.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\TextureManager\TextureManager.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\MeshManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Game\Display.h" />
@@ -246,6 +249,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Math\Point.h" />
     <ClInclude Include="DX3D\Source\DX3D\Math\Rect.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexBuffer.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Math\Vector2D.h" />
     <ClInclude Include="DX3D\Source\DX3D\Math\Vector3D.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\IndexBuffer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Input\InputSystem.h" />
@@ -254,8 +258,26 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ResourceManager\ResourceManager.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ResourceManager\TextureManager\Texture.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ResourceManager\TextureManager\TextureManager.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Object\GameObject.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\MeshManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="DX3D\Shaders\Axis\PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DX3D\Shaders\Axis\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="DX3D\Shaders\Cube\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Pixel</ShaderType>
@@ -281,6 +303,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="DX3D\Shaders\Heart\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DX3D\Shaders\VertexMeshLayout\VertexMeshLayoutShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>

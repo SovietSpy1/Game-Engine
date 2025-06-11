@@ -1,13 +1,12 @@
 struct VSInput
 {
     float3 position : POSITION;
-    float4 color : COLOR;
-    float2 uvs : TEXCOORD0;
+    float2 texcoord : TEXCOORD0;
 };
 struct VSOutput
 {
     float4 position : SV_Position;
-    float4 color : COLOR;
+    float2 texcoord : TEXCOORD0;
 };
 cbuffer constant : register(b0)
 {
@@ -26,6 +25,6 @@ VSOutput main(VSInput input)
     output.position = mul(output.position, m_view);
     //SCREEN SPACE POSITION
     output.position = mul(output.position, m_proj);
-    output.color = input.color;
+    output.texcoord = input.texcoord;
     return output;
 }

@@ -34,7 +34,12 @@ void dx3d::Game::run()
 				break;
 			}
 		}
+		if (m_display->pause) {
+			m_paused = true;
+			m_display->pause = false;
+		}
 		if (m_paused) {
+			QueryPerformanceCounter(&Time::end);
 			continue;
 		}
 		m_display->onUpdate();
@@ -46,9 +51,10 @@ void dx3d::Game::run()
 		}
 		Time::end = Time::temp;
 		Time::currentTime = static_cast<float>(Time::end.QuadPart) / Time::frequency.QuadPart;
-		/*if (currentTime > nextTime) {
+		Time::elapsedTime += Time::deltaTime;
+		/*if (Time::currentTime > nextTime) {
 			std::clog << 1.0f/Time::deltaTime << "\n";
-			nextTime = currentTime + 0.5f; // Update every 0.5 seconds
+			nextTime = Time::currentTime + 0.5f; // Update every 0.5 seconds
 		}*/
 	}
 }

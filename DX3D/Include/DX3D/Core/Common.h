@@ -3,6 +3,7 @@
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Math/Rect.h>
 #include <DX3D/Math/Vector3D.h>
+#include <DX3D/Math/Vector2D.h>
 #include <DX3D/Math/Matrix.h>
 #include <d3d11.h>
 #include <chrono>
@@ -79,14 +80,17 @@ namespace dx3d {
 		Color operator*(const float& n) const {
 			return Color(rgba * n);
 		}
-		float magnitude() {
+		float magnitude() const{
 			return rgba.magnitude();
 		}
 	};
 	struct vertex {
 		Vector3D position;
+		Vector2D uvs;
+	};
+	struct vertexWithColor {
+		Vector3D position;
 		vec4 color;
-		vec2 uvs;
 	};
 	struct MeshDesc {
 		std::vector<vertex> vertices;
@@ -100,6 +104,6 @@ namespace dx3d {
         float elapsedTime = 0.0f;  
     };
 }
-#define PI 3.141594265f
+#define PI 3.141594265f 
 #define DEG2RAD(deg) ((deg) * (PI /180.0f))
 #define WM_CUSTOM WM_USER + 1

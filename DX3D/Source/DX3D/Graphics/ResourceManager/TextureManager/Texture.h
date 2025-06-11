@@ -3,7 +3,12 @@
 namespace dx3d {
 	class Texture : public Resource
 	{
-		Texture(const wchar_t* full_path, const BaseDesc& desc);
+	public:
+		Texture(const wchar_t* full_path, const GraphicsResourceDesc& desc);
+	private:
+		Microsoft::WRL::ComPtr<ID3D11Resource> m_texture = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv = nullptr;
+		friend class DeviceContext;
 	};
 
 }

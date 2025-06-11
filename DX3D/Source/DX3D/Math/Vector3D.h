@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 namespace dx3d {
 	class Vector3D {
 	public:
@@ -17,6 +18,25 @@ namespace dx3d {
 		}
 		Vector3D operator*(const float& other) const {
 			return Vector3D(x * other, y * other, z * other);
+		}
+		Vector3D cross(Vector3D b) {
+			Vector3D result{};
+			result.x = y * b.z - z * b.y;
+			result.y = -(x * b.z - z * b.x);
+			result.z = x * b.y - y * b.x;
+			return result;
+		}
+		float dot(const Vector3D& other) const {
+			return x * other.x + y * other.y + z * other.z;
+		}
+		Vector3D normalize() {
+			float magnitude = sqrt(x * x + y * y + z * z);
+			if (magnitude > 0) {
+				x /= magnitude;
+				y /= magnitude;
+				z /= magnitude;
+			}
+			return *this;
 		}
 		static float det(const Vector3D& v1, const Vector3D& v2, const Vector3D& v3) {
 			return v1.x * (v2.y * v3.z - v2.z * v3.y) - v1.y * (v2.x * v3.z - v2.z * v3.x) + v1.z * (v2.x * v3.y - v2.y * v3.x);

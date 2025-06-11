@@ -9,6 +9,7 @@ namespace dx3d {
 	private:
 		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain{};
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv{};
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_dsv{};
 	private:
 		friend class DeviceContext;
 	};

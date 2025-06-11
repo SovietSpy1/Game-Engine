@@ -1,13 +1,12 @@
 #pragma once
-#include <DX3D/Core/Common.h>
-#include <DX3D/Core/Base.h>
+#include <DX3D/Graphics/GraphicsResource.h>
 #include <unordered_map>
 #include <string>
 namespace dx3d {
-	class ResourceManager : public Base
+	class ResourceManager : public GraphicsResource
 	{
 	public:
-		ResourceManager(const BaseDesc& desc);
+		ResourceManager(const GraphicsResourceDesc& desc);
 		virtual ~ResourceManager() {};
 		std::shared_ptr<Resource> createResourceFromFile(const wchar_t* file_path);
 	protected:

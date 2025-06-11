@@ -14,23 +14,20 @@ namespace dx3d {
 		std::shared_ptr<InputSystem>& getInputSystem() {
 			return inputSystem;
 		}
-		void Update();
+		void GameObjectUpdate();
+		void CameraUpdate();
 		virtual ~Display() override;
 	public:
 		bool initialized = false;
+		bool pause = false;
+		bool canPause = true;
+		float u = 0.0f;
 	private:
 		SwapChainPtr m_swapChain;
 		std::shared_ptr<DeviceContext> m_device_context;
-		std::shared_ptr<VertexBuffer> m_vb;
-		std::shared_ptr<Mesh> m_mesh;
 		std::shared_ptr<InputSystem> inputSystem;
 	private:
-		UINT size_list;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
 		std::shared_ptr<ConstantBuffer> constantBuffer;
-		std::shared_ptr<IndexBuffer> indexBuffer;
-		std::vector<vertex> list;
 	private:
 		Color currentCol{};
 		float xRot{};
@@ -39,8 +36,12 @@ namespace dx3d {
 		float aspectRatio = 1.0f;	
 		Vector3D scale = Vector3D(1.0f,1.0f,1.0f);
 		Matrix4X4 m_worldCam{};
+		ConstantBufferDesc cBuff{};
 		float forward = 0.0f;
 		float rightward = 0.0f;
+		std::shared_ptr<Texture> woodTexture = nullptr;
+		std::shared_ptr<GameObject> currentObject;
+		std::vector<std::shared_ptr<GameObject>> gameObjects;
 	private:
 		// Inherited via InputListener
 		void onKeyDown(int key) override;

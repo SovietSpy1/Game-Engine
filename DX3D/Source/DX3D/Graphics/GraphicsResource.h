@@ -17,6 +17,7 @@ namespace dx3d {
 		{
 
 		}
+		virtual ~GraphicsResource() = default;
 	protected:
 		std::shared_ptr<const RenderSystem> m_renderSystem;
 		ID3D11Device& m_device;
