@@ -31,13 +31,8 @@ dx3d::Mesh::Mesh(const GraphicsResourceDesc& gDesc) : Resource(gDesc)
 
 dx3d::Mesh::Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc) : Resource(full_path, desc)
 {
-	indexed = true;
-	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Cube/VertexShader.hlsl";
-	const WCHAR* pixelShaderPath = L"DX3D/Shaders/Cube/PixelShader.hlsl";
-	m_renderSystem->compilePixelShader(pixelShaderPath, pixelBlob);
-	m_renderSystem->compileVertexShader(vertexShaderPath, vertexBlob);
-	m_renderSystem->createVertexShader(vertexBlob, vertexShader);
-	m_renderSystem->createPixelShader(pixelBlob, pixelShader);
+	const WCHAR* vertexShaderPath = L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl";
+	m_renderSystem->compileVertexShader(vertexShaderPath, vertexLayoutBlob);
 	indexBuffer = desc.renderSystem->createIndexBuffer();
 	vertexBuffer = desc.renderSystem->createVertexBuffer();
 	tinyobj::attrib_t attribs;
@@ -73,72 +68,29 @@ dx3d::Mesh::Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc) : R
 					tx = attribs.texcoords.at(index.texcoord_index * 2 + 0);
 					ty = attribs.texcoords.at(index.texcoord_index * 2 + 1);
 				}
-				vertex vrtx = { Vector3D(vx,vy,vz), Vector2D(tx,ty) };
+				tinyobj::real_t nx = 0.0f, ny = 0.0f, nz = 0.0f;
+				if (attribs.normals.size() != 0) {
+					nx = attribs.normals.at(index.normal_index * 3 + 0);
+					ny = attribs.normals.at(index.normal_index * 3 + 1);
+					nz = attribs.normals.at(index.normal_index * 3 + 2);
+				}
+				vertex vrtx = vertex{ Vector3D(vx,vy,vz), Vector2D(tx,ty), Vector3D(nx,ny,nz)};
 				vertices.push_back(vrtx);
 				indices.push_back(indexOffset + v);
 			}
 			indexOffset += num_face_verts;
 		}
 	}
-	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize());
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize(), std::vector<IA>{IA::POSITION, IA::TEXCOORD, IA::NORMAL});
 	indexBuffer->load(indices.data(), indices.size());
 }
-
-void dx3d::Mesh::LoadHeartMesh()
-{
-	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Heart/VertexShader.hlsl";
-	const WCHAR* pixelShaderPath = L"DX3D/Shaders/Heart/PixelShader.hlsl";
-	vertices.clear();
-	for (int i = 0; i < 48; i++) {
-		vertices.push_back(vertex{ Vector3D{0,0,0}, Vector2D{0,0} });
-	}
-	vertices[0].position = { 0,-0.5f, 0 };
-	vertices[1].position = vertices[0].position + Vector3D{ -0.3f,0.3f,0 };
-	vertices[2].position = { 0,0,0 };
-	vertices[3].position = vertices[1].position;
-	vertices[4].position = { -0.25f, 0.25f, 0 };
-	vertices[5].position = vertices[2].position;
-	vertices[6].position = vertices[1].position;
-	vertices[7].position = { -0.5f, 0.1f, 0 };
-	vertices[8].position = vertices[4].position;
-	vertices[9].position = vertices[7].position;
-	vertices[10].position = vertices[9].position + Vector3D{ 0, 0.25f,0 };
-	vertices[11].position = vertices[4].position;
-	vertices[12].position = vertices[10].position;
-	vertices[13].position = vertices[12].position + Vector3D{ 0.15f,0.15f,0 };
-	vertices[14].position = vertices[4].position;
-	vertices[15].position = vertices[13].position;
-	vertices[16].position = vertices[15].position + Vector3D{ 0.2f,0,0 };
-	vertices[17].position = vertices[4].position;
-	vertices[18].position = vertices[4].position;
-	vertices[19].position = vertices[16].position;
-	vertices[20].position = Vector3D{ 0,0.35f,0 };
-	vertices[21].position = vertices[2].position;
-	vertices[22].position = vertices[4].position;
-	vertices[23].position = vertices[20].position;
-	for (int i = 0; i < 24; i++) {
-		vertices[24 + i].position = Vector3D{ -vertices[i].position.x, vertices[i].position.y,0 };
-	}
-	m_renderSystem->compilePixelShader(pixelShaderPath, pixelBlob);
-	m_renderSystem->compileVertexShader(vertexShaderPath, vertexBlob);
-	m_renderSystem->createVertexShader(vertexBlob, vertexShader);
-	m_renderSystem->createPixelShader(pixelBlob, pixelShader);
-}
-
 void dx3d::Mesh::LoadCubeMesh()
 {
 	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Cube/VertexShader.hlsl";
-	const WCHAR* pixelShaderPath = L"DX3D/Shaders/Cube/PixelShader.hlsl";
-	m_renderSystem->compilePixelShader(pixelShaderPath, pixelBlob);
-	m_renderSystem->compileVertexShader(vertexShaderPath, vertexBlob);
-	m_renderSystem->createVertexShader(vertexBlob, vertexShader);
-	m_renderSystem->createPixelShader(pixelBlob, pixelShader);
-	// mesh data
-	ClearMeshData();
+	m_renderSystem->compileVertexShader(vertexShaderPath, vertexLayoutBlob);
 	topology = TopologyType::TriangleList;
-	indexed = true;
 	//set positions
-	positions = {
+	std::vector<Vector3D>positions = {
 		Vector3D(-0.5f, -0.5f, -0.5f),
 		Vector3D(-0.5f, 0.5f, -0.5f),
 		Vector3D(0.5f, 0.5f, -0.5f),
@@ -172,7 +124,7 @@ void dx3d::Mesh::LoadCubeMesh()
 	};
 
 	//set uvs
-	uvs = {
+	std::vector<Vector2D>uvs = {
 		Vector2D(0.0f, 0.0f),
 		Vector2D(0.0f, 1.0f),
 		Vector2D(1.0f, 0.0f),
@@ -213,33 +165,14 @@ void dx3d::Mesh::LoadCubeMesh()
 		{positions[0], uvs[3]},
 	};
 	indexBuffer->load(indices.data(), indices.size());
-	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize());
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize());
 }
-
-void dx3d::Mesh::LoadQuadMesh()
-{
-	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Cube/VertexShader.hlsl";
-	const WCHAR* pixelShaderPath = L"DX3D/Shaders/Cube/PixelShader.hlsl";
-	m_renderSystem->compilePixelShader(pixelShaderPath, pixelBlob);
-	m_renderSystem->compileVertexShader(vertexShaderPath, vertexBlob);
-	m_renderSystem->createVertexShader(vertexBlob, vertexShader);
-	m_renderSystem->createPixelShader(pixelBlob, pixelShader);
-	vertices.clear();
-	for (int i = 0; i < 6; i++) {
-		vertices.push_back(vertex(Vector3D(0, 0, 0), Vector2D(0, 0)));
-	}
-	vertices[0].position = Vector3D(-0.5f, -0.5f, 0);
-	vertices[1].position = Vector3D(0.5f, -0.5f, 0);
-	vertices[2].position = Vector3D(-0.5f, 0.5f, 0);
-}
-
 void dx3d::Mesh::ClearMeshData()
 {
 	vertices.clear();
 	indices.clear();
-	uvs.clear();
-	positions.clear();
-	colors.clear();
 }
+
+
 
 

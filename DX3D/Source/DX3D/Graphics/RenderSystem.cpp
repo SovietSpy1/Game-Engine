@@ -8,6 +8,8 @@
 #include <DX3D/Graphics/IndexBuffer.h>
 #include <DX3D/Graphics/ResourceManager/TextureManager/TextureManager.h>
 #include <d3dcompiler.h>
+#include <DX3D/Object/Axis.h>
+#include <DX3D/Object/Material.h>
 using namespace dx3d;
 dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
 {
@@ -46,6 +48,11 @@ std::shared_ptr<Mesh> dx3d::RenderSystem::createMesh() const
 	return std::make_shared<Mesh>(getGraphicsResourceDesc());
 }
 
+std::shared_ptr<Material> dx3d::RenderSystem::createMaterial() const
+{
+	return std::make_shared<Material>(getGraphicsResourceDesc());
+}
+
 std::shared_ptr<IndexBuffer> dx3d::RenderSystem::createIndexBuffer() const
 {
 	return std::make_shared<IndexBuffer>(getGraphicsResourceDesc());
@@ -64,6 +71,11 @@ std::shared_ptr<TextureManager> dx3d::RenderSystem::createTextureManager() const
 std::shared_ptr<MeshManager> dx3d::RenderSystem::createMeshManager() const
 {
 	return std::make_shared<MeshManager>(getGraphicsResourceDesc());
+}
+
+std::shared_ptr<Axis> dx3d::RenderSystem::createAxis(const AxisDesc& desc) const
+{
+	return std::make_shared<Axis>(desc, getGraphicsResourceDesc());
 }
 
 void dx3d::RenderSystem::compileVertexShader(const WCHAR* vertexShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob) const

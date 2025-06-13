@@ -11,6 +11,7 @@ namespace dx3d {
 		TextureManager& getTextureManager() const noexcept;
 		MeshManager& getMeshManager() const noexcept;
 		std::shared_ptr<GameObject> createGameObject() const;
+		std::shared_ptr<Axis> createAxis(const AxisDesc& desc) const;
 	public:
 		//publicly accesable functions
 		std::shared_ptr<Mesh> createMesh() const;

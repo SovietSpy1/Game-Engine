@@ -71,15 +71,16 @@ namespace dx3d {
 			}
 			return temp;
 		}
-		Matrix4X4 operator*(Matrix4X4& other) {
+		Matrix4X4 operator*(const Matrix4X4& other) {
 			float temp[4][4];
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
 					temp[i][j] = mat[i][0] * other.mat[0][j] + mat[i][1] * other.mat[1][j] + mat[i][2] * other.mat[2][j] + mat[i][3] * other.mat[3][j];
 				}
 			}
-			setMatrix(temp);
-			return *this;
+			Matrix4X4 result;
+			result.setMatrix(temp);
+			return result;
 		}
 		void operator*=(const Matrix4X4& other) {
 			float temp[4][4];
@@ -167,24 +168,30 @@ namespace dx3d {
 			mat[2][3] = 1.0f;
 			mat[3][2] = (-near_plane * far_plane) / (far_plane - near_plane);
 		}
+		void Translate(Vector3D translation) {
+			mat[3][0] += translation.x;
+			mat[3][1] += translation.y;
+			mat[3][2] += translation.z;
+		}
 		void SetZDirection(Vector3D forward) {
 			Vector3D currentRight = getXDirection().normalize();
 			Vector3D currentUp = getYDirection().normalize();
+			Vector3D currentForward = getZDirection().normalize();
 			forward.normalize();
-			Vector3D worldUp = Vector3D(0, 1, 0);
-			if (forward.dot(worldUp) > 0.999f) {
-				worldUp = Vector3D(0, 0, 1); // If forward is close to up, use a different up vector
+			//Vector3D worldUp = Vector3D(0, 1, 0);
+			Vector3D worldUp = currentUp;
+			if (abs(forward.dot(worldUp)) > 0.999f) {
+				//worldUp = Vector3D(0, 0, 1); // If forward is close to up, use a different up vector
+				worldUp = currentForward;
 			}
 			Vector3D right{};
-			right = forward.cross(worldUp);
-			Vector3D otherRight = right * -1;
-			if (currentRight.dot(right) < currentRight.dot(otherRight)) {
-				right = otherRight; // Use the right vector that is more aligned with the current right
-			}
-			Vector3D up = right.cross(forward);
-			Vector3D otherUp = up * -1;
-			if (currentUp.dot(up) < currentUp.dot(otherUp)) {
-				up = otherUp; // Use the up vector that is more aligned with the current up
+			right = worldUp.cross(forward);
+			right.normalize();
+			Vector3D up = forward.cross(right);
+			up.normalize();
+			if ((currentRight.dot(right) + currentUp.dot(up)) < (currentRight.dot(right * -1) + currentUp.dot(up * -1))) {
+				right = right * -1;
+				up = up * -1;
 			}
 			float temp[4][4] = { {right.x, right.y, right.z, 0}, {up.x, up.y, up.z, 0},
 					{forward.x, forward.y, forward.z, 0},

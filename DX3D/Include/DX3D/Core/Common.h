@@ -10,6 +10,12 @@
 #include <cmath>
 #include <vector>
 namespace dx3d {
+	enum IA {
+		POSITION,
+		TEXCOORD,
+		NORMAL,
+		COLOR
+	};
 	struct BaseDesc {
 		Logger& logger;
 	};
@@ -40,6 +46,9 @@ namespace dx3d {
 	};
 	struct DeviceContextDesc {
 		ID3D11DeviceContext& context;
+	};
+	struct AxisDesc {
+		float scale;
 	};
 	struct Time {
 		inline static LARGE_INTEGER start{};
@@ -87,21 +96,16 @@ namespace dx3d {
 	struct vertex {
 		Vector3D position;
 		Vector2D uvs;
+		Vector3D normal;
 	};
-	struct vertexWithColor {
-		Vector3D position;
-		vec4 color;
-	};
-	struct MeshDesc {
-		std::vector<vertex> vertices;
-		WCHAR* vectorShaderPath;
-		WCHAR* pixelShaderPath;
-	};
+	
 	_declspec(align(16)) struct ConstantBufferDesc {
 		Matrix4X4 m_world{};
 		Matrix4X4 m_view{};
 		Matrix4X4 m_proj{};
-        float elapsedTime = 0.0f;  
+		Vector4D lightDirection;
+		Vector4D camPosition;
+		Matrix4X4 m_rotation{};
     };
 }
 #define PI 3.141594265f 

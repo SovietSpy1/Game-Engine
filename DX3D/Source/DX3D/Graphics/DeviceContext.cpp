@@ -95,6 +95,17 @@ void dx3d::DeviceContext::createBackfaceRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterDesc = {};
 	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.CullMode = D3D11_CULL_FRONT; // Disables backface culling
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.DepthClipEnable = true;
+
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateRasterizerState(&rasterDesc, rasterizerState.GetAddressOf()), "rasterstate creation failed.");
+}
+
+void dx3d::DeviceContext::createFrontfaceRasterizerState()
+{
+	D3D11_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
 	rasterDesc.CullMode = D3D11_CULL_BACK; // Disables backface culling
 	rasterDesc.FrontCounterClockwise = false;
 	rasterDesc.DepthClipEnable = true;

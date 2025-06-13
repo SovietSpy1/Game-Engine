@@ -23,6 +23,9 @@ namespace dx3d {
 	class Texture;
 	class GameObject;
 	class MeshManager;
+	class Axis;
+	class Transform;
+	class Material;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

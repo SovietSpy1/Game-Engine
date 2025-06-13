@@ -16,6 +16,5 @@ cbuffer constant : register(b0)
 
 float4 main(VSOutput input) : SV_TARGET
 {
-    float2 uv = float2(input.texcoord.x, 1.0f - input.texcoord.y);
-    return Texture.Sample(TextureSampler, uv);
+    return Texture.Sample(TextureSampler, input.texcoord);
 }

@@ -45,6 +45,11 @@ std::shared_ptr<GameObject> dx3d::GraphicsEngine::createGameObject() const
 	return std::make_shared<GameObject>(BaseDesc{m_logger});
 }
 
+std::shared_ptr<Axis> dx3d::GraphicsEngine::createAxis(const AxisDesc &desc) const
+{
+	return m_renderSystem->createAxis(desc);
+}
+
 std::shared_ptr<Mesh> dx3d::GraphicsEngine::createMesh() const
 {
 	return m_renderSystem->createMesh();

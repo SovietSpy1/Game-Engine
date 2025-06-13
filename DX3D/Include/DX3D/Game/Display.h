@@ -16,6 +16,7 @@ namespace dx3d {
 		}
 		void GameObjectUpdate();
 		void CameraUpdate();
+		void SkyBoxUpdate();
 		virtual ~Display() override;
 	public:
 		bool initialized = false;
@@ -29,10 +30,11 @@ namespace dx3d {
 	private:
 		std::shared_ptr<ConstantBuffer> constantBuffer;
 	private:
+		std::shared_ptr<GameObject> skyBox;
 		Color currentCol{};
 		float xRot{};
 		float yRot{};
-		float fov = PI;
+		float fov = PI /4.0f;
 		float aspectRatio = 1.0f;	
 		Vector3D scale = Vector3D(1.0f,1.0f,1.0f);
 		Matrix4X4 m_worldCam{};
@@ -42,11 +44,12 @@ namespace dx3d {
 		std::shared_ptr<Texture> woodTexture = nullptr;
 		std::shared_ptr<GameObject> currentObject;
 		std::vector<std::shared_ptr<GameObject>> gameObjects;
+		float lightRotation = 0.0f;
 	private:
 		// Inherited via InputListener
 		void onKeyDown(int key) override;
 		void onKeyUp(int key) override;
-
+		void onKeyDownFirst(int key) override;
 		// Inherited via InputListener
 		void onMouseMove(const Point& mouse_pos) override;
 		void onLeftMouseDown(const Point& mouse_pos) override;

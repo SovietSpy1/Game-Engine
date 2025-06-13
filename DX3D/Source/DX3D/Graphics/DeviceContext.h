@@ -15,6 +15,7 @@ namespace dx3d {
 		void createTransparentBlendState();
 		void setBlendState();
 		void createBackfaceRasterizerState();
+		void createFrontfaceRasterizerState();
 		void setRasterState();
 		void setConstantBuffer(const ConstantBuffer& cBuffer);
 		void setIndexBuffer(const IndexBuffer& iBuffer);

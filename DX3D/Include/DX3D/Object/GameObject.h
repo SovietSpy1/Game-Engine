@@ -8,25 +8,18 @@ namespace dx3d {
 		GameObject(const BaseDesc& desc);
 		void AddMesh(const wchar_t* file_path);
 		void AddMesh();
-		void SetTexture(const wchar_t* file_path);
+		void AddMaterial();
 		void SetPosition(float x, float y, float z);
 		void SetRotation(float x, float y, float z);
-		void SetAxisBuffer();
+		void SetAxis(float size = 1);
 		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Texture> texture;
-		Matrix4X4 transform;
-		
+		std::shared_ptr<Transform> transform;
+		std::shared_ptr<Material> material;
 		//Axis buffer for visualization
-		bool showAxis = true;
-		std::shared_ptr<VertexBuffer> axisVertexBuffer{};
+		bool showAxis = false;
+		std::shared_ptr<Axis> axis{};
 	public:
 		float zRot{ 0.0f };
-	private:
-		Microsoft::WRL::ComPtr<ID3DBlob> vertexBlob{};
-		Microsoft::WRL::ComPtr<ID3DBlob> pixelBlob{};
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader{};
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader{};
-		friend class Display;
 	};
 }
 

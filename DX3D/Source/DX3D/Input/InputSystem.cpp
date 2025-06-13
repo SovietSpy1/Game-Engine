@@ -59,7 +59,6 @@ void dx3d::InputSystem::onUpdate()
 						if (isNew) (*it)->onKeyDownFirst(i);
 						(*it)->onKeyDown(i);
 					}
-					(*it)->onKeyDown(i);
 					it++;
 				}
 			}

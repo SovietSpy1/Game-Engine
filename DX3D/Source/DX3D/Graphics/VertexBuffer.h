@@ -5,8 +5,8 @@ namespace dx3d {
 	{
 	public:
 		explicit VertexBuffer(const GraphicsResourceDesc& desc);
-		void load(void* list_vertices, UINT size_vertex, UINT size_list, void* shader_byte_code, UINT size_byte_shader);
-		void loadWithColor(void* list_vertices, UINT size_vertex, UINT size_list, void* shader_byte_code, UINT size_byte_shader);
+		std::vector<D3D11_INPUT_ELEMENT_DESC> LayoutFromSemantics(std::vector<IA> semantics);
+		void load(void* list_vertices, UINT size_vertex, UINT size_list, void* shader_byte_code, UINT size_byte_shader, std::vector<IA> semantics = {IA::POSITION});
 		UINT getSizeVertexList();
 	private:
 		UINT m_size_vertex{};
