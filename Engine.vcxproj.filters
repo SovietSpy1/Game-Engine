@@ -209,5 +209,8 @@
     <FxCompile Include="DX3D\Shaders\Lighting\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Skybox\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Skybox\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Lighting\SphereTex\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Wave\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Wave\PixelShader.hlsl" />
   </ItemGroup>
 </Project>

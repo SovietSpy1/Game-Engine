@@ -23,6 +23,9 @@ void dx3d::Game::run()
 				if (msg.wParam == VK_ESCAPE) {
 					m_isRunning = false;
 				}
+				if (msg.wParam == 'F') {
+					m_display->toggleFullScreen();
+				}
 				if (msg.wParam == VK_SPACE) {
 					m_paused = !m_paused;
 					m_display->getInputSystem()->showCursor(m_paused);

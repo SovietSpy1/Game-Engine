@@ -19,3 +19,20 @@ std::shared_ptr<dx3d::Resource> dx3d::ResourceManager::createResourceFromFile(co
 	}
 	return nullptr;
 }
+
+std::shared_ptr<dx3d::Resource> dx3d::ResourceManager::createResourceLocal(const wchar_t* name)
+{
+	std::wstring nameStr = std::wstring(name);
+	auto it = map_resources.find(nameStr);
+	if (it != map_resources.end()) {
+		return it->second;
+	}
+	Resource* raw_res = createResourceConcrete(name);
+	if (raw_res) {
+		std::shared_ptr<Resource> res(raw_res);
+		map_resources[nameStr] = res;
+		return res;
+	}
+	return nullptr;
+}
+

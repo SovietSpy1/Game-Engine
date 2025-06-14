@@ -17,8 +17,8 @@
 #include <string>
 dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size))
 {
-	m_worldCam.SetTranslate(Vector3D(0.0f, 0.0f, -2));
 	aspectRatio = static_cast<float>(m_size.width) / static_cast<float>(m_size.height);
+	m_worldCam.SetTranslate(Vector3D(0.0f, 0.0f, -2));
 	HWND console = GetConsoleWindow();
 	ShowWindow(console, SW_MINIMIZE);
 	m_swapChain = desc.rendererSystem.createSwapChain({ m_handle, m_size });
@@ -30,25 +30,58 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	inputSystem->showCursor(false);
 
 	skyBox = GraphicsEngine::get()->createGameObject();
-	skyBox->AddMesh(L"Assets/Meshes/sphere.obj");
+	skyBox->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
 	skyBox->AddMaterial();
 	skyBox->material->SetTexture(L"Assets/Textures/sky_water.jpeg");
 	skyBox->material->SetPixelShader(L"DX3D/Shaders/Skybox/PixelShader.hlsl");
 	skyBox->material->SetVertexShader(L"DX3D/Shaders/Skybox/VertexShader.hlsl");
+	skyBox->transform->scale.SetScale(Vector3D(1, 1, 1) * 99);
 	gameObjects.push_back(skyBox);
 	//Per Game Object
 	//setting up mesh with the heart vertices and heart shaders
+
 	currentObject = GraphicsEngine::get()->createGameObject();
-	currentObject->AddMesh(L"Assets/Meshes/sphere.obj");
+	currentObject->AddMesh(L"Wave");
+	currentObject->mesh->Demo();
 	currentObject->AddMaterial();
-	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/PixelShader.hlsl");
-	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
-	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 1);
-	currentObject->SetAxis(0.5f);
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Wave/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Wave/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/wave.jpg");
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 0.2f) );
+	currentObject->transform->position.SetTranslate(Vector3D(-10, -2, -10));
 	gameObjects.push_back(currentObject);
 
 	currentObject = GraphicsEngine::get()->createGameObject();
-	currentObject->AddMesh(L"Assets/Meshes/statue.obj");
+	currentObject->AddMesh(L"Quad");
+	currentObject->AddMaterial();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/grass.jpg");
+	currentObject->transform->scale.SetScale(Vector3D(10, 1, 10));
+	currentObject->transform->position.SetTranslate(Vector3D(0, -1, 0));
+	gameObjects.push_back(currentObject);
+
+	currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMesh(L"Cube");
+	currentObject->AddMaterial();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
+	gameObjects.push_back(currentObject);
+
+	currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
+	currentObject->AddMaterial();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 1);
+	currentObject->transform->position.SetTranslate(Vector3D(3, 0, 0));
+	gameObjects.push_back(currentObject);
+
+	currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMeshFromFile(L"Assets/Meshes/statue.obj");
 	currentObject->AddMaterial();
 	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/PixelShader.hlsl");
 	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
@@ -58,6 +91,8 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	gameObjects.push_back(currentObject);
 
 	m_device_context->SetViewportSize(m_size.width, m_size.height);
+	m_device_context->createTransparentBlendState();
+	m_device_context->setBlendState();
 	currentCol = Color{ 0,0,0.7f };
 	//set constant buffer with values 
 	initialized = true;
@@ -72,7 +107,6 @@ void dx3d::Display::onUpdate()
 		currentObject = gameObjects[i];
 		if (currentObject == skyBox) {
 			currentObject->transform->position.SetTranslate(m_worldCam.getTranslation());
-			currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 10);
 			SkyBoxUpdate();
 		}
 		else{
@@ -114,6 +148,7 @@ void dx3d::Display::GameObjectUpdate()
 
 void dx3d::Display::CameraUpdate()
 {
+	cBuff.elapsedTime = Time::elapsedTime;
 	Matrix4X4 lightRot;
 	lightRot.SetIdentity();
 	lightRotation += 0.25f * PI * Time::deltaTime;
@@ -130,14 +165,14 @@ void dx3d::Display::CameraUpdate()
 	worldCam *= temp;
 	temp.SetRotationY(yRot);
 	worldCam *= temp;
-	Vector3D new_pos = m_worldCam.getTranslation() + worldCam.getZDirection() * forward * 0.01f;
-	new_pos = new_pos + worldCam.getXDirection() * rightward * 0.01f;
+	Vector3D new_pos = m_worldCam.getTranslation() + worldCam.getZDirection() * forward * 0.1f;
+	new_pos = new_pos + worldCam.getXDirection() * rightward * 0.1f;
 	cBuff.camPosition = new_pos;
 	worldCam.SetTranslate(new_pos);
 	m_worldCam = worldCam;
 	worldCam.inverse();
 	cBuff.m_view = worldCam;
-	cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.000001f, 100.0f);
+	cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.01f, 100.0f);
 }
 
 void dx3d::Display::SkyBoxUpdate()
@@ -160,6 +195,12 @@ void dx3d::Display::SkyBoxUpdate()
 
 dx3d::Display::~Display()
 {
+}
+
+void dx3d::Display::onResize(const Rect& new_size)
+{
+	m_swapChain->resize(new_size.width, new_size.height);
+	aspectRatio = static_cast<float>(new_size.width) / static_cast<float>(new_size.height);
 }
 
 void dx3d::Display::onKeyDown(int key)

@@ -9,13 +9,13 @@ dx3d::GameObject::GameObject(const BaseDesc& desc) :Base(desc)
 {
 	transform = std::make_shared<Transform>();
 }
-void dx3d::GameObject::AddMesh(const wchar_t* file_path)
+void dx3d::GameObject::AddMeshFromFile(const wchar_t* file_path)
 {
 	mesh = GraphicsEngine::get()->getMeshManager().createMeshFromFile(file_path);
 }
-void dx3d::GameObject::AddMesh()
+void dx3d::GameObject::AddMesh(const wchar_t* name)
 {
-	mesh = GraphicsEngine::get()->getMeshManager().createMesh();
+	mesh = GraphicsEngine::get()->getMeshManager().createMesh(name);
 }
 
 void dx3d::GameObject::AddMaterial()

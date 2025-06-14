@@ -6,8 +6,8 @@ namespace dx3d {
 	{
 	public:
 		GameObject(const BaseDesc& desc);
-		void AddMesh(const wchar_t* file_path);
-		void AddMesh();
+		void AddMeshFromFile(const wchar_t* file_path);
+		void AddMesh(const wchar_t* name);
 		void AddMaterial();
 		void SetPosition(float x, float y, float z);
 		void SetRotation(float x, float y, float z);

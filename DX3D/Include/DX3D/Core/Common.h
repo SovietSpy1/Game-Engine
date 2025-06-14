@@ -95,10 +95,16 @@ namespace dx3d {
 	};
 	struct vertex {
 		Vector3D position;
-		Vector2D uvs;
+		Vector2D uv;
 		Vector3D normal;
+		Vector4D color;
 	};
-	
+	enum MeshType
+	{
+		Cube,
+		Quad,
+		Custom
+	};
 	_declspec(align(16)) struct ConstantBufferDesc {
 		Matrix4X4 m_world{};
 		Matrix4X4 m_view{};
@@ -106,6 +112,7 @@ namespace dx3d {
 		Vector4D lightDirection;
 		Vector4D camPosition;
 		Matrix4X4 m_rotation{};
+		float elapsedTime;
     };
 }
 #define PI 3.141594265f 

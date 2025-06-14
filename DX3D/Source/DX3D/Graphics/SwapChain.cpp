@@ -33,9 +33,13 @@ dx3d::SwapChain::SwapChain(const SwapChainDesc& desc, const GraphicsResourceDesc
 
 
 }
-
 bool dx3d::SwapChain::present(bool vsync)
 {
 	m_swapChain->Present(vsync, NULL);
 	return true;
+}
+
+void dx3d::SwapChain::resize(UINT width, UINT height)
+{
+	m_swapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 }

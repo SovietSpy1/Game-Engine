@@ -11,6 +11,12 @@ namespace dx3d {
 		std::shared_ptr<Texture> createTextureFromFile(const wchar_t* file_path);
 	protected:
 		Resource* createResourceFromFileConcrete(const wchar_t* file_path);
+	private:
+		Resource* createResourceConcrete(const wchar_t* name) 
+		{
+			// This method is not used in TextureManager, but must be defined due to inheritance
+			return nullptr; // or throw an exception if this should not be called
+		}
 	};
 }
 

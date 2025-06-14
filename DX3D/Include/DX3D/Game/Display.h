@@ -18,6 +18,7 @@ namespace dx3d {
 		void CameraUpdate();
 		void SkyBoxUpdate();
 		virtual ~Display() override;
+		virtual void onResize(const Rect& new_size) override;
 	public:
 		bool initialized = false;
 		bool pause = false;

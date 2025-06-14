@@ -13,3 +13,5 @@ dx3d::Resource* dx3d::TextureManager::createResourceFromFileConcrete(const wchar
 	catch (...) {}
 	return tex;
 }
+
+

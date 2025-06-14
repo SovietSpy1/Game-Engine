@@ -10,6 +10,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 #include <locale>
+
 std::string WideCharToUTF8(const wchar_t* wideStr)
 {
 	int size_needed = WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, nullptr, 0, nullptr, nullptr);
@@ -31,8 +32,6 @@ dx3d::Mesh::Mesh(const GraphicsResourceDesc& gDesc) : Resource(gDesc)
 
 dx3d::Mesh::Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc) : Resource(full_path, desc)
 {
-	const WCHAR* vertexShaderPath = L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl";
-	m_renderSystem->compileVertexShader(vertexShaderPath, vertexLayoutBlob);
 	indexBuffer = desc.renderSystem->createIndexBuffer();
 	vertexBuffer = desc.renderSystem->createVertexBuffer();
 	tinyobj::attrib_t attribs;
@@ -74,7 +73,7 @@ dx3d::Mesh::Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc) : R
 					ny = attribs.normals.at(index.normal_index * 3 + 1);
 					nz = attribs.normals.at(index.normal_index * 3 + 2);
 				}
-				vertex vrtx = vertex{ Vector3D(vx,vy,vz), Vector2D(tx,ty), Vector3D(nx,ny,nz)};
+				vertex vrtx = vertex{ Vector3D(vx,vy,vz), Vector2D(tx,ty), Vector3D(nx,ny,nz), Vector4D(1,1,1,1)};
 				vertices.push_back(vrtx);
 				indices.push_back(indexOffset + v);
 			}
@@ -84,10 +83,26 @@ dx3d::Mesh::Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc) : R
 	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize(), std::vector<IA>{IA::POSITION, IA::TEXCOORD, IA::NORMAL});
 	indexBuffer->load(indices.data(), indices.size());
 }
+dx3d::Mesh::Mesh(const GraphicsResourceDesc& gDesc, MeshType meshType) : Resource(gDesc), meshType(meshType)
+{
+	indexBuffer = gDesc.renderSystem->createIndexBuffer();
+	vertexBuffer = gDesc.renderSystem->createVertexBuffer();
+	switch (meshType) {
+		case MeshType::Cube:
+			LoadCubeMesh();
+			break;
+		case MeshType::Quad:
+			LoadQuadMesh();
+			break;
+		case MeshType::Custom:
+			break;
+		default:
+			DX3DLogErrorAndThrow("Mesh type not supported.");
+			break;
+	}
+}
 void dx3d::Mesh::LoadCubeMesh()
 {
-	const WCHAR* vertexShaderPath = L"DX3D/Shaders/Cube/VertexShader.hlsl";
-	m_renderSystem->compileVertexShader(vertexShaderPath, vertexLayoutBlob);
 	topology = TopologyType::TriangleList;
 	//set positions
 	std::vector<Vector3D>positions = {
@@ -132,45 +147,233 @@ void dx3d::Mesh::LoadCubeMesh()
 	};
 
 	//set vertices
-	vertices = {
-		//front face
-		{positions[0], uvs[1]},
-		{positions[1], uvs[0]},
-		{positions[2], uvs[2]},
-		{positions[3], uvs[3]},
-		//back face
-		{positions[4], uvs[1]},
-		{positions[5], uvs[0]},
-		{positions[6], uvs[2]},
-		{positions[7], uvs[3]},
-		
-		{positions[1], uvs[1]},
-		{positions[6], uvs[0]},
-		{positions[5], uvs[2]},
-		{positions[2], uvs[3]},
+	std::vector<Vector3D> vPositions = {
+		// front face
+		positions[0],
+		positions[1],
+		positions[2],
+		positions[3],
 
-		{positions[7], uvs[1]},
-		{positions[0], uvs[0]},
-		{positions[3], uvs[2]},
-		{positions[4], uvs[3]},
+		// back face
+		positions[4],
+		positions[5],
+		positions[6],
+		positions[7],
 
-		{positions[3], uvs[1]},
-		{positions[2], uvs[0]},
-		{positions[5], uvs[2]},
-		{positions[4], uvs[3]},
+		positions[1],
+		positions[6],
+		positions[5],
+		positions[2],
 
-		{positions[7], uvs[1]},
-		{positions[6], uvs[0]},
-		{positions[1], uvs[2]},
-		{positions[0], uvs[3]},
+		positions[7],
+		positions[0],
+		positions[3],
+		positions[4],
+
+		positions[3],
+		positions[2],
+		positions[5],
+		positions[4],
+
+		positions[7],
+		positions[6],
+		positions[1],
+		positions[0]
 	};
+	std::vector<Vector2D> vUvs = {
+		// front face
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		// back face
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3]
+	};
+	std::vector<Vector3D> vNormals = {
+		// front face
+		Vector3D(0.0f, 0.0f, -1.0f),
+		Vector3D(0.0f, 0.0f, -1.0f),
+		Vector3D(0.0f, 0.0f, -1.0f),
+		Vector3D(0.0f, 0.0f, -1.0f),
+
+		// back face
+		Vector3D(0.0f, 0.0f, 1.0f),
+		Vector3D(0.0f, 0.0f, 1.0f),
+		Vector3D(0.0f, 0.0f, 1.0f),
+		Vector3D(0.0f, 0.0f, 1.0f),
+
+		// top face
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+
+		// bottom face
+		Vector3D(0.0f, -1.0f, 0.0f),
+		Vector3D(0.0f, -1.0f, 0.0f),
+		Vector3D(0.0f, -1.0f, 0.0f),
+		Vector3D(0.0f, -1.0f, 0.0f),
+
+		// right face
+		Vector3D(1.0f, 0.0f, 0.0f),
+		Vector3D(1.0f, 0.0f, 0.0f),
+		Vector3D(1.0f, 0.0f, 0.0f),
+		Vector3D(1.0f, 0.0f, 0.0f),
+
+		// left face
+		Vector3D(-1.0f, 0.0f, 0.0f),
+		Vector3D(-1.0f, 0.0f, 0.0f),
+		Vector3D(-1.0f, 0.0f, 0.0f),
+		Vector3D(-1.0f, 0.0f, 0.0f)
+	};
+	FillInVertexData({ {IA::POSITION, vPositions}, {IA::TEXCOORD, vUvs} , {IA::NORMAL, vNormals} });
 	indexBuffer->load(indices.data(), indices.size());
 	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize());
 }
-void dx3d::Mesh::ClearMeshData()
+
+void dx3d::Mesh::LoadQuadMesh()
 {
+	std::vector<Vector3D> positions = {
+		Vector3D(-0.5f, 0, -0.5f),
+		Vector3D(-0.5f, 0, 0.5f),
+		Vector3D(0.5f, 0, -0.5f),
+		Vector3D(0.5f, 0, 0.5f)
+	};
+	std::vector<Vector2D> uvs = {
+		Vector2D(0.0f, 0.0f),
+		Vector2D(0.0f, 1.0f),
+		Vector2D(1.0f, 0.0f),
+		Vector2D(1.0f, 1.0f)
+	};
+	std::vector<Vector3D> normals = {
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f)
+	};
+	std::vector<UINT> indices = {
+		0, 1, 2, // first triangle
+		2, 1, 3  // second triangle
+	};
+	FillInVertexData({ {IA::POSITION, positions}, {IA::TEXCOORD, uvs}, {IA::NORMAL, normals} });
+	indexBuffer->load(indices.data(), indices.size());
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize(), std::vector<IA>{IA::POSITION, IA::TEXCOORD, IA::NORMAL});
+}
+void dx3d::Mesh::Demo() {
+	std::vector<Vector3D> positions;
+	std::vector<Vector2D> uvs;
+	std::vector<Vector3D> normals;
+	std::vector<UINT> indices;
+	std::vector<Vector3D> tempNormals = {
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f)
+	};
+	float z = 0;
+	float x = 0;
+	for (UINT i = 0; i < 100; i++) {
+		UINT UVOffset = i % 5;
+		for (UINT j = 0; j < 20; j++) {
+			UINT indexOffset = i * 80 + j * 4;
+			std::vector<Vector3D> tempPos{
+				Vector3D(x + -0.5f, 0, z + -0.5f),
+				Vector3D(x + -0.5f, 0, z + 0.5f),
+				Vector3D(x + 0.5f, 0, z + -0.5f),
+				Vector3D(x + 0.5f, 0, z + 0.5f)
+			};
+			std::vector<Vector2D> tempUvs = {
+				Vector2D(0.0f, UVOffset + 0.0f),
+				Vector2D(0.0f, UVOffset + 1.0f),
+				Vector2D(1.0f, UVOffset + 0.0f),
+				Vector2D(1.0f, UVOffset + 1.0f)
+			};
+			std::vector<UINT> tempIndices = {
+				0 + indexOffset, 1 + indexOffset, 2 + indexOffset, // first triangle
+				2 + indexOffset, 1 + indexOffset, 3 + indexOffset  // second triangle
+			};
+			positions.insert(positions.end(), tempPos.begin(), tempPos.end());
+			uvs.insert(uvs.end(), tempUvs.begin(), tempUvs.end());
+			normals.insert(normals.end(), tempNormals.begin(), tempNormals.end());
+			indices.insert(indices.end(), tempIndices.begin(), tempIndices.end());
+			x = j;
+		}
+		z = i;
+	}
+	
+	FillInVertexData({ {IA::POSITION, positions}, {IA::TEXCOORD, uvs}, {IA::NORMAL, normals} });
+	indexBuffer->load(indices.data(), indices.size());
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize(), std::vector<IA>{IA::POSITION, IA::TEXCOORD, IA::NORMAL});
+}
+void dx3d::Mesh::FillInVertexData(std::unordered_map<IA, vertexData> data)
+{
+	auto it = data.find(IA::POSITION);
+	if (it == data.end()) {
+		DX3DLogErrorAndThrow("No vertex data provided.");
+	}
+	size_t size = std::get<std::vector<Vector3D>>(it->second).size();
+	std::vector<Vector3D> positions(size);
+	std::vector<Vector2D> uvs(size);
+	std::vector<Vector3D> normals(size);
+	std::vector<Vector4D> colors(size);
 	vertices.clear();
-	indices.clear();
+	vertices.reserve(size);
+	it = data.begin();
+	while (it != data.end())
+	{
+		switch (it->first) {
+		case IA::POSITION:
+			positions = std::get<std::vector<Vector3D>>(it->second);
+			break;
+		case IA::TEXCOORD:
+			uvs = std::get<std::vector<Vector2D>>(it->second);
+			break;
+		case IA::NORMAL:
+			normals = std::get<std::vector<Vector3D>>(it->second);
+			break;
+		case IA::COLOR:
+			colors = std::get<std::vector<Vector4D>>(it->second);
+			break;
+		default:
+			DX3DLogErrorAndThrow("Invalid vertex data type.");
+			break;
+		}
+		it++;
+	}
+	for (size_t i = 0; i < size; i++)
+	{
+		vertex vtx{};
+		vtx.position = positions[i];
+		vtx.uv = uvs[i];
+		vtx.normal = normals[i];
+		vtx.color = colors[i];
+		vertices.push_back(vtx);
+	}
+
 }
 
 
