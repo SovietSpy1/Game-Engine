@@ -39,6 +39,9 @@ void dx3d::PhysicsEngine::Update()
 		for (size_t i = 0; i < collider->baseNormals.size(); i++) {
 			collider->normals.at(i) = collider->owner->transform->rotation.ReverseMul(collider->baseNormals.at(i));
 		}
+		for (size_t i = 0; i < collider->baseEdges.size(); i++) {
+			collider->edges.at(i) = collider->owner->transform->rotation.ReverseMul(collider->baseEdges.at(i));
+		}
 	}
 	for (const auto& collider : colliders) {
 		for (const auto& otherCollider : colliders) {
@@ -91,6 +94,8 @@ bool dx3d::PhysicsEngine::IntersectCheck(const std::shared_ptr<Collider>& collid
 	std::vector<Vector3D> vertices2 = collider2->vertices;
 	std::vector<Vector3D> normals1 = collider1->normals;
 	std::vector<Vector3D> normals2 = collider2->normals;
+	std::vector<Vector3D> edges1 = collider1->edges;
+	std::vector<Vector3D> edges2 = collider2->edges;
 	Vector3D leastDistAxis;
 	float leastDist;
 	if (vertices1.empty() || vertices2.empty() || normals1.empty() || normals2.empty()) {
@@ -134,17 +139,17 @@ bool dx3d::PhysicsEngine::IntersectCheck(const std::shared_ptr<Collider>& collid
 	for (const auto& n : normals2) {
 		if (!checkAxis(n)) return false;
 	}
-	std::vector<Vector3D> crossedNormals;
-	for (const auto& n1 : normals1) {
-		for (const auto& n2 : normals2) {
-			Vector3D crossedNorm = n1.cross(n2);
-			if (crossedNorm.mag() >= 0.001f) {
-				crossedNormals.push_back(crossedNorm.normalize());
+	std::vector<Vector3D> crossedEdges;
+	for (const auto& e1 : edges1) {
+		for (const auto& e2 : edges2) {
+			Vector3D crossedEdge = e1.cross(e2);
+			if (crossedEdge.mag() >= 0.001f) {
+				crossedEdges.push_back(crossedEdge.normalize());
 			}
 		}
 	}
-	for (const auto& n : crossedNormals) {
-		if (!checkAxis(n)) return false;
+	for (const auto& e : crossedEdges) {
+		if (!checkAxis(e)) return false;
 	}
 	if (moveVec != nullptr) {
 		*moveVec = leastDistAxis * leastDist;

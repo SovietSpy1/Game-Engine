@@ -19,6 +19,8 @@ namespace dx3d {
 		std::vector<Vector3D> baseVertices;
 		std::vector<Vector3D> normals;
 		std::vector<Vector3D> baseNormals;
+		std::vector<Vector3D> baseEdges;
+		std::vector<Vector3D> edges;
 		std::vector<UINT> indices;
 		std::shared_ptr<VertexBuffer> vertexBuffer;
 		std::shared_ptr<IndexBuffer> indexBuffer;
@@ -30,7 +32,7 @@ namespace dx3d {
 		Matrix4X4 scale;
 		ColliderBuffer colliderBuffer;
 		std::shared_ptr<ConstantBuffer> constantBuffer{};
-		bool show = false;
+		bool show = true;
 	};
 }
 

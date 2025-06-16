@@ -58,7 +58,6 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
 	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
 	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
-	currentObject->collider->show = true;
 	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
 	currentObject->transform->position.SetTranslate(Vector3D(0, 0, -4));
 	gameObjects.push_back(currentObject);
@@ -67,7 +66,7 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	camera->tags.push_back(Tags::Camera);
 	camera->transform->SetParent(currentObject->transform.get());
 	camera->transform->position.SetTranslate(Vector3D(0, 1, -1));
-	gameObjects.push_back(std::static_pointer_cast<GameObject>(camera));
+	//gameObjects.push_back(std::static_pointer_cast<GameObject>(camera));
 
 	currentObject = std::make_shared<SkyBox>(BaseDesc{ m_logger }, camera.get());
 	currentObject->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
@@ -87,7 +86,6 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	currentObject->AddMesh(L"Quad");
 	currentObject->AddMaterial();
 	currentObject->AddCollider(ColliderType::Quad);
-	currentObject->collider->show = true;
 	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
 	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
 	currentObject->material->SetTexture(L"Assets/Textures/grass.jpg");
@@ -104,7 +102,6 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
 	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
 	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
-	currentObject->collider->show = true;
 	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
 	currentObject->transform->position.SetTranslate(Vector3D(0, 10, 0));
 	gameObjects.push_back(currentObject);
@@ -113,7 +110,6 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	currentObject->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
 	currentObject->AddMaterial();
 	currentObject->AddCollider(ColliderType::Box);
-	currentObject->collider->show = true;
 	currentObject->AddRigidBody();
 	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
 	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
@@ -126,7 +122,6 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	currentObject->AddMeshFromFile(L"Assets/Meshes/statue.obj");
 	currentObject->AddMaterial();
 	currentObject->AddCollider(ColliderType::Box);
-	currentObject->collider->show = true;
 	currentObject->collider->SetTransform(Vector3D::up() * 1.2f + Vector3D::forward() * 0.2f);
 	currentObject->collider->SetScale(Vector3D(0.1f, 0.5f, 0.1f));
 	currentObject->AddRigidBody();
@@ -161,15 +156,12 @@ void dx3d::Display::onUpdate()
 	m_device_context->clearRenderTargetColor(m_swapChain, currentCol.rgba);
 	inputSystem->onUpdate();
 	PhysicsEngine::get()->Update();
+	camera->Update();
+	CameraUpdate();
 	for (int i = 0; i < gameObjects.size(); i++) {
 		currentObject = gameObjects[i];
 		currentObject->Update();
-		if (currentObject == camera) {
-			CameraUpdate();
-		}
-		else {
-			GameObjectUpdate();
-		}
+		GameObjectUpdate();
 	}
 	m_swapChain->present(true);
 }

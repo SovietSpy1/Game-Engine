@@ -9,15 +9,13 @@ namespace dx3d {
 		Player(const BaseDesc& desc) : GameObject(desc) {}
 		void Update() override {
 			if (rigidBody != nullptr) {
-				Matrix4X4 temp{};
-				temp.SetRotationY(yRot);
-				Vector3D moveDir = temp.getZDirection() * forward + temp.getXDirection() * rightward;
+				Vector3D moveDir = transform->rotation.getZDirection() * forward + transform->rotation.getXDirection() * rightward;
 				rigidBody->SetVelocity(Vector3D(velocity * moveDir.x, rigidBody->velocity.y, velocity * moveDir.z));
 			}
 		}
 		void Jump() {
 			if (rigidBody != nullptr) {
-				rigidBody->AddForce(Vector3D::up() * 100);
+				rigidBody->AddForce(Vector3D::up() * 200);
 			}
 		}
 		void onKeyDown(int key) override {
@@ -33,6 +31,8 @@ namespace dx3d {
 			if (key == 'S') {
 				forward = -1;
 			}
+		}
+		void onKeyDownFirst(int key) {
 			if (key == VK_SHIFT) {
 				Jump();
 			}

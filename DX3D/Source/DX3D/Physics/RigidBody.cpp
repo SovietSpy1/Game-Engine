@@ -22,8 +22,6 @@ void dx3d::RigidBody::Update()
 	}
 	owner->transform->position.Translate(velocity * Time::deltaTime);
 	actingForces = {};
-	velocity = {};
-	acceleration = {};
 }
 
 void dx3d::RigidBody::onCollideDynamic(Vector3D moveDir)

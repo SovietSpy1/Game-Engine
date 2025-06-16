@@ -37,6 +37,7 @@ dx3d::Collider::Collider(const BaseDesc& desc, GameObject* owner, ColliderType c
 	}
 	vertices.resize(baseVertices.size());
 	normals.resize(baseNormals.size());
+	edges.resize(baseEdges.size());
 	std::vector<Vector4D> colors(baseVertices.size(), Vector4D(0, 1, 0, 1));
 	std::vector<vertex> renderedVerts = VertexBuffer::FillInVertexData({ {IA::POSITION, baseVertices}, {IA::COLOR, colors} });
 	vertexBuffer->load(renderedVerts.data(), sizeof(vertex), renderedVerts.size());
@@ -59,6 +60,13 @@ void dx3d::Collider::LoadCubeCollider()
 	};
 	baseNormals = {
 		//back face
+		Vector3D(0.0f, 0.0f, 1.0f),
+		// top face
+		Vector3D(0.0f, 1.0f, 0.0f),
+		// right face
+		Vector3D(1.0f, 0.0f, 0.0f),
+	};
+	baseEdges = {
 		Vector3D(0.0f, 0.0f, 1.0f),
 		// top face
 		Vector3D(0.0f, 1.0f, 0.0f),
@@ -100,6 +108,10 @@ void dx3d::Collider::LoadQuadCollider()
 	};
 	baseNormals = {
 		Vector3D(0.0f, 1.0f, 0.0f) // Normal pointing up
+	};
+	baseEdges = {
+		Vector3D(1.0f, 0,0),
+		Vector3D(0,0,1)
 	};
 	indices = {
 		0, 1,
