@@ -203,6 +203,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DX3D\Source\DX3D\Physics\Collider.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\DeviceContext.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Win32Game\Display.cpp" />
@@ -229,8 +230,14 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\TextureManager\TextureManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\MeshManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Object\Material.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Physics\PhysicsEngine.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Physics\RigidBody.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Camera.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Player.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\SkyBox.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Physics\Collider.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\Display.h" />
     <ClInclude Include="DX3D\Include\DX3D\All.h" />
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h" />
@@ -265,6 +272,8 @@
     <ClInclude Include="DX3D\Source\DX3D\Object\Axis.h" />
     <ClInclude Include="DX3D\Source\DX3D\Object\Transform.h" />
     <ClInclude Include="DX3D\Source\DX3D\Object\Material.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Physics\PhysicsEngine.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Physics\RigidBody.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DX3D\Shaders\Axis\PixelShader.hlsl">
@@ -276,6 +285,22 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="DX3D\Shaders\Axis\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DX3D\Shaders\Collider\PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DX3D\Shaders\Collider\VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -340,6 +365,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="DX3D\Shaders\Skybox\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DX3D\Shaders\Lighting\VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>

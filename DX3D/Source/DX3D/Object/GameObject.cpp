@@ -5,9 +5,17 @@
 #include <DX3D/Graphics/ResourceManager/TextureManager/TextureManager.h>
 #include <DX3D/Graphics/VertexBuffer.h>
 #include <DX3D/Object/Transform.h>
+#include <DX3D/Physics/PhysicsEngine.h>
+#include <DX3D/Game/Display.h>
+#include <DX3D/Input/InputSystem.h>
 dx3d::GameObject::GameObject(const BaseDesc& desc) :Base(desc)
 {
 	transform = std::make_shared<Transform>();
+	InputSystem::get()->addListener(this);
+}
+void dx3d::GameObject::Update()
+{
+
 }
 void dx3d::GameObject::AddMeshFromFile(const wchar_t* file_path)
 {
@@ -21,6 +29,16 @@ void dx3d::GameObject::AddMesh(const wchar_t* name)
 void dx3d::GameObject::AddMaterial()
 {
 	material = GraphicsEngine::get()->getRenderSystem().createMaterial();
+}
+
+void dx3d::GameObject::AddRigidBody()
+{
+	rigidBody = PhysicsEngine::get()->createRigidBody(this);
+}
+
+void dx3d::GameObject::AddCollider(ColliderType colliderType)
+{
+	collider = PhysicsEngine::get()->createCollider(this, colliderType);
 }
 
 void dx3d::GameObject::SetPosition(float x, float y, float z)

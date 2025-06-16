@@ -111,13 +111,13 @@ namespace dx3d {
 			float det4 = mat[0][3] * this->getSubMatrix(0,3).getDeterminant();
 			return det1 - det2 + det3 - det4;
 		}
-		void inverse() {
+		Matrix4X4 inverse() {
 			Matrix4X4 out{};
 			Matrix4X4 cofactors{};
 			Matrix4X4 adjugate{};
 			Matrix4X4 inverse{};
 			float det = getDeterminant();
-			if (!det) return;
+			if (!det) return Matrix4X4();
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
 					cofactors.mat[i][j] = (((i + j) % 2 == 0) ? 1.0f : -1.0f)
@@ -130,7 +130,7 @@ namespace dx3d {
 				}
 			}
 			inverse = adjugate * (1.0f / det);
-			setMatrix(inverse.mat);
+			return Matrix4X4{ inverse };
 		}
 		void setMatrix(float temp[4][4]) {
 			for (int i = 0; i < 4; i++) {
@@ -197,6 +197,13 @@ namespace dx3d {
 					{forward.x, forward.y, forward.z, 0},
 					{0, 0, 0, 1} };
 			setMatrix(temp);
+		}
+		Vector3D ReverseMul(const Vector3D& vec) {
+			Vector3D temp{};
+			temp.x = vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0] + mat[3][0];
+			temp.y = vec.x * mat[0][1] + vec.y * mat[1][1] + vec.z * mat[2][1] + mat[3][1];
+			temp.z = vec.x * mat[0][2] + vec.y * mat[1][2] + vec.z * mat[2][2] + mat[3][2];
+			return temp;
 		}
 		float mat[4][4] = {};
 	};

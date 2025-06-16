@@ -17,6 +17,7 @@ namespace dx3d {
 		void showCursor(bool show) {
 			::ShowCursor(show);
 		}
+		bool listening = true;
 	private:
 		static inline InputSystem* S = nullptr;
 	private:

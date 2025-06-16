@@ -27,6 +27,9 @@ void dx3d::InputSystem::setCursorPosition(const Point& pos)
 
 void dx3d::InputSystem::onUpdate()
 {
+	if (!listening) {
+		return;
+	}
 	POINT mouse_point{};
 	::GetCursorPos(&mouse_point);
 	mouse_pos = { mouse_point.x, mouse_point.y };

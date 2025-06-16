@@ -12,8 +12,6 @@ namespace dx3d {
 		LineStrip,
 		PointList
 	};
-	
-	using vertexData = std::variant<std::vector<Vector2D>, std::vector<Vector3D>, std::vector<Vector4D>>;
 	class Mesh : public Resource
 	{
 	public:
@@ -23,10 +21,8 @@ namespace dx3d {
 		void LoadCubeMesh();
 		void LoadQuadMesh();
 		void Demo();
-		void FillInVertexData(std::unordered_map<IA, vertexData> data);
 		std::vector<vertex> vertices;
 		std::vector<UINT> indices;
-		static inline Microsoft::WRL::ComPtr<ID3DBlob> vertexLayoutBlob{};
 		std::shared_ptr<VertexBuffer> vertexBuffer;
 		std::shared_ptr<IndexBuffer> indexBuffer;
 		MeshType meshType{ MeshType::Custom };

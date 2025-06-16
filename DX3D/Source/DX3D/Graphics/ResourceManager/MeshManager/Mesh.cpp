@@ -80,7 +80,8 @@ dx3d::Mesh::Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc) : R
 			indexOffset += num_face_verts;
 		}
 	}
-	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize(), std::vector<IA>{IA::POSITION, IA::TEXCOORD, IA::NORMAL});
+
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
 	indexBuffer->load(indices.data(), indices.size());
 }
 dx3d::Mesh::Mesh(const GraphicsResourceDesc& gDesc, MeshType meshType) : Resource(gDesc), meshType(meshType)
@@ -250,9 +251,9 @@ void dx3d::Mesh::LoadCubeMesh()
 		Vector3D(-1.0f, 0.0f, 0.0f),
 		Vector3D(-1.0f, 0.0f, 0.0f)
 	};
-	FillInVertexData({ {IA::POSITION, vPositions}, {IA::TEXCOORD, vUvs} , {IA::NORMAL, vNormals} });
+	vertices = VertexBuffer::FillInVertexData({ {IA::POSITION, vPositions}, {IA::TEXCOORD, vUvs} , {IA::NORMAL, vNormals} });
 	indexBuffer->load(indices.data(), indices.size());
-	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize());
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
 }
 
 void dx3d::Mesh::LoadQuadMesh()
@@ -279,9 +280,9 @@ void dx3d::Mesh::LoadQuadMesh()
 		0, 1, 2, // first triangle
 		2, 1, 3  // second triangle
 	};
-	FillInVertexData({ {IA::POSITION, positions}, {IA::TEXCOORD, uvs}, {IA::NORMAL, normals} });
+	vertices = VertexBuffer::FillInVertexData({ {IA::POSITION, positions}, {IA::TEXCOORD, uvs}, {IA::NORMAL, normals} });
 	indexBuffer->load(indices.data(), indices.size());
-	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize(), std::vector<IA>{IA::POSITION, IA::TEXCOORD, IA::NORMAL});
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
 }
 void dx3d::Mesh::Demo() {
 	std::vector<Vector3D> positions;
@@ -297,9 +298,10 @@ void dx3d::Mesh::Demo() {
 	float z = 0;
 	float x = 0;
 	for (UINT i = 0; i < 100; i++) {
-		UINT UVOffset = i % 5;
-		for (UINT j = 0; j < 20; j++) {
-			UINT indexOffset = i * 80 + j * 4;
+		UINT UVOffset = i;
+		for (UINT j = 0; j < 100; j++) {
+			UINT UVXOffset = j;
+			UINT indexOffset = i * 400 + j * 4;
 			std::vector<Vector3D> tempPos{
 				Vector3D(x + -0.5f, 0, z + -0.5f),
 				Vector3D(x + -0.5f, 0, z + 0.5f),
@@ -307,10 +309,10 @@ void dx3d::Mesh::Demo() {
 				Vector3D(x + 0.5f, 0, z + 0.5f)
 			};
 			std::vector<Vector2D> tempUvs = {
-				Vector2D(0.0f, UVOffset + 0.0f),
-				Vector2D(0.0f, UVOffset + 1.0f),
-				Vector2D(1.0f, UVOffset + 0.0f),
-				Vector2D(1.0f, UVOffset + 1.0f)
+				Vector2D(UVXOffset + 0.0f, UVOffset + 0.0f),
+				Vector2D(UVXOffset + 0.0f, UVOffset + 1.0f),
+				Vector2D(UVXOffset + 1.0f, UVOffset + 0.0f),
+				Vector2D(UVXOffset + 1.0f, UVOffset + 1.0f)
 			};
 			std::vector<UINT> tempIndices = {
 				0 + indexOffset, 1 + indexOffset, 2 + indexOffset, // first triangle
@@ -325,56 +327,11 @@ void dx3d::Mesh::Demo() {
 		z = i;
 	}
 	
-	FillInVertexData({ {IA::POSITION, positions}, {IA::TEXCOORD, uvs}, {IA::NORMAL, normals} });
+	vertices = VertexBuffer::FillInVertexData({ {IA::POSITION, positions}, {IA::TEXCOORD, uvs}, {IA::NORMAL, normals} });
 	indexBuffer->load(indices.data(), indices.size());
-	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size(), vertexLayoutBlob->GetBufferPointer(), vertexLayoutBlob->GetBufferSize(), std::vector<IA>{IA::POSITION, IA::TEXCOORD, IA::NORMAL});
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
 }
-void dx3d::Mesh::FillInVertexData(std::unordered_map<IA, vertexData> data)
-{
-	auto it = data.find(IA::POSITION);
-	if (it == data.end()) {
-		DX3DLogErrorAndThrow("No vertex data provided.");
-	}
-	size_t size = std::get<std::vector<Vector3D>>(it->second).size();
-	std::vector<Vector3D> positions(size);
-	std::vector<Vector2D> uvs(size);
-	std::vector<Vector3D> normals(size);
-	std::vector<Vector4D> colors(size);
-	vertices.clear();
-	vertices.reserve(size);
-	it = data.begin();
-	while (it != data.end())
-	{
-		switch (it->first) {
-		case IA::POSITION:
-			positions = std::get<std::vector<Vector3D>>(it->second);
-			break;
-		case IA::TEXCOORD:
-			uvs = std::get<std::vector<Vector2D>>(it->second);
-			break;
-		case IA::NORMAL:
-			normals = std::get<std::vector<Vector3D>>(it->second);
-			break;
-		case IA::COLOR:
-			colors = std::get<std::vector<Vector4D>>(it->second);
-			break;
-		default:
-			DX3DLogErrorAndThrow("Invalid vertex data type.");
-			break;
-		}
-		it++;
-	}
-	for (size_t i = 0; i < size; i++)
-	{
-		vertex vtx{};
-		vtx.position = positions[i];
-		vtx.uv = uvs[i];
-		vtx.normal = normals[i];
-		vtx.color = colors[i];
-		vertices.push_back(vtx);
-	}
 
-}
 
 
 

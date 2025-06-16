@@ -8,6 +8,7 @@ namespace dx3d {
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Resource> m_texture = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler = nullptr;
 		friend class DeviceContext;
 	};
 

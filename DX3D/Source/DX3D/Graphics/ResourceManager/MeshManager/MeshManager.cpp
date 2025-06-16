@@ -3,8 +3,6 @@
 #include <DX3D/Graphics/RenderSystem.h>
 dx3d::MeshManager::MeshManager(const GraphicsResourceDesc& desc) : ResourceManager(desc)
 {
-	const WCHAR* vertexShaderPath = L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl";
-	m_renderSystem->compileVertexShader(vertexShaderPath, Mesh::vertexLayoutBlob);
 }
 std::shared_ptr<dx3d::Mesh> dx3d::MeshManager::createMeshFromFile(const wchar_t* file_path)
 {

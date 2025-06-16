@@ -14,31 +14,127 @@
 #include <DX3D/Object/Transform.h>
 #include <DX3D/Object/Axis.h>
 #include <DX3D/Object/Material.h>
+#include <DX3D/Physics/PhysicsEngine.h>
+#include <DX3D/Physics/RigidBody.h>
+#include <DX3D/Physics/Collider.h>
+//gameObjects
+#include <DX3D/Object/Objects/Camera.h>
+#include <DX3D/Object/Objects/SkyBox.h>
+#include <DX3D/Object/Objects/Player.h>
 #include <string>
 dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size))
 {
+	S = this;
 	aspectRatio = static_cast<float>(m_size.width) / static_cast<float>(m_size.height);
-	m_worldCam.SetTranslate(Vector3D(0.0f, 0.0f, -2));
 	HWND console = GetConsoleWindow();
 	ShowWindow(console, SW_MINIMIZE);
 	m_swapChain = desc.rendererSystem.createSwapChain({ m_handle, m_size });
 	m_device_context = desc.rendererSystem.createDeviceContext();
 	constantBuffer = desc.rendererSystem.createConstantBuffer();
-
 	inputSystem = std::make_shared<InputSystem>(InputSystemDesc(desc.window.base, (HWND)m_handle));
 	inputSystem->addListener(this);
 	inputSystem->showCursor(false);
+	PhysicsEngine::get()->gravity = -3;
 
-	skyBox = GraphicsEngine::get()->createGameObject();
-	skyBox->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
-	skyBox->AddMaterial();
-	skyBox->material->SetTexture(L"Assets/Textures/sky_water.jpeg");
-	skyBox->material->SetPixelShader(L"DX3D/Shaders/Skybox/PixelShader.hlsl");
-	skyBox->material->SetVertexShader(L"DX3D/Shaders/Skybox/VertexShader.hlsl");
-	skyBox->transform->scale.SetScale(Vector3D(1, 1, 1) * 99);
-	gameObjects.push_back(skyBox);
+	/*currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMesh(L"Cube");
+	currentObject->AddCollider(ColliderType::Box);
+	currentObject->AddRigidBody();
+	currentObject->AddMaterial();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
+	currentObject->collider->show = true;
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
+	currentObject->transform->position.SetTranslate(Vector3D(0, 10, 0));
+	gameObjects.push_back(currentObject);*/
+
+	
+	currentObject = std::make_shared<Player>(BaseDesc{m_logger});
+	currentObject->AddMesh(L"Cube");
+	currentObject->AddCollider(ColliderType::Box);
+	currentObject->AddRigidBody();
+	currentObject->AddMaterial();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
+	currentObject->collider->show = true;
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
+	currentObject->transform->position.SetTranslate(Vector3D(0, 0, -4));
+	gameObjects.push_back(currentObject);
+
+	camera = std::make_shared<Camera>(BaseDesc{m_logger});
+	camera->tags.push_back(Tags::Camera);
+	camera->transform->SetParent(currentObject->transform.get());
+	camera->transform->position.SetTranslate(Vector3D(0, 1, -1));
+	gameObjects.push_back(std::static_pointer_cast<GameObject>(camera));
+
+	currentObject = std::make_shared<SkyBox>(BaseDesc{ m_logger }, camera.get());
+	currentObject->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
+	currentObject->AddMaterial();
+	currentObject->material->SetTexture(L"Assets/Textures/sky_water.jpeg");
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Skybox/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Skybox/VertexShader.hlsl");
+	currentObject->material->rasterizerStateType = RasterizerStateType::BackFace;
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 99);
+	gameObjects.push_back(std::static_pointer_cast<GameObject>(currentObject));
 	//Per Game Object
 	//setting up mesh with the heart vertices and heart shaders
+
+
+
+	currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMesh(L"Quad");
+	currentObject->AddMaterial();
+	currentObject->AddCollider(ColliderType::Quad);
+	currentObject->collider->show = true;
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/grass.jpg");
+	currentObject->material->rasterizerStateType = RasterizerStateType::AllFace;
+	currentObject->transform->scale.SetScale(Vector3D(10, 1, 10));
+	currentObject->transform->position.SetTranslate(Vector3D(0, -1, 0));
+	gameObjects.push_back(currentObject);
+
+	currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMesh(L"Cube");
+	currentObject->AddCollider(ColliderType::Box);
+	currentObject->AddRigidBody();
+	currentObject->AddMaterial();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
+	currentObject->collider->show = true;
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
+	currentObject->transform->position.SetTranslate(Vector3D(0, 10, 0));
+	gameObjects.push_back(currentObject);
+
+	currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
+	currentObject->AddMaterial();
+	currentObject->AddCollider(ColliderType::Box);
+	currentObject->collider->show = true;
+	currentObject->AddRigidBody();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
+	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 1);
+	currentObject->transform->position.SetTranslate(Vector3D(3, 10, 0));
+	gameObjects.push_back(currentObject);
+
+	currentObject = GraphicsEngine::get()->createGameObject();
+	currentObject->AddMeshFromFile(L"Assets/Meshes/statue.obj");
+	currentObject->AddMaterial();
+	currentObject->AddCollider(ColliderType::Box);
+	currentObject->collider->show = true;
+	currentObject->collider->SetTransform(Vector3D::up() * 1.2f + Vector3D::forward() * 0.2f);
+	currentObject->collider->SetScale(Vector3D(0.1f, 0.5f, 0.1f));
+	currentObject->AddRigidBody();
+	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/PixelShader.hlsl");
+	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
+	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 5);
+	currentObject->transform->position.SetTranslate(Vector3D(-3, 10, 0));
+	gameObjects.push_back(currentObject);
 
 	currentObject = GraphicsEngine::get()->createGameObject();
 	currentObject->AddMesh(L"Wave");
@@ -47,47 +143,9 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	currentObject->material->SetPixelShader(L"DX3D/Shaders/Wave/PixelShader.hlsl");
 	currentObject->material->SetVertexShader(L"DX3D/Shaders/Wave/VertexShader.hlsl");
 	currentObject->material->SetTexture(L"Assets/Textures/wave.jpg");
-	currentObject->transform->scale.SetScale(Vector3D(1, 1, 0.2f) );
+	currentObject->material->rasterizerStateType = RasterizerStateType::AllFace;
+	currentObject->transform->scale.SetScale(Vector3D(0.2f, 1, 0.2f));
 	currentObject->transform->position.SetTranslate(Vector3D(-10, -2, -10));
-	gameObjects.push_back(currentObject);
-
-	currentObject = GraphicsEngine::get()->createGameObject();
-	currentObject->AddMesh(L"Quad");
-	currentObject->AddMaterial();
-	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
-	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
-	currentObject->material->SetTexture(L"Assets/Textures/grass.jpg");
-	currentObject->transform->scale.SetScale(Vector3D(10, 1, 10));
-	currentObject->transform->position.SetTranslate(Vector3D(0, -1, 0));
-	gameObjects.push_back(currentObject);
-
-	currentObject = GraphicsEngine::get()->createGameObject();
-	currentObject->AddMesh(L"Cube");
-	currentObject->AddMaterial();
-	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
-	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
-	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
-	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
-	gameObjects.push_back(currentObject);
-
-	currentObject = GraphicsEngine::get()->createGameObject();
-	currentObject->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
-	currentObject->AddMaterial();
-	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
-	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
-	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
-	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 1);
-	currentObject->transform->position.SetTranslate(Vector3D(3, 0, 0));
-	gameObjects.push_back(currentObject);
-
-	currentObject = GraphicsEngine::get()->createGameObject();
-	currentObject->AddMeshFromFile(L"Assets/Meshes/statue.obj");
-	currentObject->AddMaterial();
-	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/PixelShader.hlsl");
-	currentObject->material->SetVertexShader(L"DX3D/Shaders/VertexMeshLayout/VertexShader.hlsl");
-	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1) * 3);
-	currentObject->transform->position.SetTranslate(Vector3D(-3, 0, 0));
-	currentObject->SetAxis(0.5f);
 	gameObjects.push_back(currentObject);
 
 	m_device_context->SetViewportSize(m_size.width, m_size.height);
@@ -99,17 +157,17 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 }
 void dx3d::Display::onUpdate()
 {
+	Window::onUpdate();
 	m_device_context->clearRenderTargetColor(m_swapChain, currentCol.rgba);
 	inputSystem->onUpdate();
-	Window::onUpdate();
-	CameraUpdate();
+	PhysicsEngine::get()->Update();
 	for (int i = 0; i < gameObjects.size(); i++) {
 		currentObject = gameObjects[i];
-		if (currentObject == skyBox) {
-			currentObject->transform->position.SetTranslate(m_worldCam.getTranslation());
-			SkyBoxUpdate();
+		currentObject->Update();
+		if (currentObject == camera) {
+			CameraUpdate();
 		}
-		else{
+		else {
 			GameObjectUpdate();
 		}
 	}
@@ -118,27 +176,55 @@ void dx3d::Display::onUpdate()
 
 void dx3d::Display::onFocus()
 {
-	inputSystem->addListener(this);
+	inputSystem->listening = true;
+	inputSystem->showCursor(false);
 }
 
 void dx3d::Display::onKillFocus()
 {
-	inputSystem->removeListener(this);
+	inputSystem->listening = false;
+	inputSystem->showCursor(true);
+}
+
+dx3d::Display* dx3d::Display::Get()
+{
+	return S;
 }
 
 void dx3d::Display::GameObjectUpdate()
 {
+	//prepating
+	constantBuffers.clear();
 	cBuff.m_world = currentObject->transform->Get();
-	cBuff.m_rotation = currentObject->transform->rotation;
+	cBuff.m_rotation = currentObject->transform->GetRotation();
 	constantBuffer->load(cBuff);
-	m_device_context->setConstantBuffer(*constantBuffer);
-	m_device_context->setVertexBuffer(currentObject->mesh->vertexBuffer);
-	m_device_context->setIndexBuffer(*currentObject->mesh->indexBuffer);
-	m_device_context->loadShaders(currentObject->material->vertexShader, currentObject->material->pixelShader);
-	if (currentObject->material->texture != nullptr) {
-		m_device_context->setTexture(currentObject->material->texture);
+	constantBuffers.insert({ 0, constantBuffer });
+	if (currentObject->collider != nullptr) {
+		if (currentObject->collider->show) {
+			constantBuffers.insert({ 5,currentObject->collider->constantBuffer });
+		}
 	}
-	m_device_context->drawIndexedTriangleList(currentObject->mesh->indexBuffer->getSizeIndexList(), 0, 0);
+	m_device_context->setConstantBuffers(constantBuffers);
+	
+	//drawing 
+	if (currentObject->material != nullptr && currentObject->mesh != nullptr) {
+		m_device_context->setRasterizerState(currentObject->material->rasterizerStateType);
+		m_device_context->setVertexBuffer(currentObject->mesh->vertexBuffer);
+		m_device_context->setIndexBuffer(currentObject->mesh->indexBuffer);
+		m_device_context->loadShaders(currentObject->material->vertexShader, currentObject->material->pixelShader);
+		if (currentObject->material->textures.size() != 0) {
+			m_device_context->setTexture(currentObject->material->textures);
+		}
+		m_device_context->drawIndexedTriangleList(currentObject->mesh->indexBuffer->getSizeIndexList(), 0, 0);
+	}
+	if(currentObject->collider != nullptr) {
+		if (currentObject->collider->show) {
+			m_device_context->setVertexBuffer(currentObject->collider->vertexBuffer);
+			m_device_context->setIndexBuffer(currentObject->collider->indexBuffer);
+			m_device_context->loadShaders(Collider::vertexShader, Collider::pixelShader);
+			m_device_context->DrawIndexedLines(currentObject->collider->indexBuffer->getSizeIndexList(), 0, 0);
+		}
+	}
 	if (currentObject->showAxis) {
 		m_device_context->setVertexBuffer(currentObject->axis->axisVertexBuffer);
 		m_device_context->loadShaders(currentObject->axis->vertexShader, currentObject->axis->pixelShader);
@@ -148,7 +234,6 @@ void dx3d::Display::GameObjectUpdate()
 
 void dx3d::Display::CameraUpdate()
 {
-	cBuff.elapsedTime = Time::elapsedTime;
 	Matrix4X4 lightRot;
 	lightRot.SetIdentity();
 	lightRotation += 0.25f * PI * Time::deltaTime;
@@ -157,40 +242,12 @@ void dx3d::Display::CameraUpdate()
 	lightRot *= temp;
 	temp.SetRotationY(lightRotation);
 	lightRot *= temp;
-	cBuff.lightDirection = Vector4D(lightRot.getZDirection());
-
-	Matrix4X4 worldCam{};
-	worldCam.SetIdentity();
-	temp.SetRotationX(xRot);
-	worldCam *= temp;
-	temp.SetRotationY(yRot);
-	worldCam *= temp;
-	Vector3D new_pos = m_worldCam.getTranslation() + worldCam.getZDirection() * forward * 0.1f;
-	new_pos = new_pos + worldCam.getXDirection() * rightward * 0.1f;
-	cBuff.camPosition = new_pos;
-	worldCam.SetTranslate(new_pos);
-	m_worldCam = worldCam;
-	worldCam.inverse();
-	cBuff.m_view = worldCam;
+	
+	cBuff.lightDirection = lightRot.getZDirection();
+	cBuff.elapsedTime = Time::elapsedTime;
+	cBuff.camPosition = camera->transform->position.getTranslation();
+	cBuff.m_view = camera->transform->Get().inverse();
 	cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.01f, 100.0f);
-}
-
-void dx3d::Display::SkyBoxUpdate()
-{
-	m_device_context->createBackfaceRasterizerState();
-	m_device_context->setRasterState();
-	cBuff.m_world = currentObject->transform->Get();
-	constantBuffer->load(cBuff);
-	m_device_context->setConstantBuffer(*constantBuffer);
-	m_device_context->setVertexBuffer(currentObject->mesh->vertexBuffer);
-	m_device_context->setIndexBuffer(*currentObject->mesh->indexBuffer);
-	m_device_context->loadShaders(currentObject->material->vertexShader, currentObject->material->pixelShader);
-	if (currentObject->material->texture != nullptr) {
-		m_device_context->setTexture(currentObject->material->texture);
-	}
-	m_device_context->drawIndexedTriangleList(currentObject->mesh->indexBuffer->getSizeIndexList(), 0, 0);
-	m_device_context->createFrontfaceRasterizerState();
-	m_device_context->setRasterState();
 }
 
 dx3d::Display::~Display()
@@ -200,34 +257,16 @@ dx3d::Display::~Display()
 void dx3d::Display::onResize(const Rect& new_size)
 {
 	m_swapChain->resize(new_size.width, new_size.height);
+	m_device_context->SetViewportSize(new_size.width, new_size.height);
 	aspectRatio = static_cast<float>(new_size.width) / static_cast<float>(new_size.height);
 }
 
 void dx3d::Display::onKeyDown(int key)
 {
-	if (key == 'W') {
-		//xRot += Time::deltaTime * PI;
-		forward = 1.0f;
-	}
-	if (key == 'S') {
-		//xRot -= Time::deltaTime * PI;
-		forward = -1.0f;
-	}
-	if (key == 'A') {
-		//yRot += Time::deltaTime * PI;
-		rightward = -1.0f;
-	}
-	if (key == 'D') {
-		//yRot -= Time::deltaTime * PI;
-		rightward = 1.0f;
-	}
-	
 }
 
 void dx3d::Display::onKeyUp(int key)
 {
-	forward = 0.0f;
-	rightward = 0.0f;
 }
 
 void dx3d::Display::onKeyDownFirst(int key)
@@ -236,11 +275,7 @@ void dx3d::Display::onKeyDownFirst(int key)
 
 void dx3d::Display::onMouseMove(const Point& mouse_pos)
 {
-	InputSystem::get()->setCursorPosition(Point(m_size.width / 2.0f, m_size.height / 2.0f));
-	xRot -= (mouse_pos.y-(m_size.height/2.0f)) * Time::deltaTime * 0.1f;
-	yRot -= (mouse_pos.x-(m_size.width/2.0f)) * Time::deltaTime * 0.1f;
-	if (xRot > PI / 2.0f) xRot = PI / 2.0f;
-	if (xRot < -PI / 2.0f) xRot = -PI / 2.0f;
+	
 }
 
 void dx3d::Display::onLeftMouseDown(const Point& mouse_pos)

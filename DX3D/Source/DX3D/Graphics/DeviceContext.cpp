@@ -49,6 +49,12 @@ void dx3d::DeviceContext::DrawLines(UINT vertex_count, UINT start_vertex_index)
 	m_device_context.Draw(vertex_count, start_vertex_index);
 }
 
+void dx3d::DeviceContext::DrawIndexedLines(UINT index_count, UINT start_vertex_index, UINT start_index_location)
+{
+	m_device_context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	m_device_context.DrawIndexed(index_count, start_vertex_index, start_index_location);
+}
+
 void dx3d::DeviceContext::SetViewportSize(UINT width, UINT height)
 {
 	D3D11_VIEWPORT vp{};
@@ -99,7 +105,7 @@ void dx3d::DeviceContext::createBackfaceRasterizerState()
 	rasterDesc.FrontCounterClockwise = false;
 	rasterDesc.DepthClipEnable = true;
 
-	DX3DGraphicsLogErrorAndThrow(m_device.CreateRasterizerState(&rasterDesc, rasterizerState.GetAddressOf()), "rasterstate creation failed.");
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateRasterizerState(&rasterDesc, backFaceRasterizerState.GetAddressOf()), "rasterstate creation failed.");
 }
 
 void dx3d::DeviceContext::createFrontfaceRasterizerState()
@@ -110,25 +116,71 @@ void dx3d::DeviceContext::createFrontfaceRasterizerState()
 	rasterDesc.FrontCounterClockwise = false;
 	rasterDesc.DepthClipEnable = true;
 
-	DX3DGraphicsLogErrorAndThrow(m_device.CreateRasterizerState(&rasterDesc, rasterizerState.GetAddressOf()), "rasterstate creation failed.");
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateRasterizerState(&rasterDesc, frontFaceRasterizerState.GetAddressOf()), "rasterstate creation failed.");
 }
 
-void dx3d::DeviceContext::setRasterState()
+void dx3d::DeviceContext::createAllfaceRasterizerState()
 {
+	D3D11_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.CullMode = D3D11_CULL_NONE; // Disables backface culling
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.DepthClipEnable = true;
+
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateRasterizerState(&rasterDesc, allFaceRasterizerState.GetAddressOf()), "rasterstate creation failed.");
+}
+
+void dx3d::DeviceContext::setRasterizerState(dx3d::RasterizerStateType rasterizerType)
+{
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
+	switch (rasterizerType)
+	{
+	case dx3d::RasterizerStateType::BackFace:
+		if (!backFaceRasterizerState) {
+			createBackfaceRasterizerState();
+		}
+		rasterizerState = backFaceRasterizerState;
+		break;
+	case dx3d::RasterizerStateType::FrontFace:
+		if (!frontFaceRasterizerState) {
+			createFrontfaceRasterizerState();
+		}
+		rasterizerState = frontFaceRasterizerState;
+		break;
+	case dx3d::RasterizerStateType::AllFace:
+		if (!allFaceRasterizerState) {
+			createAllfaceRasterizerState();
+		}
+		rasterizerState = allFaceRasterizerState;
+		break;
+	default:
+		DX3DLogErrorAndThrow("Invalid rasterizer state type specified.");
+	}
 	m_device_context.RSSetState(rasterizerState.Get());
 }
-void dx3d::DeviceContext::setConstantBuffer(const ConstantBuffer& cBuffer)
+void dx3d::DeviceContext::setConstantBuffers(const std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> buffers)
 {
-	m_device_context.PSSetConstantBuffers(0, 1, cBuffer.m_buffer.GetAddressOf());
-	m_device_context.VSSetConstantBuffers(0, 1, cBuffer.m_buffer.GetAddressOf());
+	for (auto it = buffers.begin(); it != buffers.end(); it++) {
+		m_device_context.PSSetConstantBuffers(it->first, 1, it->second->m_buffer.GetAddressOf());
+		m_device_context.VSSetConstantBuffers(it->first, 1, it->second->m_buffer.GetAddressOf());
+	}
 }
 
-void dx3d::DeviceContext::setIndexBuffer(const IndexBuffer& iBuffer)
+
+void dx3d::DeviceContext::setIndexBuffer(std::shared_ptr<IndexBuffer> iBuffer)
 {
-	m_device_context.IASetIndexBuffer(iBuffer.m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	m_device_context.IASetIndexBuffer(iBuffer->m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }
 
-void dx3d::DeviceContext::setTexture(std::shared_ptr<Texture> texture)
+void dx3d::DeviceContext::setTexture(std::vector<std::shared_ptr<Texture>> textures)
 {
-	m_device_context.PSSetShaderResources(0, 1, texture->m_srv.GetAddressOf());
+	ID3D11ShaderResourceView* srvs[32];
+	ID3D11SamplerState* samplers[32];
+	for (size_t i = 0; i < textures.size(); ++i) {
+		srvs[i] = textures[i]->m_srv.Get();
+		samplers[i] = textures[i]->m_sampler.Get();
+	}
+
+	m_device_context.PSSetShaderResources(0, textures.size(), srvs);
+	m_device_context.PSSetSamplers(0, textures.size(), samplers);
 }

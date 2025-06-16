@@ -13,13 +13,27 @@ namespace dx3d {
 		Vector3D operator+(const Vector3D& other) const {
 			return Vector3D(x + other.x, y + other.y, z + other.z);
 		}
+		Vector3D operator+=(const Vector3D& other) {
+			x += other.x;
+			y += other.y;
+			z += other.z;
+			return *this;
+		}
 		Vector3D operator-(const Vector3D& other) const {
 			return Vector3D(x - other.x, y - other.y, z - other.z);
 		}
 		Vector3D operator*(const float& other) const {
 			return Vector3D(x * other, y * other, z * other);
 		}
-		Vector3D cross(Vector3D b) {
+		void operator*=(const Vector3D& other){
+			x *= other.x;
+			y *= other.y;
+			z *= other.z;
+		}
+		Vector3D operator*(const Vector3D& other) const {
+			return Vector3D(x * other.x, y * other.y, z * other.z);
+		}
+		Vector3D cross(Vector3D b) const{
 			Vector3D result{};
 			result.x = y * b.z - z * b.y;
 			result.y = -(x * b.z - z * b.x);
@@ -28,6 +42,9 @@ namespace dx3d {
 		}
 		float dot(const Vector3D& other) const {
 			return x * other.x + y * other.y + z * other.z;
+		}
+		float mag() const {
+			return sqrt(x * x + y * y + z * z);
 		}
 		Vector3D normalize() {
 			float magnitude = sqrt(x * x + y * y + z * z);
@@ -38,6 +55,15 @@ namespace dx3d {
 			}
 			return *this;
 		}
+		static inline Vector3D up() {
+			return Vector3D(0.0f, 1.0f, 0.0f);
+		}
+		static inline Vector3D right() {
+			return Vector3D(1.0f, 0.0f, 0.0f);
+		}
+		static inline Vector3D forward() {
+			return Vector3D(0.0f, 0.0f, 1.0f);
+		}
 		static float det(const Vector3D& v1, const Vector3D& v2, const Vector3D& v3) {
 			return v1.x * (v2.y * v3.z - v2.z * v3.y) - v1.y * (v2.x * v3.z - v2.z * v3.x) + v1.z * (v2.x * v3.y - v2.y * v3.x);
 		}
@@ -45,7 +71,5 @@ namespace dx3d {
 			return start * (1.0f - u) + end * (u);
 		}
 		float x, y, z;
-	private:
-		
 	};
 }

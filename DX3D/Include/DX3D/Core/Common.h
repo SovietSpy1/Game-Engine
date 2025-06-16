@@ -10,11 +10,28 @@
 #include <cmath>
 #include <vector>
 namespace dx3d {
-	enum IA {
+	enum class RasterizerStateType {
+		BackFace,
+		FrontFace,
+		AllFace
+	};
+	enum class IA {
 		POSITION,
 		TEXCOORD,
 		NORMAL,
 		COLOR
+	};
+	enum class Tags {
+		Camera,
+	};
+	enum class ColliderType
+	{
+		Quad,
+		Box,
+		Sphere,
+		Capsule,
+		Cylinder,
+		TriangleMesh
 	};
 	struct BaseDesc {
 		Logger& logger;
@@ -99,7 +116,7 @@ namespace dx3d {
 		Vector3D normal;
 		Vector4D color;
 	};
-	enum MeshType
+	enum class MeshType
 	{
 		Cube,
 		Quad,

@@ -12,10 +12,10 @@ namespace dx3d {
 		virtual void onKillFocus();  
 		virtual void toggleFullScreen();
 		virtual void onResize(const Rect& new_size);
+		Rect m_size{};
 	protected:  
 		void* m_handle{};
 		bool fullScreen;
-		Rect m_size{}; 
 		Rect m_fullScreenSize{};
 		Rect m_windowedSize{};
 	};  

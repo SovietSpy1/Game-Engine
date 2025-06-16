@@ -3,20 +3,21 @@
 #include <DX3D/Math/GameMath.h>
 #include <wrl.h>
 #include <DX3D/Input/InputListener.h>
+#include <unordered_map>
 namespace dx3d {
 	class Display final: public Window, public InputListener
 	{
 	public:
 		explicit Display(const DisplayDesc& desc);
-		virtual void onUpdate() override;
-		virtual void onFocus() override;
-		virtual void onKillFocus() override;
+		void onUpdate() override;
+		void onFocus() override;
+		void onKillFocus() override;
 		std::shared_ptr<InputSystem>& getInputSystem() {
 			return inputSystem;
 		}
+		static Display* Get();
 		void GameObjectUpdate();
 		void CameraUpdate();
-		void SkyBoxUpdate();
 		virtual ~Display() override;
 		virtual void onResize(const Rect& new_size) override;
 	public:
@@ -28,21 +29,16 @@ namespace dx3d {
 		SwapChainPtr m_swapChain;
 		std::shared_ptr<DeviceContext> m_device_context;
 		std::shared_ptr<InputSystem> inputSystem;
-	private:
 		std::shared_ptr<ConstantBuffer> constantBuffer;
+		std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> constantBuffers{};
 	private:
-		std::shared_ptr<GameObject> skyBox;
+		static inline Display* S{};
+		std::shared_ptr<Camera> camera;
+	private:
 		Color currentCol{};
-		float xRot{};
-		float yRot{};
 		float fov = PI /4.0f;
-		float aspectRatio = 1.0f;	
-		Vector3D scale = Vector3D(1.0f,1.0f,1.0f);
-		Matrix4X4 m_worldCam{};
+		float aspectRatio = 1.0f;
 		ConstantBufferDesc cBuff{};
-		float forward = 0.0f;
-		float rightward = 0.0f;
-		std::shared_ptr<Texture> woodTexture = nullptr;
 		std::shared_ptr<GameObject> currentObject;
 		std::vector<std::shared_ptr<GameObject>> gameObjects;
 		float lightRotation = 0.0f;
@@ -55,6 +51,7 @@ namespace dx3d {
 		void onMouseMove(const Point& mouse_pos) override;
 		void onLeftMouseDown(const Point& mouse_pos) override;
 		void onRightMouseDown(const Point& mouse_pos) override;
+
 	};
 }
 

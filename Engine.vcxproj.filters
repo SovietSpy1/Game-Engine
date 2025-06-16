@@ -93,6 +93,15 @@
     <ClCompile Include="DX3D\Source\DX3D\Object\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Physics\PhysicsEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Physics\Collider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Physics\RigidBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -197,13 +206,31 @@
     <ClInclude Include="DX3D\Source\DX3D\Object\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Physics\PhysicsEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Physics\Collider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Physics\RigidBody.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DX3D\Shaders\Heart\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Heart\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Cube\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Cube\PixelShader.hlsl" />
-    <FxCompile Include="DX3D\Shaders\VertexMeshLayout\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Lighting\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Axis\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Axis\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Lighting\PixelShader.hlsl" />
@@ -212,5 +239,8 @@
     <FxCompile Include="DX3D\Shaders\Lighting\SphereTex\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Wave\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Wave\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Collider\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Collider\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\VertexMeshLayout\VertexShader.hlsl" />
   </ItemGroup>
 </Project>

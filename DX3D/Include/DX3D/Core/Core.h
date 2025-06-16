@@ -26,6 +26,11 @@ namespace dx3d {
 	class Axis;
 	class Transform;
 	class Material;
+	class Collider;
+	class PhysicsEngine;
+	class RigidBody;
+	class Camera;
+	class SkyBox;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;
