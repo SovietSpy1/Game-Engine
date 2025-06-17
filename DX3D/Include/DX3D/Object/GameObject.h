@@ -7,6 +7,7 @@ namespace dx3d {
 	{
 	public:
 		GameObject(const BaseDesc& desc);
+		GameObject(const GameObject& object);
 		virtual ~GameObject() {};
 		virtual void Update();
 		void AddMeshFromFile(const wchar_t* file_path);

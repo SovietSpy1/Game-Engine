@@ -203,6 +203,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DX3D\Source\DX3D\Component\Component.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Physics\Collider.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\DeviceContext.cpp" />
@@ -234,6 +235,8 @@
     <ClCompile Include="DX3D\Source\DX3D\Physics\RigidBody.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DX3D\Include\DX3D\Component\Component.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Component\RigidBodyCom.h" />
     <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Camera.h" />
     <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Player.h" />
     <ClInclude Include="DX3D\Include\DX3D\Object\Objects\SkyBox.h" />
