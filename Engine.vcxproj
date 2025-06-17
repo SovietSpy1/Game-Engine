@@ -217,6 +217,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ResourceManager\MeshManager\Mesh.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Object\GameObject.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Object\Transform.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\GameManager\GameManager.cpp" />
     <ClCompile Include="Game\main.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsEngine.cpp" />
@@ -277,6 +278,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Object\Material.h" />
     <ClInclude Include="DX3D\Include\DX3D\Physics\PhysicsEngine.h" />
     <ClInclude Include="DX3D\Include\DX3D\Physics\RigidBody.h" />
+    <ClInclude Include="DX3D\Include\DX3D\GameManager\GameManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DX3D\Shaders\Axis\PixelShader.hlsl">

@@ -7,7 +7,6 @@ namespace dx3d {
 	public:  
 		explicit Window(const WindowDesc& desc);  
 		virtual ~Window() override;  
-		virtual void onUpdate();  
 		virtual void onFocus();  
 		virtual void onKillFocus();  
 		virtual void toggleFullScreen();

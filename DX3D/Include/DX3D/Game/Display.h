@@ -9,7 +9,7 @@ namespace dx3d {
 	{
 	public:
 		explicit Display(const DisplayDesc& desc);
-		void onUpdate() override;
+		void onUpdate();
 		void onFocus() override;
 		void onKillFocus() override;
 		std::shared_ptr<InputSystem>& getInputSystem() {

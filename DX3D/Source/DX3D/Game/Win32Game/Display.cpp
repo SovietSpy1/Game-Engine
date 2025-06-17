@@ -152,7 +152,6 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 }
 void dx3d::Display::onUpdate()
 {
-	Window::onUpdate();
 	m_device_context->clearRenderTargetColor(m_swapChain, currentCol.rgba);
 	inputSystem->onUpdate();
 	PhysicsEngine::get()->Update();
