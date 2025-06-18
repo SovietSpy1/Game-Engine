@@ -4,7 +4,7 @@ namespace dx3d {
 	class Base
 	{
 	public:
-		explicit Base(const BaseDesc& desc);
+		Base(const BaseDesc& desc);
 		virtual ~Base();
 		virtual Logger& getLogger() const noexcept final;
 	public:
@@ -13,7 +13,7 @@ namespace dx3d {
 		Base& operator = (const Base&) = default;
 		Base& operator=(Base&&) = default;
 	protected:
-		Logger& m_logger;
+		Logger* m_logger{ nullptr };
 	};
 }
 

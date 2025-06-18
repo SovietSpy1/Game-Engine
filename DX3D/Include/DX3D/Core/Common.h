@@ -34,7 +34,7 @@ namespace dx3d {
 		TriangleMesh
 	};
 	struct BaseDesc {
-		Logger& logger;
+		Logger* logger;
 	};
 	struct WindowDesc {
 		BaseDesc base;

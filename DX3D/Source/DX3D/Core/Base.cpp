@@ -10,5 +10,5 @@ dx3d::Base::~Base()
 
 Logger& dx3d::Base::getLogger() const noexcept
 {
-	return m_logger;
+	return *m_logger;
 }

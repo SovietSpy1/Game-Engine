@@ -9,14 +9,6 @@
 
 namespace dx3d {
 	constexpr UINT MAX_COMPONENTS = 64;
-
-	class GameManager final : public Base
-	{
-	public:
-		//constructor
-		GameManager();
-	};
-
 	struct Entity {
 		UINT id{};
 		bool operator==(const Entity& other) const {
@@ -24,9 +16,8 @@ namespace dx3d {
 		}
 	};
 
-	class ComponentListBase : public Base{
+	class ComponentListBase : public Base {
 	public:
-		ComponentListBase(const BaseDesc& desc) : Base(desc) {};
 		virtual ~ComponentListBase() = default;
 		virtual void Remove(Entity entity) = 0;
 	};
@@ -34,7 +25,6 @@ namespace dx3d {
 	template<typename ComponentType>
 	class ComponentList : public ComponentListBase {
 	public:
-		ComponentList(const BaseDesc& desc) : ComponentListBase(desc) {};
 		ComponentType* Get(Entity entity) {
 			auto it = entityComponentMap.find(entity);
 			if (it == entityComponentMap.end()) {
@@ -55,9 +45,8 @@ namespace dx3d {
 		std::unordered_map<Entity, ComponentType> entityComponentMap;
 	};
 
-	class Registry final : public Base{
+	class Registry {
 	public:
-		Registry(const BaseDesc& desc) : Base(desc) {};
 		//functions
 		Entity CreateEntity() {
 			return Entity{ nextEntity++ };
@@ -70,7 +59,7 @@ namespace dx3d {
 				std::string message = std::string(typeid(ComponentType).name()) + " already registered!";
 				return;
 			}
-			typeComponentMap[typeIndex] = std::make_unique<ComponentList<ComponentType>>(BaseDesc{m_logger});
+			typeComponentMap[typeIndex] = std::make_unique<ComponentList<ComponentType>>();
 			typeIndexMap[typeIndex] = componentMaskIndex++;
 		}
 
@@ -119,7 +108,6 @@ namespace dx3d {
 			componentList->Insert(entity, component);
 			entityMaskMap[entity].set(typeIndexMap[typeIndex]);
 		}
-
 		template <typename ComponentType>
 		void RemoveComponent(Entity entity) {
 			std::type_index typeIndex = typeid(ComponentType);
@@ -147,6 +135,15 @@ namespace dx3d {
 		UINT componentMaskIndex = 0;
 		UINT nextEntity = 0;
 	};
+	class GameManager final
+	{
+	public:
+		//constructor
+		GameManager();
+		void Update();
+	};
+
+	
 }
 
 // Hash function for Entity should be defined elsewhere in your codebase
