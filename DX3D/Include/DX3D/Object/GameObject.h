@@ -1,7 +1,10 @@
 #pragma once
 #include "DX3D/Core/Base.h"
 #include <DX3D/Input/InputListener.h>
+#include <DX3D/Component/Component.h>
 #include <wrl.h>
+#include <typeindex>
+#include <unordered_map>
 namespace dx3d {
 	class GameObject : public Base, public InputListener
 	{
@@ -17,16 +20,12 @@ namespace dx3d {
 		void AddCollider(ColliderType colliderType);
 		void SetPosition(float x, float y, float z);
 		void SetRotation(float x, float y, float z);
-		void SetAxis(float size = 1);
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Transform> transform;
-		std::shared_ptr<Material> material;
-		std::shared_ptr<RigidBody> rigidBody;
-		std::shared_ptr<Collider> collider;
-		std::vector<Tags> tags;
-		//Axis buffer for visualization
-		bool showAxis = false;
-		std::shared_ptr<Axis> axis{};
+		//variables
+		std::unordered_map<std::type_index, std::shared_ptr<ComponentBase>> components;
+		template <typename ComponentType>
+		void AddComponent(std::shared_ptr<ComponentType> component);
+		template <typename ComponentType>
+		ComponentType* GetComponent();
 		//inherited via input listener
 		virtual void onKeyDown(int key) override {};
 		virtual void onKeyUp(int key) override {};

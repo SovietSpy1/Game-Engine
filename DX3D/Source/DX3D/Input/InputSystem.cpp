@@ -1,6 +1,6 @@
 #include "DX3D/Input/InputSystem.h"
 #include <DX3D/Input/InputListener.h>
-dx3d::InputSystem::InputSystem(const InputSystemDesc& desc) : Base(desc.base), m_desc(desc)
+dx3d::InputSystem::InputSystem(const BaseDesc& desc) : Base(desc)
 {
 	S = this;
 }
@@ -25,7 +25,7 @@ void dx3d::InputSystem::setCursorPosition(const Point& pos)
 	::SetCursorPos(pos.x, pos.y);
 }
 
-void dx3d::InputSystem::onUpdate()
+void dx3d::InputSystem::Update()
 {
 	if (!listening) {
 		return;

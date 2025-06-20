@@ -28,7 +28,7 @@ void dx3d::Game::run()
 				}
 				if (msg.wParam == VK_SPACE) {
 					m_paused = !m_paused;
-					m_display->getInputSystem()->showCursor(m_paused);
+					InputSystem::get()->showCursor(m_paused);
 				}
 			}
 			TranslateMessage(&msg);
@@ -45,7 +45,7 @@ void dx3d::Game::run()
 			QueryPerformanceCounter(&Time::end);
 			continue;
 		}
-		m_display->onUpdate();
+		m_display->Update();
 		QueryPerformanceCounter(&Time::temp);
 		Time::deltaTime = static_cast<float>(Time::temp.QuadPart - Time::end.QuadPart) / Time::frequency.QuadPart;
 		while (Time::deltaTime < 1.0f / 60.0f) {

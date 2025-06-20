@@ -8,12 +8,15 @@ namespace dx3d {
 	public:
 		Player(const BaseDesc& desc) : GameObject(desc) {}
 		void Update() override {
+			RigidBody* rigidBody = GetComponent<RigidBody>();
+			Transform* transform = GetComponent<Transform>();
 			if (rigidBody != nullptr) {
 				Vector3D moveDir = transform->rotation.getZDirection() * forward + transform->rotation.getXDirection() * rightward;
 				rigidBody->SetVelocity(Vector3D(velocity * moveDir.x, rigidBody->velocity.y, velocity * moveDir.z));
 			}
 		}
 		void Jump() {
+			RigidBody* rigidBody = GetComponent<RigidBody>();
 			if (rigidBody != nullptr) {
 				rigidBody->AddForce(Vector3D::up() * 200);
 			}
@@ -34,7 +37,10 @@ namespace dx3d {
 		}
 		void onKeyDownFirst(int key) {
 			if (key == VK_SHIFT) {
-				Jump();
+				RigidBody* rb = GetComponent<RigidBody>();
+				if (rb != nullptr) {
+					Jump();
+				}
 			}
 		}
 		void onKeyUp(int key) override {
@@ -42,11 +48,12 @@ namespace dx3d {
 			rightward = 0;
 		}
 		void onMouseMove(const Point& mouse_pos) override {
-			InputSystem::get()->setCursorPosition(Point(Display::Get()->m_size.width / 2.0f, Display::Get()->m_size.height / 2.0f));
-			xRot -= (mouse_pos.y - (Display::Get()->m_size.height / 2.0f)) * Time::deltaTime * 0.1f;
-			yRot -= (mouse_pos.x - (Display::Get()->m_size.width / 2.0f)) * Time::deltaTime * 0.1f;
+			InputSystem::get()->setCursorPosition(Point(Display::get()->m_size.width / 2.0f, Display::get()->m_size.height / 2.0f));
+			xRot -= (mouse_pos.y - (Display::get()->m_size.height / 2.0f)) * Time::deltaTime * 0.1f;
+			yRot -= (mouse_pos.x - (Display::get()->m_size.width / 2.0f)) * Time::deltaTime * 0.1f;
 			if (xRot > PI / 2.0f) xRot = PI / 2.0f;
 			if (xRot < -PI / 2.0f) xRot = -PI / 2.0f;
+			Transform* transform = GetComponent<Transform>();
 			transform->rotation.SetIdentity();
 			Matrix4X4 temp{};
 			temp.SetRotationY(yRot);

@@ -30,52 +30,53 @@ void dx3d::PhysicsEngine::Update()
 		rigidBody->Update();
 	}
 	for (auto& collider : colliders) {
+		Transform* transform = collider->owner->GetComponent<Transform>();
 		for (size_t i = 0; i < collider->baseVertices.size(); i++) {
 			Vector3D transformedPos = collider->scale.ReverseMul(collider->baseVertices.at(i));
-			transformedPos = collider->owner->transform->Get().ReverseMul(transformedPos);
+			transformedPos = transform->Get().ReverseMul(transformedPos);
 			transformedPos = collider->transform.ReverseMul(transformedPos);
 			collider->vertices.at(i) = transformedPos;
 		}
 		for (size_t i = 0; i < collider->baseNormals.size(); i++) {
-			collider->normals.at(i) = collider->owner->transform->rotation.ReverseMul(collider->baseNormals.at(i));
+
+			collider->normals.at(i) = transform->rotation.ReverseMul(collider->baseNormals.at(i));
 		}
 		for (size_t i = 0; i < collider->baseEdges.size(); i++) {
-			collider->edges.at(i) = collider->owner->transform->rotation.ReverseMul(collider->baseEdges.at(i));
+			collider->edges.at(i) = transform->rotation.ReverseMul(collider->baseEdges.at(i));
 		}
 	}
 	for (const auto& collider : colliders) {
 		for (const auto& otherCollider : colliders) {
 			if (collider != otherCollider) {
-				Vector3D directionToMove;
-				std::shared_ptr<RigidBody>& rigidBody = collider->owner->rigidBody;
+				Vector3D directionToMove{};
+				RigidBody* rigidBody = collider->owner->GetComponent<RigidBody>();
+				RigidBody* otherRb = otherCollider->owner->GetComponent<RigidBody>();
 				if (IntersectCheck(collider, otherCollider, &directionToMove)) {
 					if (rigidBody != nullptr) {
-						switch (collider->owner->rigidBody->physicsType) {
+						switch (rigidBody->physicsType) {
 						case PhysicsType::Kinematic:
 							rigidBody->onCollide();
 							//nothing happens
 							break;
 						case PhysicsType::Dynamic:
-							if (otherCollider->owner->rigidBody != nullptr) {
-								switch (otherCollider->owner->rigidBody->physicsType) {
-								case PhysicsType::Kinematic:
-									rigidBody->onCollideDynamic(directionToMove);
-									break;
-								case PhysicsType::Dynamic:
-									rigidBody->onCollideDynamic(directionToMove * 0.5f);
-									break;
-								}
-							}
-							else {
+							if (otherRb == nullptr) {
 								rigidBody->onCollideDynamic(directionToMove);
+								break;
+							}
+							switch (otherRb->physicsType) {
+							case PhysicsType::Kinematic:
+								rigidBody->onCollideDynamic(directionToMove);
+								break;
+							case PhysicsType::Dynamic:
+								rigidBody->onCollideDynamic(directionToMove * 0.5f);
+								break;
 							}
 							break;
 						default:
 							DX3DLogWarning("Not a valid PhysicsType");
 						}
-						
 					}
-				 }
+				}
 				else {
 					if (rigidBody != nullptr) {
 						if (rigidBody->colliding) {

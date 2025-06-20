@@ -31,6 +31,8 @@ namespace dx3d {
 	class RigidBody;
 	class Camera;
 	class SkyBox;
+	class GameManager;
+	class ComponentBase;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

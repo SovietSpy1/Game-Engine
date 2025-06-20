@@ -32,7 +32,7 @@ namespace dx3d {
 		Matrix4X4 scale;
 		ColliderBuffer colliderBuffer;
 		std::shared_ptr<ConstantBuffer> constantBuffer{};
-		bool show = false;
+		bool show = true;
 	};
 }
 

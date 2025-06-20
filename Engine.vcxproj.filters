@@ -233,10 +233,16 @@
     <ClInclude Include="DX3D\Include\DX3D\Component\Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX3D\Include\DX3D\Component\RigidBodyCom.h">
+    <ClInclude Include="DX3D\Include\DX3D\GameManager\GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX3D\Include\DX3D\GameManager\GameManager.h">
+    <ClInclude Include="DX3D\Include\DX3D\GameManager\Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\SmokeCell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Smoke.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -20,7 +20,12 @@ void dx3d::RigidBody::Update()
 	for (auto& f : actingForces) {
 		velocity += f * Time::deltaTime;
 	}
-	owner->transform->position.Translate(velocity * Time::deltaTime);
+
+	Transform* transform = owner->GetComponent<Transform>();
+	if (transform == nullptr) {
+		return;
+	}
+	transform->position.Translate(velocity * Time::deltaTime);
 	actingForces = {};
 }
 
@@ -29,7 +34,11 @@ void dx3d::RigidBody::onCollideDynamic(Vector3D moveDir)
 	velocity = Vector3D(0, 0, 0);
 	acceleration = Vector3D(0, 0, 0);
 	grounded = true;
-	owner->transform->position.Translate(moveDir);
+	Transform* transform = owner->GetComponent<Transform>();
+	if (transform == nullptr) {
+		return;
+	}
+	transform->position.Translate(moveDir);
 	colliding = true;
 	onCollide();
 }

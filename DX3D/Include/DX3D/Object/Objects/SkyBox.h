@@ -7,7 +7,8 @@ namespace dx3d {
 	public:
 		SkyBox(const BaseDesc& desc, Camera* camera) : GameObject(desc), cam(camera){};
 		void Update() override {
-			transform->position.SetTranslate(cam->transform->GetPosition());
+
+			GetComponent<Transform>()->position.SetTranslate(cam->GetComponent<Transform>()->GetPosition());
 		}
 		Camera* cam;
 	};

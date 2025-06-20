@@ -9,6 +9,7 @@ namespace dx3d {
 			// Initialization code for the texture manager
 		}
 		std::shared_ptr<Texture> createTextureFromFile(const wchar_t* file_path);
+		std::shared_ptr<Texture> create2DSmokeTexture(int resolution);
 	protected:
 		Resource* createResourceFromFileConcrete(const wchar_t* file_path);
 	private:

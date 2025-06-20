@@ -4,10 +4,13 @@
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Game/Display.h>
 #include <DX3D/Physics/PhysicsEngine.h>
+#include <DX3D/Input/InputSystem.h>
 dx3d::Game::Game(const GameDesc& desc) : Base({ std::make_unique<Logger>(desc.logLevel).release()}), m_loggerPtr{m_logger}
 {
 	m_graphicsEngine = std::make_unique<GraphicsEngine>(GraphicsEngineDesc{m_logger});
 	m_physicsEngine = std::make_unique<PhysicsEngine>(BaseDesc{ m_logger });
+	m_inputSystem = std::make_unique<InputSystem>(BaseDesc{ m_logger });
+	m_inputSystem->showCursor(false);
 	m_display = std::make_unique<Display>(DisplayDesc{ {m_logger, {1080, 720}}, m_graphicsEngine->getRenderSystem()});
 	DX3DLogInfo("Game initialized");
 }

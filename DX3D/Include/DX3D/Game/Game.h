@@ -12,6 +12,7 @@ namespace dx3d {
 		std::unique_ptr<Logger> m_loggerPtr{};
 		std::unique_ptr<GraphicsEngine> m_graphicsEngine{};
 		std::unique_ptr<PhysicsEngine> m_physicsEngine{};
+		std::unique_ptr<InputSystem> m_inputSystem{};
 		std::unique_ptr<Display> m_display{};
 		bool m_isRunning{true};
 		bool m_paused{ false };

@@ -149,7 +149,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTexD.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTexD.lib;vld.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -237,10 +237,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Component\Component.h" />
-    <ClInclude Include="DX3D\Include\DX3D\Component\RigidBodyCom.h" />
+    <ClInclude Include="DX3D\Include\DX3D\GameManager\Registry.h" />
     <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Camera.h" />
     <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Player.h" />
     <ClInclude Include="DX3D\Include\DX3D\Object\Objects\SkyBox.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Smoke.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\SmokeCell.h" />
     <ClInclude Include="DX3D\Include\DX3D\Physics\Collider.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\Display.h" />
     <ClInclude Include="DX3D\Include\DX3D\All.h" />
