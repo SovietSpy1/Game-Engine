@@ -108,6 +108,9 @@
     <ClCompile Include="DX3D\Source\DX3D\GameManager\GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\StructuredBuffer\StructuredBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -245,6 +248,12 @@
     <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Smoke.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Object\Objects\Grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\StructuredBuffer\StructuredBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DX3D\Shaders\Heart\VertexShader.hlsl" />
@@ -263,5 +272,10 @@
     <FxCompile Include="DX3D\Shaders\Collider\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Collider\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\VertexMeshLayout\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Smoke\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Smoke\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Grid\PixelShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Grid\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Smoke\Compute\AddSourceCompute.hlsl" />
   </ItemGroup>
 </Project>

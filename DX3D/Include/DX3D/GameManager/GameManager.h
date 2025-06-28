@@ -18,6 +18,7 @@ namespace dx3d {
 		void GameObjectUpdate();
 		void CameraUpdate();
 		void LoadBasicScene();
+		void SmokeTest2DUpdate();
 		static GameManager* get() {
 			return S;
 		}
@@ -27,6 +28,7 @@ namespace dx3d {
 		std::shared_ptr<Camera> camera;
 		std::shared_ptr<GameObject> currentObject;
 		std::vector<std::shared_ptr<GameObject>> gameObjects;
+		std::shared_ptr<Smoke> smokeHolder;
 		float lightRotation = 0.0f;
 	};
 

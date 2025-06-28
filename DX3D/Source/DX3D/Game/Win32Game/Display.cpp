@@ -23,10 +23,10 @@
 #include <DX3D/Object/Objects/SkyBox.h>
 #include <DX3D/Object/Objects/Player.h>
 #include <string>
+#include <DX3D/Object/Objects/Grid.h>
 dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size))
 {
 	S = this;
-	gameManager = std::make_unique<GameManager>(BaseDesc{ m_logger });
 	constantBuffer = GraphicsEngine::get()->getRenderSystem().createConstantBuffer();
 	aspectRatio = static_cast<float>(m_size.width) / static_cast<float>(m_size.height);
 	HWND console = GetConsoleWindow();
@@ -36,12 +36,12 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 	m_device_context->SetViewportSize(m_size.width, m_size.height);
 	m_device_context->createTransparentBlendState();
 	m_device_context->setBlendState();
-	currentCol = Color{ 0,0,0.7f };
-	
+	currentCol = vec4_32{255,255,255,255 };
+	gameManager = std::make_unique<GameManager>(BaseDesc{ m_logger });
 }
 void dx3d::Display::Update()
 {
-	m_device_context->clearRenderTargetColor(m_swapChain, currentCol.rgba);
+	m_device_context->clearRenderTargetColor(m_swapChain, currentCol);
 	GameManager::get()->Update();
 	m_swapChain->present(true);
 }
@@ -49,13 +49,11 @@ void dx3d::Display::Update()
 void dx3d::Display::onFocus()
 {
 	InputSystem::get()->listening = true;
-	InputSystem::get()->showCursor(false);
 }
 
 void dx3d::Display::onKillFocus()
 {
 	InputSystem::get()->listening = false;
-	InputSystem::get()->showCursor(true);
 }
 
 dx3d::Display* dx3d::Display::get()
@@ -107,6 +105,12 @@ void dx3d::Display::Draw(GameObject* currentObject)
 		m_device_context->loadShaders(axis->vertexShader, axis->pixelShader);
 		m_device_context->DrawLines(6, 0);
 	}
+	Grid* grid = currentObject->GetComponent<Grid>();
+	if (grid != nullptr) {
+		m_device_context->setVertexBuffer(grid->vertexBuffer);
+		m_device_context->loadShaders(Grid::vertexShader, Grid::pixelShader);
+		m_device_context->DrawLines(grid->vertexBuffer->getSizeVertexList(), 0);
+	}
 }
 
 void dx3d::Display::CameraUpdate(Matrix4X4 lightRot, Camera* cam, float fov)
@@ -116,7 +120,7 @@ void dx3d::Display::CameraUpdate(Matrix4X4 lightRot, Camera* cam, float fov)
 	cBuff.elapsedTime = Time::elapsedTime;
 	cBuff.camPosition = transform->position.getTranslation();
 	cBuff.m_view = transform->Get().inverse();
-	cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.01f, 100.0f);
+	cBuff.m_proj.SetOrthoLH(1.1f * aspectRatio, 1.1f, 0, 10);
 }
 
 dx3d::Display::~Display()

@@ -1,5 +1,6 @@
 #include "DX3D/Input/InputSystem.h"
 #include <DX3D/Input/InputListener.h>
+#include <DX3D/Game/Display.h>
 dx3d::InputSystem::InputSystem(const BaseDesc& desc) : Base(desc)
 {
 	S = this;
@@ -32,7 +33,8 @@ void dx3d::InputSystem::Update()
 	}
 	POINT mouse_point{};
 	::GetCursorPos(&mouse_point);
-	mouse_pos = { mouse_point.x, mouse_point.y };
+	Point clientPos = Display::get()->GetClientPosition();
+	mouse_pos = { mouse_point.x - clientPos.x, Display::get()->m_size.height - (mouse_point.y - clientPos.y)};
 	if (first_call) {
 		last_mouse_pos = mouse_pos;
 		first_call = false;
@@ -54,6 +56,7 @@ void dx3d::InputSystem::Update()
 				while (it != listeners.end()) {
 					if (i == VK_LBUTTON) {
 						if (isNew) (*it)->onLeftMouseDown(mouse_pos);
+						(*it)->onHoldLeftMouseDown(mouse_pos);
 					}
 					else if (i == VK_RBUTTON) {
 						if (isNew) (*it)->onRightMouseDown(mouse_pos);

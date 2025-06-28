@@ -20,11 +20,16 @@ namespace dx3d {
 		std::shared_ptr<TextureManager> createTextureManager() const;
 		std::shared_ptr<MeshManager> createMeshManager() const;
 		std::shared_ptr<Axis> createAxis(const AxisDesc& desc) const;
+		std::shared_ptr<StructuredBuffer> createStructuredBuffer() const;
 		void compileVertexShader(const WCHAR* vertexShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob) const;
 		void compilePixelShader(const WCHAR* pixelShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pixelBlob) const;
 		void createVertexShader(Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob, Microsoft::WRL::ComPtr<ID3D11VertexShader>& vertexShader) const;
 		void createPixelShader(Microsoft::WRL::ComPtr<ID3DBlob>& pixelBlob, Microsoft::WRL::ComPtr<ID3D11PixelShader>& pixelShader) const;
+		static RenderSystem* get() {
+			return S;
+		}
 	private:
+		static inline RenderSystem* S{};
 		GraphicsResourceDesc getGraphicsResourceDesc() const noexcept;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Device> m_d3dDevice{};

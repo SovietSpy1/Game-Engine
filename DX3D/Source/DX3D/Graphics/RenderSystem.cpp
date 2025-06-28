@@ -10,9 +10,13 @@
 #include <d3dcompiler.h>
 #include <DX3D/Object/Axis.h>
 #include <DX3D/Object/Material.h>
+#include <DX3D/Graphics/StructuredBuffer/StructuredBuffer.h>
 using namespace dx3d;
 dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
 {
+	if (S == nullptr) {
+		S = this;
+	}
 	D3D_FEATURE_LEVEL featureLevel{};
 	UINT createDeviceFlags{};
 #ifdef _DEBUG
@@ -76,6 +80,11 @@ std::shared_ptr<MeshManager> dx3d::RenderSystem::createMeshManager() const
 std::shared_ptr<Axis> dx3d::RenderSystem::createAxis(const AxisDesc& desc) const
 {
 	return std::make_shared<Axis>(desc, getGraphicsResourceDesc());
+}
+
+std::shared_ptr<StructuredBuffer> dx3d::RenderSystem::createStructuredBuffer() const
+{
+	return std::make_shared<StructuredBuffer>(getGraphicsResourceDesc());
 }
 
 void dx3d::RenderSystem::compileVertexShader(const WCHAR* vertexShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob) const

@@ -28,9 +28,12 @@ namespace dx3d {
 		ConstantBufferDesc cBuff{};
 		std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> constantBuffers{};
 		std::shared_ptr<ConstantBuffer> constantBuffer;
+		friend class Texture;
+		friend class InputSystem;
 	private:
-		Color currentCol{};
+		vec4_32 currentCol{};
 		float aspectRatio = 1.0f;
+		
 	};
 }
 

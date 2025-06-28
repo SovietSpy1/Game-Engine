@@ -2,6 +2,8 @@
 #include <DirectXTex.h>
 #include "DX3D/Graphics/GraphicsEngine.h"
 #include <iostream>
+#include <DX3D/Game/Display.h>
+#include <DX3D/Graphics/DeviceContext.h>
 dx3d::Texture::Texture(const wchar_t* full_path, const GraphicsResourceDesc& desc) : Resource(full_path, desc)
 {
 	DirectX::ScratchImage image_data;
@@ -29,10 +31,10 @@ dx3d::Texture::Texture(const wchar_t* full_path, const GraphicsResourceDesc& des
 
 dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resource(desc)
 {
-	std::vector<vec4> initColors(resolution * resolution, vec4{ 0,0,0,0 });
+	std::vector<vec4_32> initColors(resolution * resolution, vec4_32{0,0,0,0});
 	D3D11_SUBRESOURCE_DATA initValues{};
-	initValues.pSysMem = &initColors;
-	initValues.SysMemPitch = resolution * sizeof(vec4);
+	initValues.pSysMem = initColors.data();
+	initValues.SysMemPitch = resolution * sizeof(vec4_32);
 	initValues.SysMemSlicePitch = 0;
 	D3D11_TEXTURE2D_DESC texDesc{};
 	texDesc.Height = resolution;
@@ -69,5 +71,18 @@ dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resou
 	sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateSamplerState(&sampler_desc, m_sampler.GetAddressOf()), "CreateSamplerState failed.");
+}
+
+void dx3d::Texture::MapToTexture(std::vector<vec4_32> data, int resolution)
+{
+	D3D11_MAPPED_SUBRESOURCE map{};
+	map = Display::get()->m_device_context->GetMap(m_texture);
+	uint8_t* destPtr = reinterpret_cast<uint8_t*>(map.pData);
+	const uint8_t* sourcePtr = reinterpret_cast<uint8_t*>(data.data());
+	UINT pitch = 4 * resolution;
+	for (UINT y = 0; y < resolution; y++) {
+		::memcpy(destPtr + y * map.RowPitch, sourcePtr + y * pitch, pitch);
+	}
+	Display::get()->m_device_context->UnMap(m_texture);
 }
 	

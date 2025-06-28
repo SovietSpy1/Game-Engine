@@ -12,11 +12,13 @@
 #include <DX3D/Object/Material.h>
 #include <DX3D/Physics/RigidBody.h>
 #include <DX3D/Physics/Collider.h>
+#include <DX3D/Object/Objects/Grid.h>
+#include <DX3D/Graphics/ResourceManager/TextureManager/Texture.h>
 dx3d::GameObject::GameObject(const BaseDesc& desc) :Base(desc)
 {
 std::shared_ptr<Transform> transform = std::make_shared<Transform>();
 	AddComponent<Transform>(transform);
-	InputSystem::get()->addListener(this);
+	//InputSystem::get()->addListener(this);
 }
 dx3d::GameObject::GameObject(const GameObject& object) : Base(BaseDesc{ object.m_logger })
 {
@@ -104,13 +106,17 @@ ComponentType* dx3d::GameObject::GetComponent()
 template void dx3d::GameObject::AddComponent<dx3d::Transform>(std::shared_ptr<dx3d::Transform>);
 template void dx3d::GameObject::AddComponent<dx3d::Mesh>(std::shared_ptr<dx3d::Mesh>);
 template void dx3d::GameObject::AddComponent<dx3d::Material>(std::shared_ptr<dx3d::Material>);
+template void dx3d::GameObject::AddComponent<dx3d::Texture>(std::shared_ptr<dx3d::Texture>);
 template void dx3d::GameObject::AddComponent<dx3d::RigidBody>(std::shared_ptr<dx3d::RigidBody>);
 template void dx3d::GameObject::AddComponent<dx3d::Collider>(std::shared_ptr<dx3d::Collider>);
 template void dx3d::GameObject::AddComponent<dx3d::Axis>(std::shared_ptr<dx3d::Axis>);
+template void dx3d::GameObject::AddComponent<dx3d::Grid>(std::shared_ptr<dx3d::Grid>);
 
 template dx3d::Transform* dx3d::GameObject::GetComponent<dx3d::Transform>();
 template dx3d::Mesh* dx3d::GameObject::GetComponent<dx3d::Mesh>();
 template dx3d::Material* dx3d::GameObject::GetComponent<dx3d::Material>();
+template dx3d::Texture* dx3d::GameObject::GetComponent<dx3d::Texture>();
 template dx3d::RigidBody* dx3d::GameObject::GetComponent<dx3d::RigidBody>();
 template dx3d::Collider* dx3d::GameObject::GetComponent<dx3d::Collider>();
 template dx3d::Axis* dx3d::GameObject::GetComponent<dx3d::Axis>();
+template dx3d::Grid* dx3d::GameObject::GetComponent<dx3d::Grid>();

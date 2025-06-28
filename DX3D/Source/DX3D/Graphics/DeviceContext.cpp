@@ -7,11 +7,14 @@
 #include <DX3D/Graphics/ResourceManager/TextureManager/Texture.h>
 dx3d::DeviceContext::DeviceContext(const DeviceContextDesc& desc, const GraphicsResourceDesc& gDesc) : GraphicsResource(gDesc), m_device_context(desc.context)
 {
+	if (S == nullptr) {
+		S = this;
+	}
 }
 
-void dx3d::DeviceContext::clearRenderTargetColor(std::shared_ptr<SwapChain> swap_chain, vec4 rgba)
+void dx3d::DeviceContext::clearRenderTargetColor(std::shared_ptr<SwapChain> swap_chain, vec4_32 rgba)
 {
-	FLOAT clear_color[] = { rgba.r, rgba.g, rgba.b, rgba.a};
+	FLOAT clear_color[] = { rgba.r/255.0f, rgba.g/255.0f, rgba.b/255.0f, rgba.a/255.0f};
 	m_device_context.ClearRenderTargetView(swap_chain->m_rtv.Get(), clear_color);
 	m_device_context.ClearDepthStencilView(swap_chain->m_dsv.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_device_context.OMSetRenderTargets(1, swap_chain->m_rtv.GetAddressOf(), swap_chain->m_dsv.Get());
@@ -73,6 +76,41 @@ void dx3d::DeviceContext::loadShaders(Microsoft::WRL::ComPtr<ID3D11VertexShader>
 	m_device_context.PSSetShader(m_pixelShader.Get(), nullptr, 0);
 }
 
+D3D11_MAPPED_SUBRESOURCE dx3d::DeviceContext::GetMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource)
+{
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	m_device_context.Map(resource.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	return mapped;
+}
+
+void dx3d::DeviceContext::UnMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource)
+{
+	m_device_context.Unmap(resource.Get(), 0);
+}
+
+void dx3d::DeviceContext::CSSetSRVS(std::vector<ID3D11ShaderResourceView*> srvs)
+{
+	m_device_context.CSSetShaderResources(0, srvs.size(), srvs.data());
+}
+
+void dx3d::DeviceContext::CSSetUAVS(std::vector<ID3D11UnorderedAccessView*> uavs)
+{
+	m_device_context.CSSetUnorderedAccessViews(0, uavs.size(), uavs.data(), nullptr);
+}
+
+void dx3d::DeviceContext::CSSetConstantBuffers(const std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> buffers)
+{
+	for (auto it = buffers.begin(); it != buffers.end(); it++) {
+		m_device_context.PSSetConstantBuffers(it->first, 1, it->second->m_buffer.GetAddressOf());
+	}
+}
+
+void dx3d::DeviceContext::UpdateSubresource(ID3D11Resource* resource, void* subData)
+{
+	m_device_context.UpdateSubresource(resource, 0, nullptr, subData, 0, 0);
+}
+
+
 void dx3d::DeviceContext::createTransparentBlendState()
 {
 	D3D11_BLEND_DESC blendDesc = {};
@@ -95,6 +133,16 @@ void dx3d::DeviceContext::setBlendState()
 	float blendFactor[4] = { 0,0,0,0 };
 	UINT sample_mask = 0xffffffff;
 	m_device_context.OMSetBlendState(blendState.Get(), blendFactor, sample_mask);
+}
+
+void dx3d::DeviceContext::Dispatch(uint32_t xGroups, uint32_t yGroups, uint32_t zGroups)
+{
+	m_device_context.Dispatch(xGroups, yGroups, zGroups);
+}
+
+void dx3d::DeviceContext::CSSetShader(Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_computeShader)
+{
+	m_device_context.CSSetShader(m_computeShader.Get(), nullptr, 0);
 }
 
 void dx3d::DeviceContext::createBackfaceRasterizerState()

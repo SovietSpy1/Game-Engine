@@ -2,7 +2,7 @@
 #include <iostream>
 dx3d::Logger::Logger(LogLevel logLevel) : m_logLevel{ logLevel }
 {
-	std::clog << "PardCode | C++ 3D Game Tutorial Series" << "\n";
+	std::clog << "C++ Graphics Simulator" << "\n";
 	std::clog << "--------------------------------------" << "\n";
 }
 

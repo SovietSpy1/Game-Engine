@@ -33,6 +33,9 @@ namespace dx3d {
 	class SkyBox;
 	class GameManager;
 	class ComponentBase;
+	class Smoke;
+	class Grid;
+	class StructuredBuffer;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

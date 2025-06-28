@@ -6,6 +6,7 @@ namespace dx3d {
 	public:
 		Texture(const wchar_t* full_path, const GraphicsResourceDesc& desc);
 		Texture(int resolution, const GraphicsResourceDesc& desc);
+		void MapToTexture(std::vector<vec4_32> data, int resolution);
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Resource> m_texture = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv = nullptr;

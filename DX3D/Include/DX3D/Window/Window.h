@@ -1,6 +1,7 @@
 #pragma once  
 #include <DX3D/Core/Base.h>  
 #include <DX3D/Core/Common.h>  
+#include <DX3D/Math/Point.h>
 namespace dx3d {  
 	class Window : public Base  
 	{  
@@ -11,6 +12,7 @@ namespace dx3d {
 		virtual void onKillFocus();  
 		virtual void toggleFullScreen();
 		virtual void onResize(const Rect& new_size);
+		virtual Point GetClientPosition();
 		Rect m_size{};
 	protected:  
 		void* m_handle{};

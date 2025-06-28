@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <variant>
 namespace dx3d {
-	using vertexData = std::variant<std::vector<Vector2D>, std::vector<Vector3D>, std::vector<Vector4D>>;
+	using vertexData = std::variant<std::vector<Vector2D>, std::vector<Vector3D>, std::vector<vec4_32>>;
 	class VertexBuffer: public GraphicsResource
 	{
 	public:

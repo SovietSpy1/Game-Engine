@@ -80,6 +80,23 @@ namespace dx3d {
 	struct vec2 {
 		float u, v;
 	};
+	struct vec4_32 {
+		uint8_t r, g, b, a;
+		vec4_32 operator-=(const vec4_32& other) {
+			r -= other.r;
+			g -= other.g;
+			b -= other.b;
+			a -= other.a;
+			return *this;
+		}
+		vec4_32 operator+=(const vec4_32& other) {
+			r += other.r;
+			g += other.g;
+			b += other.b;
+			a += other.a;
+			return *this;
+		}
+	};
 	struct vec4 {
 		float r, g, b, a;
 		vec4 operator+(const vec4& other) const {
@@ -114,7 +131,7 @@ namespace dx3d {
 		Vector3D position;
 		Vector2D uv;
 		Vector3D normal;
-		Vector4D color;
+		vec4_32 color;
 	};
 	enum class MeshType
 	{

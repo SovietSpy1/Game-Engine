@@ -38,7 +38,7 @@ dx3d::Collider::Collider(const BaseDesc& desc, GameObject* owner, ColliderType c
 	vertices.resize(baseVertices.size());
 	normals.resize(baseNormals.size());
 	edges.resize(baseEdges.size());
-	std::vector<Vector4D> colors(baseVertices.size(), Vector4D(0, 1, 0, 1));
+	std::vector<vec4_32> colors(baseVertices.size(), vec4_32(0, 255, 0, 255));
 	std::vector<vertex> renderedVerts = VertexBuffer::FillInVertexData({ {IA::POSITION, baseVertices}, {IA::COLOR, colors} });
 	vertexBuffer->load(renderedVerts.data(), sizeof(vertex), renderedVerts.size());
 	indexBuffer->load(indices.data(), indices.size());

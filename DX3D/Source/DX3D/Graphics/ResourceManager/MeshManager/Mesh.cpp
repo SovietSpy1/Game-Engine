@@ -73,7 +73,7 @@ dx3d::Mesh::Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc) : R
 					ny = attribs.normals.at(index.normal_index * 3 + 1);
 					nz = attribs.normals.at(index.normal_index * 3 + 2);
 				}
-				vertex vrtx = vertex{ Vector3D(vx,vy,vz), Vector2D(tx,ty), Vector3D(nx,ny,nz), Vector4D(1,1,1,1)};
+				vertex vrtx = vertex{ Vector3D(vx,vy,vz), Vector2D(tx,ty), Vector3D(nx,ny,nz), vec4_32(255,255,255,255)};
 				vertices.push_back(vrtx);
 				indices.push_back(indexOffset + v);
 			}

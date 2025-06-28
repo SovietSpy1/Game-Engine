@@ -26,9 +26,9 @@ std::vector<D3D11_INPUT_ELEMENT_DESC> dx3d::VertexBuffer::LayoutFromSemantics(st
 		size += 12;
 	}
 	if (std::find(semantics.begin(), semantics.end(), dx3d::IA::COLOR) != semantics.end()) {
-		D3D11_INPUT_ELEMENT_DESC color_desc{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, size, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		D3D11_INPUT_ELEMENT_DESC color_desc{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, size, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 		layout_desc.push_back(color_desc);
-		size += 16; // 4 floats for color
+		size += 4; // 4 floats for color
 	}
 	return layout_desc;
 }
@@ -73,7 +73,7 @@ std::vector<dx3d::vertex> dx3d::VertexBuffer::FillInVertexData(std::unordered_ma
 	std::vector<Vector3D> positions(size);
 	std::vector<Vector2D> uvs(size);
 	std::vector<Vector3D> normals(size);
-	std::vector<Vector4D> colors(size);
+	std::vector<vec4_32> colors(size);
 	verts.resize(size);
 	it = data.begin();
 	while (it != data.end())
@@ -89,7 +89,7 @@ std::vector<dx3d::vertex> dx3d::VertexBuffer::FillInVertexData(std::unordered_ma
 			normals = std::get<std::vector<Vector3D>>(it->second);
 			break;
 		case IA::COLOR:
-			colors = std::get<std::vector<Vector4D>>(it->second);
+			colors = std::get<std::vector<vec4_32>>(it->second);
 			break;
 		default:
 			break;

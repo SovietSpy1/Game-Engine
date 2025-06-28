@@ -23,6 +23,8 @@
 #include <DX3D/Object/Objects/SkyBox.h>
 #include <DX3D/Object/Objects/Player.h>
 #include <string>
+#include <DX3D/Object/Objects/Smoke.h>
+#include <DX3D/Object/Objects/Grid.h>
 dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 {
 	if (S == nullptr) {
@@ -31,14 +33,30 @@ dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 	else {
 		DX3DLogErrorAndThrow("Game Manager has already been asigned!");
 	}
-	LoadBasicScene();
+
+	camera = std::make_shared<Camera>(BaseDesc{ m_logger });
+	UINT resolution = 100;
+	smokeHolder = std::make_shared<Smoke>(desc, resolution);
+	smokeHolder->radius = 0.05f;
+	smokeHolder->AddMaterial();
+	std::shared_ptr<Texture> tex = GraphicsEngine::get()->getTextureManager().create2DSmokeTexture(resolution);
+	smokeHolder->GetComponent<Material>()->textures.push_back(tex);
+	smokeHolder->GetComponent<Material>()->SetPixelShader(L"DX3D/Shaders/Smoke/PixelShader.hlsl");
+	smokeHolder->GetComponent<Material>()->SetVertexShader(L"DX3D/Shaders/Smoke/VertexShader.hlsl");
+	smokeHolder->AddMesh(L"Quad");
+	smokeHolder->GetComponent<Transform>()->rotation.SetRotationX(PI / 2.0f);
+	smokeHolder->GetComponent<Transform>()->position.Translate(Vector3D(0, 0, 1));
+	std::shared_ptr<Grid> grid = std::make_shared<Grid>();
+	grid->LoadBorder();
+	smokeHolder->AddComponent<Grid>(grid);
+	gameObjects.push_back(smokeHolder);
 }
 
 void dx3d::GameManager::Update()
 {
 	InputSystem::get()->Update();
 	PhysicsEngine::get()->Update();
-	camera->Update();
+	//camera->Update();
 	CameraUpdate();
 	for (int i = 0; i < gameObjects.size(); i++) {
 		currentObject = gameObjects[i];
@@ -190,4 +208,10 @@ void dx3d::GameManager::LoadBasicScene()
 	transform->scale.SetScale(Vector3D(0.2f, 1, 0.2f));
 	transform->position.SetTranslate(Vector3D(-10, -2, -10));
 	gameObjects.push_back(currentObject);
+}
+
+void dx3d::GameManager::SmokeTest2DUpdate()
+{
+	InputSystem::get()->Update();
+
 }

@@ -33,9 +33,9 @@ void dx3d::Game::run()
 			}
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-			if (++messageCount > maxMessages) {
+			/*if (++messageCount > maxMessages) {
 				break;
-			}
+			}*/
 		}
 		if (m_display->pause) {
 			m_paused = true;
@@ -55,9 +55,5 @@ void dx3d::Game::run()
 		Time::end = Time::temp;
 		Time::currentTime = static_cast<float>(Time::end.QuadPart) / Time::frequency.QuadPart;
 		Time::elapsedTime += Time::deltaTime;
-		/*if (Time::currentTime > nextTime) {
-			std::clog << 1.0f/Time::deltaTime << "\n";
-			nextTime = Time::currentTime + 0.5f; // Update every 0.5 seconds
-		}*/
 	}
 }

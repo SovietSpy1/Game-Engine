@@ -10,5 +10,6 @@ namespace dx3d {
 		virtual void onLeftMouseDown(const Point& mouse_pos) {};
 		virtual void onRightMouseDown(const Point& mouse_pos) {};
 		virtual void onKeyDownFirst(int key) {};
+		virtual void onHoldLeftMouseDown(const Point& mouse_pos) {};
 	};
 }
