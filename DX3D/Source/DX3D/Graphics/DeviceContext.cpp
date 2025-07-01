@@ -83,6 +83,13 @@ D3D11_MAPPED_SUBRESOURCE dx3d::DeviceContext::GetMap(Microsoft::WRL::ComPtr<ID3D
 	return mapped;
 }
 
+D3D11_MAPPED_SUBRESOURCE dx3d::DeviceContext::GetReadableMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource)
+{
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	m_device_context.Map(resource.Get(), 0, D3D11_MAP_READ, 0, &mapped);
+	return mapped;
+}
+
 void dx3d::DeviceContext::UnMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource)
 {
 	m_device_context.Unmap(resource.Get(), 0);
@@ -101,7 +108,7 @@ void dx3d::DeviceContext::CSSetUAVS(std::vector<ID3D11UnorderedAccessView*> uavs
 void dx3d::DeviceContext::CSSetConstantBuffers(const std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> buffers)
 {
 	for (auto it = buffers.begin(); it != buffers.end(); it++) {
-		m_device_context.PSSetConstantBuffers(it->first, 1, it->second->m_buffer.GetAddressOf());
+		m_device_context.CSSetConstantBuffers(it->first, 1, it->second->m_buffer.GetAddressOf());
 	}
 }
 
@@ -231,4 +238,9 @@ void dx3d::DeviceContext::setTexture(std::vector<std::shared_ptr<Texture>> textu
 
 	m_device_context.PSSetShaderResources(0, textures.size(), srvs);
 	m_device_context.PSSetSamplers(0, textures.size(), samplers);
+}
+
+void dx3d::DeviceContext::PSSetSRVS(std::vector<ID3D11ShaderResourceView*> srvs)
+{
+	m_device_context.PSSetShaderResources(1, srvs.size(), srvs.data());
 }

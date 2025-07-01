@@ -13,7 +13,7 @@ namespace dx3d {
 		void CameraUpdate(Matrix4X4 lightRot, Camera* cam, float fov);
 		void onFocus() override;
 		void onKillFocus() override;
-		void Draw(GameObject* currentObject);
+		void Draw(std::shared_ptr<GameObject> currentObject);
 		static Display* get();
 		virtual ~Display() override;
 		virtual void onResize(const Rect& new_size) override;

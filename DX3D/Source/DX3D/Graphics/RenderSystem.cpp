@@ -11,6 +11,7 @@
 #include <DX3D/Object/Axis.h>
 #include <DX3D/Object/Material.h>
 #include <DX3D/Graphics/StructuredBuffer/StructuredBuffer.h>
+#include <iostream>
 using namespace dx3d;
 dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
 {
@@ -123,6 +124,30 @@ void dx3d::RenderSystem::compilePixelShader(const WCHAR* pixelShaderPath, Micros
 	if (error_blob != nullptr) {
 		error_blob->Release();
 	}
+}
+
+void dx3d::RenderSystem::compileComputeShader(const WCHAR* computeShaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& computeBlob) const
+{
+	ID3DBlob* error_blob = nullptr;
+	DX3DGraphicsLogErrorAndThrow(D3DCompileFromFile(
+		computeShaderPath,      // shader file name
+		nullptr,                         // optional macros
+		nullptr,                         // include interface
+		"main",                          // entry point function
+		"cs_5_0",                        // shader model
+		0,                               // compile flags
+		0,                               // effect flags
+		computeBlob.GetAddressOf(),                    // compiled shader
+		&error_blob                      // errors
+	), "compileComputeShader failed.");
+	if (error_blob != nullptr) {
+		error_blob->Release();
+	}
+}
+
+void dx3d::RenderSystem::createComputeShader(Microsoft::WRL::ComPtr<ID3DBlob>& computeBlob, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& computeShader) const
+{
+	DX3DGraphicsLogErrorAndThrow(m_d3dDevice->CreateComputeShader(computeBlob->GetBufferPointer(), computeBlob->GetBufferSize(), nullptr, computeShader.GetAddressOf()), "createComputeShader failed.");
 }
 
 void dx3d::RenderSystem::createVertexShader(Microsoft::WRL::ComPtr<ID3DBlob>& vertexBlob, Microsoft::WRL::ComPtr<ID3D11VertexShader> &vertexShader) const

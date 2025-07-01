@@ -31,10 +31,10 @@ dx3d::Texture::Texture(const wchar_t* full_path, const GraphicsResourceDesc& des
 
 dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resource(desc)
 {
-	std::vector<vec4_32> initColors(resolution * resolution, vec4_32{0,0,0,0});
+	std::vector<vec4> initColors(resolution * resolution, vec4{0,0,0,100});
 	D3D11_SUBRESOURCE_DATA initValues{};
 	initValues.pSysMem = initColors.data();
-	initValues.SysMemPitch = resolution * sizeof(vec4_32);
+	initValues.SysMemPitch = resolution * sizeof(vec4);
 	initValues.SysMemSlicePitch = 0;
 	D3D11_TEXTURE2D_DESC texDesc{};
 	texDesc.Height = resolution;
@@ -43,21 +43,20 @@ dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resou
 	texDesc.ArraySize = 1;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
+	texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	texDesc.Usage = D3D11_USAGE_DYNAMIC;
-	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	texDesc.MiscFlags = 0;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture{};
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateTexture2D(&texDesc, &initValues, texture.GetAddressOf()), "Create Smoke Texture Failed!");
 	m_texture = texture;
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shader_desc{};
-	shader_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	shader_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	shader_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shader_desc.Texture2D.MipLevels = 1;
 	shader_desc.Texture2D.MostDetailedMip = 0;
-
+	
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateShaderResourceView(m_texture.Get(), &shader_desc, m_srv.GetAddressOf()), "Create shaderResourceView failed.");
 
 	D3D11_SAMPLER_DESC sampler_desc = {};
@@ -73,15 +72,19 @@ dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resou
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateSamplerState(&sampler_desc, m_sampler.GetAddressOf()), "CreateSamplerState failed.");
 }
 
-void dx3d::Texture::MapToTexture(std::vector<vec4_32> data, int resolution)
+void dx3d::Texture::MapToTexture(std::vector<vec4> data, int resolution)
 {
 	D3D11_MAPPED_SUBRESOURCE map{};
 	map = Display::get()->m_device_context->GetMap(m_texture);
-	uint8_t* destPtr = reinterpret_cast<uint8_t*>(map.pData);
-	const uint8_t* sourcePtr = reinterpret_cast<uint8_t*>(data.data());
-	UINT pitch = 4 * resolution;
+	vec4* destPtr = reinterpret_cast<vec4*>(map.pData);
+	UINT pitch = resolution * sizeof(vec4);
+	const vec4* sourcePtr = data.data(); // already vec4*
 	for (UINT y = 0; y < resolution; y++) {
-		::memcpy(destPtr + y * map.RowPitch, sourcePtr + y * pitch, pitch);
+		std::memcpy(
+			reinterpret_cast<uint8_t*>(destPtr) + y * map.RowPitch,
+			sourcePtr + y * resolution,
+			pitch
+		);
 	}
 	Display::get()->m_device_context->UnMap(m_texture);
 }

@@ -30,9 +30,8 @@ namespace dx3d {
 		std::vector<std::shared_ptr<GameObject>> gameObjects;
 		std::shared_ptr<Smoke> smokeHolder;
 		float lightRotation = 0.0f;
+		friend class Display;
 	};
 
 	
 }
-
-// Hash function for Entity should be defined elsewhere in your codebase

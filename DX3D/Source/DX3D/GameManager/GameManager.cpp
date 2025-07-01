@@ -67,7 +67,7 @@ void dx3d::GameManager::Update()
 
 void dx3d::GameManager::GameObjectUpdate()
 {
-	Display::get()->Draw(currentObject.get());
+	Display::get()->Draw(currentObject);
 }
 
 void dx3d::GameManager::CameraUpdate()
@@ -212,6 +212,4 @@ void dx3d::GameManager::LoadBasicScene()
 
 void dx3d::GameManager::SmokeTest2DUpdate()
 {
-	InputSystem::get()->Update();
-
 }

@@ -15,6 +15,7 @@ namespace dx3d {
 		void SetViewportSize(UINT width, UINT height);
 		void loadShaders(Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader, Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader);
 		D3D11_MAPPED_SUBRESOURCE GetMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource);
+		D3D11_MAPPED_SUBRESOURCE GetReadableMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource);
 		void UnMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource);
 		void CSSetSRVS(std::vector<ID3D11ShaderResourceView*> srvs);
 		void CSSetUAVS(std::vector<ID3D11UnorderedAccessView*> uavs);
@@ -31,8 +32,12 @@ namespace dx3d {
 		void setConstantBuffers(const std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> buffers);
 		void setIndexBuffer(std::shared_ptr<IndexBuffer> iBuffer);
 		void setTexture(std::vector<std::shared_ptr<Texture>> texture);
+		void PSSetSRVS(std::vector<ID3D11ShaderResourceView*> srvs);
 		static DeviceContext* get() {
 			return S;
+		}
+		void CopyResource(ID3D11Resource* dest, ID3D11Resource* src) {
+			m_device_context.CopyResource(dest, src);
 		}
 	private:
 		static inline DeviceContext* S{};

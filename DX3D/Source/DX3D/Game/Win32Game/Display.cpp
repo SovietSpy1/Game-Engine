@@ -24,6 +24,8 @@
 #include <DX3D/Object/Objects/Player.h>
 #include <string>
 #include <DX3D/Object/Objects/Grid.h>
+#include <DX3D/Object/Objects/Smoke.h>
+#include <DX3D/Graphics/StructuredBuffer/StructuredBuffer.h>
 dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size))
 {
 	S = this;
@@ -61,9 +63,9 @@ dx3d::Display* dx3d::Display::get()
 	return S;
 }
 
-void dx3d::Display::Draw(GameObject* currentObject)
+void dx3d::Display::Draw(std::shared_ptr<GameObject> currentObject)
 {
-	//prepating
+	//preparing
 	constantBuffers.clear();
 	Transform* transform = currentObject->GetComponent<Transform>();
 	cBuff.m_world = transform->Get();
