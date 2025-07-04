@@ -19,18 +19,19 @@ StructuredBuffer<float> VYLast : register(t2);
 
 RWStructuredBuffer<float> DataCurrent : register(u0);
 
-[numthreads(BLOCK_SIZE, BLOCK_SIZE, 1)]
+[numthreads(10, 10, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    uint x = DTid.x + 1;
-    uint y = DTid.y + 1;
-    if (x > resolution || y > resolution)
+    if (DTid.x >= resolution || DTid.y >= resolution)
     {
         return;
     }
+    uint x = DTid.x + 1;
+    uint y = DTid.y + 1;
+    
     float xPos = x - VXLast[IX(x, y)] * dt * resolution;
     xPos = clamp(xPos, 0.0f, (float) resolution);
-    float yPos = y - VYLast[IX(x, y)] * dt * resolution;
+    float yPos = y - VYLast[IX(x, y)] *dt * resolution;
     yPos = clamp(yPos, 0.0f, (float) resolution);
     int i = (int) xPos;
     int j = (int) yPos;
@@ -41,5 +42,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float tL = (1 - iProp) * (jProp);
     float tR = (iProp) * (jProp);
     
-    DataCurrent[IX(x, y)] = bL * DataLast[IX(i, j)] + bR * DataLast[IX(i+1, j)] + tL * DataLast[IX(i, j+1)] + tR * DataLast[IX(i+1, j+1)];
+   DataCurrent[IX(x, y)] = bL * DataLast[IX(i, j)] + bR * DataLast[IX(i+1, j)] + tL * DataLast[IX(i, j+1)] + tR * DataLast[IX(i+1, j+1)];
 }

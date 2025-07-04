@@ -19,8 +19,8 @@ RWStructuredBuffer<float> Div : register(u0);
 [numthreads(10, 10, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    float h = 1.0f / resolution;
-    if (DTid.x > resolution || DTid.y > resolution)
+    float h = 1.0f / (float) resolution;
+    if (DTid.x >= resolution || DTid.y >= resolution)
     {
         return;
     }

@@ -276,6 +276,5 @@
     <FxCompile Include="DX3D\Shaders\Smoke\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Grid\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Grid\VertexShader.hlsl" />
-    <FxCompile Include="DX3D\Shaders\Smoke\Compute\AddSourceCompute.hlsl" />
   </ItemGroup>
 </Project>

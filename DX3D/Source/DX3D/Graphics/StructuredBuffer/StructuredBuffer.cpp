@@ -16,9 +16,9 @@ void dx3d::StructuredBuffer::loadSmokeBuffers(int resolution)
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 
-	std::vector<float> initDens(size * size, 0.5f);
+	//std::vector<float> initYVel(size * size, 0.5f);
 	D3D11_SUBRESOURCE_DATA initValues{};
-	initValues.pSysMem = initDens.data();
+	//initValues.pSysMem = initYVel.data();
 	initValues.SysMemPitch = resolution * sizeof(float);
 	initValues.SysMemSlicePitch = 0;
 	

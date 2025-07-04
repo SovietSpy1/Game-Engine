@@ -78,10 +78,12 @@ namespace dx3d {
 		int resolution;
 		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res){
 			InputSystem::get()->addListener(this);
-			CPUStart();
+			//CPUStart();
+			GPUStart();
 		}
 		void Update() override {
-			SmokeUpdate();
+			//SmokeUpdate();
+			SmokeGraphicsUpdate();
 		}
 		void GPUStart() {
 			groupCount = (resolution + 9) / 10;
@@ -135,13 +137,11 @@ namespace dx3d {
 			dC->CSSetConstantBuffers({ {0, constantBuffer} });
 			smokeBuffDesc.dt = Time::deltaTime;
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
-			GraphicsAddSource();
-			UINT xPos = 0.5f * resolution;
-			UINT yPos = 0.5f * resolution;
-			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 1, 0, 0, 2);
 			GraphicsAdvect();
+			dC->CSSetConstantBuffers({ {0, constantBuffer} });
+			GraphicsAddSource();
 			//GraphicsDiffuse();
-			//GraphicsProject();
+			GraphicsProject();
 			Finalize();
 		}
 		void Finalize() {
@@ -161,29 +161,29 @@ namespace dx3d {
 		void GraphicsAdvect() {
 			SWAP(structuredBuffer->dens_uav_current, structuredBuffer->dens_uav_last);
 			SWAP(structuredBuffer->dens_srv_current, structuredBuffer->dens_srv_last);
-			/*SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
+			SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
 			SWAP(structuredBuffer->velX_srv_current, structuredBuffer->velX_srv_last);
 			SWAP(structuredBuffer->velY_uav_current, structuredBuffer->velY_uav_last);
-			SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);*/
+			SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);
 			dC->CSSetSRVS({ structuredBuffer->dens_srv_last.Get(), structuredBuffer->velX_srv_current.Get(), structuredBuffer->velY_srv_current.Get()});
 			dC->CSSetUAVS({ structuredBuffer->dens_uav_current.Get() });
 			dC->CSSetShader(AdvectionCS);
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			/*dC->CSSetSRVS({structuredBuffer->velX_srv_last.Get(), structuredBuffer->velX_srv_last.Get(), structuredBuffer->velY_srv_last.Get()});
+			dC->CSSetSRVS({structuredBuffer->velX_srv_last.Get(), structuredBuffer->velX_srv_last.Get(), structuredBuffer->velY_srv_last.Get()});
 			dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 			dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get(), structuredBuffer->velX_srv_last.Get(), structuredBuffer->velY_srv_last.Get() });
 			dC->CSSetUAVS({ structuredBuffer->velY_uav_current.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
-			Clear();*/
+			Clear();
 		}
 		void GraphicsAddSource() {
 			UINT xPos = 0.5f * resolution;
 			UINT yPos = 0.1f * resolution;
 			float ranVelocityX = std::rand() % 20;
-			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, 30.0f, 0, 0);
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, darkAmp, -10 + ranVelocityX, eVY);
 		}
 		void GraphicsAddToSmoke(Vector3D position, float radius, float dens, float xDir = 0, float yDir = 0) {
 			smokeBuffDesc.emissionPoint = vec2_int{ (int)position.x, (int)position.y };
@@ -207,6 +207,7 @@ namespace dx3d {
 			dC->CSSetUAVS({ structuredBuffer->dens_uav_current.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
+			
 			dC->CSSetSRVS({structuredBuffer->velX_srv_last.Get()});
 			dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
 			smokeBuffDesc.max = maxSpeed;
@@ -230,7 +231,7 @@ namespace dx3d {
 			dC->CopyResource(structuredBuffer->dens_start.Get(), structuredBuffer->dens_current.Get());
 			dC->CopyResource(structuredBuffer->velX_start.Get(), structuredBuffer->velX_current.Get());
 			dC->CopyResource(structuredBuffer->velY_start.Get(), structuredBuffer->velY_current.Get());
-			int adaptiveIterations = 10;
+			int adaptiveIterations = 20;
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(structuredBuffer->dens_uav_current, structuredBuffer->dens_uav_last);
 				SWAP(structuredBuffer->dens_srv_current, structuredBuffer->dens_srv_last);
@@ -244,18 +245,18 @@ namespace dx3d {
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
 				SWAP(structuredBuffer->velX_srv_current, structuredBuffer->velX_srv_last);
-				dC->CSSetSRVS({ structuredBuffer->velX_srv_last.Get() });
+				dC->CSSetSRVS({ structuredBuffer->velX_srv_last.Get(), structuredBuffer->velX_srv_start.Get() });
 				dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
 				dC->CSSetShader(DiffusionCS);
 				dC->Dispatch(groupCount, groupCount, 1);
 				Clear();
-				GraphicsSetBnd(1, structuredBuffer->velX_srv_current, structuredBuffer->velX_uav_current);
+			GraphicsSetBnd(1, structuredBuffer->velX_srv_current, structuredBuffer->velX_uav_current);
 			}
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(structuredBuffer->velY_uav_current, structuredBuffer->velY_uav_last);
 				SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);
 				dC->CSSetShader(DiffusionCS);
-				dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get() });
+				dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get() , structuredBuffer->velY_srv_start.Get()});
 				dC->CSSetUAVS({ structuredBuffer->velY_uav_current.Get() });
 				dC->Dispatch(groupCount, groupCount, 1);
 				Clear();
@@ -277,13 +278,13 @@ namespace dx3d {
 			dC->CSSetUAVS({ structuredBuffer->div_uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			GraphicsSetBnd(0, structuredBuffer->div_srv, structuredBuffer->div_uav);
+			//GraphicsSetBnd(0, structuredBuffer->div_srv, structuredBuffer->div_uav);
 			dC->CSSetShader(ClearCS);
 			dC->CSSetUAVS({ structuredBuffer->pressure_uav_current.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			GraphicsSetBnd(0, structuredBuffer->pressure_srv_current, structuredBuffer->pressure_uav_current);
-			int adaptiveIterations = 20;
+			//GraphicsSetBnd(0, structuredBuffer->pressure_srv_current, structuredBuffer->pressure_uav_current);
+			int adaptiveIterations = 10;
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(structuredBuffer->pressure_uav_current, structuredBuffer->pressure_uav_last);
 				SWAP(structuredBuffer->pressure_srv_current, structuredBuffer->pressure_srv_last);
@@ -425,7 +426,7 @@ namespace dx3d {
 		}
 		void Diffuse(float* newData, float* oldData, float diff, int b) {
 			float a = resolution * resolution * diff * Time::deltaTime;
-			int adaptiveIterations = std::max(5, 20);
+			int adaptiveIterations = 20;
 			for (int k = 0; k < adaptiveIterations; k++) {
 				for (int y = 1; y <= resolution; y++) {
 					for (int x = 1; x <= resolution; x++) {
@@ -445,7 +446,7 @@ namespace dx3d {
 			}
 			set_bnd(0, div); 
 			set_bnd(0, pressure);
-			int adaptiveIterations = std::max(5, 20);
+			int adaptiveIterations = 20;
 			for (int k = 0; k < adaptiveIterations; k++) {
 				for (UINT y = 1; y <= resolution; y++) {
 					for (UINT x = 1; x <= resolution; x++) {
