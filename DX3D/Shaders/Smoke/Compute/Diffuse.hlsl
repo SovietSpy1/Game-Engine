@@ -20,7 +20,7 @@ RWStructuredBuffer<float> DataCurrent : register(u0);
 [numthreads(10, 10, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    if (DTid.x > resolution || DTid.y > resolution)
+    if (DTid.x >= resolution || DTid.y >= resolution)
     {
         return;
     }

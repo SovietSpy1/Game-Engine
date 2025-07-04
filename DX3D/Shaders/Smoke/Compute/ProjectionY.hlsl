@@ -19,8 +19,12 @@ RWStructuredBuffer<float> DataCurrent : register(u0);
 [numthreads(10, 10, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    float h = 1.0f / (float) resolution;
+    if (DTid.x >= resolution || DTid.y >= resolution)
+    {
+        return;
+    }
+    float h = 1.0 / (float) resolution;
     uint x = DTid.x + 1;
     uint y = DTid.y + 1;
-    DataCurrent[IX(x, y)] -= ((Pressure[IX(x, y+1)] - Pressure[IX(x, y-1)]) * 0.5f / h);
+    DataCurrent[IX(x, y)] = DataLast[IX(x,y)] - ((Pressure[IX(x, y+1)] - Pressure[IX(x, y-1)]) * 0.5f / h);
 }

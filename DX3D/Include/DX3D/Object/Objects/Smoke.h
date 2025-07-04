@@ -138,9 +138,8 @@ namespace dx3d {
 			smokeBuffDesc.dt = Time::deltaTime;
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
 			GraphicsAdvect();
-			dC->CSSetConstantBuffers({ {0, constantBuffer} });
 			GraphicsAddSource();
-			//GraphicsDiffuse();
+			GraphicsDiffuse();
 			GraphicsProject();
 			Finalize();
 		}
@@ -278,13 +277,13 @@ namespace dx3d {
 			dC->CSSetUAVS({ structuredBuffer->div_uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			//GraphicsSetBnd(0, structuredBuffer->div_srv, structuredBuffer->div_uav);
+			GraphicsSetBnd(0, structuredBuffer->div_srv, structuredBuffer->div_uav);
 			dC->CSSetShader(ClearCS);
 			dC->CSSetUAVS({ structuredBuffer->pressure_uav_current.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			//GraphicsSetBnd(0, structuredBuffer->pressure_srv_current, structuredBuffer->pressure_uav_current);
-			int adaptiveIterations = 10;
+			GraphicsSetBnd(0, structuredBuffer->pressure_srv_current, structuredBuffer->pressure_uav_current);
+			int adaptiveIterations = 20;
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(structuredBuffer->pressure_uav_current, structuredBuffer->pressure_uav_last);
 				SWAP(structuredBuffer->pressure_srv_current, structuredBuffer->pressure_srv_last);
@@ -299,15 +298,13 @@ namespace dx3d {
 			SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
 			SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);
 			SWAP(structuredBuffer->velY_uav_current, structuredBuffer->velY_uav_last);
-			SWAP(structuredBuffer->pressure_srv_current, structuredBuffer->pressure_srv_last);
-			SWAP(structuredBuffer->pressure_uav_current, structuredBuffer->pressure_uav_last);
 			dC->CSSetShader(ProjectionXCS);
-			dC->CSSetSRVS({ structuredBuffer->velX_srv_last.Get(), structuredBuffer->pressure_srv_last.Get() });
+			dC->CSSetSRVS({ structuredBuffer->velX_srv_last.Get(), structuredBuffer->pressure_srv_current.Get() });
 			dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 			dC->CSSetShader(ProjectionYCS);
-			dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get(), structuredBuffer->pressure_srv_last.Get() });
+			dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get(), structuredBuffer->pressure_srv_current.Get() });
 			dC->CSSetUAVS({ structuredBuffer->velY_uav_current.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
@@ -331,9 +328,17 @@ namespace dx3d {
 		void SmokeUpdate() {
 			AdvectUpdate();
 			AddSource();
+			Diffuse();
 			VelUpdate();
-			DensUpdate();
 			TextureUpdate();
+		}
+		void Diffuse() {
+			SWAP(oldvX, vX);
+			SWAP(oldvY, vY);
+			Diffuse(vX.data(), oldvX.data(), visc, 1);
+			Diffuse(vY.data(), oldvY.data(), visc, 2);
+			SWAP(oldDensities, densities);
+			Diffuse(densities.data(), oldDensities.data(), diff, 0);
 		}
 		void TextureUpdate() {
 			for (int y = 1; y <= resolution; y++) {
@@ -359,15 +364,7 @@ namespace dx3d {
 			AddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, vec4{ 0,0,0,1 }, -10 + ranVelocityX, eVY);
 		}
 		void VelUpdate() {
-			SWAP(oldvX, vX);
-			SWAP(oldvY, vY);
-			Diffuse(vX.data(), oldvX.data(), visc, 1);
-			Diffuse(vY.data(), oldvY.data(), visc, 2);
 			Project(vX.data(), vY.data(), pressure.data(), div.data());
-		}
-		void DensUpdate() {
-			SWAP(oldDensities, densities);
-			Diffuse(densities.data(), oldDensities.data(), diff, 0);
 		}
 		void AddToSmoke(Vector3D position, float radius, vec4 color, float xDir = 0, float yDir = 0) {
 			int arrayRad = radius * resolution;
