@@ -63,8 +63,8 @@ void dx3d::DeviceContext::SetViewportSize(UINT width, UINT height)
 	D3D11_VIEWPORT vp{};
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
-	vp.Width = width;
-	vp.Height = height;
+	vp.Width = (FLOAT)width;
+	vp.Height = (FLOAT)height;
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	m_device_context.RSSetViewports(1, &vp);
@@ -97,12 +97,12 @@ void dx3d::DeviceContext::UnMap(Microsoft::WRL::ComPtr<ID3D11Resource> resource)
 
 void dx3d::DeviceContext::CSSetSRVS(std::vector<ID3D11ShaderResourceView*> srvs)
 {
-	m_device_context.CSSetShaderResources(0, srvs.size(), srvs.data());
+	m_device_context.CSSetShaderResources(0, (UINT)srvs.size(), srvs.data());
 }
 
 void dx3d::DeviceContext::CSSetUAVS(std::vector<ID3D11UnorderedAccessView*> uavs)
 {
-	m_device_context.CSSetUnorderedAccessViews(0, uavs.size(), uavs.data(), nullptr);
+	m_device_context.CSSetUnorderedAccessViews(0, (UINT)uavs.size(), uavs.data(), nullptr);
 }
 
 void dx3d::DeviceContext::CSSetConstantBuffers(const std::unordered_map<UINT, std::shared_ptr<ConstantBuffer>> buffers)
@@ -236,8 +236,8 @@ void dx3d::DeviceContext::setTexture(std::vector<std::shared_ptr<Texture>> textu
 		samplers[i] = textures[i]->m_sampler.Get();
 	}
 
-	m_device_context.PSSetShaderResources(0, textures.size(), srvs);
-	m_device_context.PSSetSamplers(0, textures.size(), samplers);
+	m_device_context.PSSetShaderResources(0, (UINT)textures.size(), srvs);
+	m_device_context.PSSetSamplers(0, (UINT)textures.size(), samplers);
 }
 
 void dx3d::DeviceContext::PSSetSRVS(std::vector<ID3D11ShaderResourceView*> srvs)

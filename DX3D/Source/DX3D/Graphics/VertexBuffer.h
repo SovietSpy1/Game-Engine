@@ -9,7 +9,7 @@ namespace dx3d {
 	public:
 		explicit VertexBuffer(const GraphicsResourceDesc& desc);
 		std::vector<D3D11_INPUT_ELEMENT_DESC> LayoutFromSemantics(std::vector<IA> semantics);
-		void load(void* list_vertices, UINT size_vertex, UINT size_list, void* shader_byte_code = nullptr, UINT size_byte_shader = 0, std::vector<IA> semantics = {IA::POSITION, IA::TEXCOORD, IA::NORMAL, IA::COLOR});
+		void load(void* list_vertices, UINT size_vertex, size_t size_list, void* shader_byte_code = nullptr, UINT size_byte_shader = 0, std::vector<IA> semantics = {IA::POSITION, IA::TEXCOORD, IA::NORMAL, IA::COLOR});
 		static std::vector<vertex> FillInVertexData(std::unordered_map<IA, vertexData> data);
 		UINT getSizeVertexList();
 	private:

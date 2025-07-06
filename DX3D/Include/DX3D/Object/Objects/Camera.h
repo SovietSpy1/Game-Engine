@@ -14,7 +14,7 @@ namespace dx3d {
 		void onKeyUp(int key) override {
 		}
 		void onMouseMove(const Point& mouse_pos) override {
-			InputSystem::get()->setCursorPosition(Point(Display::get()->m_size.width / 2.0f, Display::get()->m_size.height / 2.0f));
+			InputSystem::get()->setCursorPosition(Point((int)Display::get()->m_size.width / 2.0f, (int)Display::get()->m_size.height / 2.0f));
 			xRot -= (mouse_pos.y - (Display::get()->m_size.height / 2.0f)) * Time::deltaTime * 0.1f;
 			yRot -= (mouse_pos.x - (Display::get()->m_size.width / 2.0f)) * Time::deltaTime * 0.1f;
 			if (xRot > PI / 4.0f) xRot = PI / 4.0f;

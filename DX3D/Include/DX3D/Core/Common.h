@@ -10,6 +10,21 @@
 #include <cmath>
 #include <vector>
 namespace dx3d {
+	struct vec2_int {
+		int x, y;
+	};
+	struct smokeConstantBufferDesc {
+		int resolution;
+		float dt;
+		float diff;
+		float visc;
+		vec2_int emissionPoint;
+		int emissionRadius;
+		float emission;
+		float max = 1.0f;
+		float min = 0.0f;
+		int b = 0;
+	};
 	enum class RasterizerStateType {
 		BackFace,
 		FrontFace,
@@ -109,7 +124,7 @@ namespace dx3d {
 			return vec4(r *other, g * other, b *other, a * other);
 		}
 		float magnitude() const{
-			return std::sqrt(std::pow(r, 2) + std::pow(g, 2) + std::pow(b, 2) + std::pow(a, 2));
+			return std::sqrtf(std::powf(r, 2) + std::powf(g, 2) + std::powf(b, 2) + std::powf(a, 2));
 		}
 	};
 	struct Color {
@@ -128,10 +143,10 @@ namespace dx3d {
 		}
 	};
 	struct vertex {
-		Vector3D position;
-		Vector2D uv;
-		Vector3D normal;
-		vec4_32 color;
+		Vector3D position{};
+		Vector2D uv{};
+		Vector3D normal{};
+		vec4_32 color{};
 	};
 	enum class MeshType
 	{
@@ -143,10 +158,10 @@ namespace dx3d {
 		Matrix4X4 m_world{};
 		Matrix4X4 m_view{};
 		Matrix4X4 m_proj{};
-		Vector4D lightDirection;
-		Vector4D camPosition;
+		Vector4D lightDirection{};
+		Vector4D camPosition{};
 		Matrix4X4 m_rotation{};
-		float elapsedTime;
+		float elapsedTime{};
     };
 }
 #define PI 3.141594265f 

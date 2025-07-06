@@ -15,21 +15,44 @@
 namespace dx3d {
 	class Smoke : public GameObject{
 	public:
-		struct vec2_int {
-			int x, y;
-		};
-		struct smokeConstantBufferDesc {
-			int resolution;
-			float dt;
-			float diff;
-			float visc;
-			vec2_int emissionPoint;
-			int emissionRadius;
-			float emission;
-			float max = 1.0f;
-			float min = 0.0f;
-			int b = 0;
-		};
+		//shared variables
+		DeviceContext* dC{};
+		RenderSystem* rS{};
+		float darkAmp = 10.0f;
+		float eVX = 0.0f;
+		float eVY = 10.0f;
+		float visc = 0.0001f;
+		float diff = 0.001f;
+		float radius = 0.1f;
+		float maxSpeed = 5.0f;
+		int resolution;
+		//shared methods
+		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res){
+			InputSystem::get()->addListener(this);
+			//CPUStart();
+			GPUStart();
+		}
+		void Update() override {
+			//SmokeUpdate();
+			SmokeGraphicsUpdate();
+		}
+		virtual void onLeftMouseDown(const Point& mouse_pos) override {
+
+		}
+		virtual void onHoldLeftMouseDown(const Point& mouse_pos) override {
+			Rect d = Display::get()->m_size;
+			float o = 1.1f;
+			float x = o / d.height * (mouse_pos.x - 0.5f * d.width) + 0.5f;
+			float y = (float)(mouse_pos.y - 0.5f * d.height) * o / d.height + 0.5f;
+			if (x < 0 || y < 0 || x >= 1 || y >= 1) {
+				return;
+			}
+			int coordX = x * resolution;
+			int coordY = y * resolution;
+			//AddToSmoke(Vector3D(coordX, coordY, 0), radius, vec4{ 0,0,0,1 });
+			GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
+		}
+		//GPU Variables
 		std::unique_ptr<BufferPair> dens_read;
 		std::unique_ptr<BufferPair> dens_write;
 		std::unique_ptr<BufferPair> velX_read;
@@ -65,41 +88,13 @@ namespace dx3d {
 		const WCHAR* projectionYCP = L"DX3D/Shaders/Smoke/Compute/ProjectionY.hlsl";
 		const WCHAR* mapCP = L"DX3D/Shaders/Smoke/Compute/Map.hlsl";
 		const WCHAR* transferCP = L"DX3D/Shaders/Smoke/Compute/Transfer.hlsl";
-		DeviceContext* dC{};
-		RenderSystem* rS{};
 		smokeConstantBufferDesc smokeBuffDesc{};
 		std::shared_ptr<StructuredBuffer> structuredBuffer;
 		std::shared_ptr<ConstantBuffer> constantBuffer;
 
-		std::vector<float> pressure;
-		std::vector<float> div;
-		std::vector<float> oldvX;
-		std::vector<float> oldvY;
-		std::vector<float> vX;
-		std::vector<float> vY;
-		std::vector<vec4> colors;
-		std::vector<float> densities;
-		std::vector<float> oldDensities;
-
 		UINT groupCount;
 		UINT borderCount;
-		float darkAmp = 10.0f;
-		float eVX = 0.0f;
-		float eVY = 10.0f;
-		float visc = 0.0001f;
-		float diff = 0.001f;
-		float radius = 0.1f;
-		float maxSpeed = 5.0f;
-		int resolution;
-		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res){
-			InputSystem::get()->addListener(this);
-			//CPUStart();
-			GPUStart();
-		}
-		void Update() override {
-			//SmokeUpdate();
-			SmokeGraphicsUpdate();
-		}
+		//GPU Methods
 		void GPUStart() {
 			dC = DeviceContext::get();
 			rS = RenderSystem::get();
@@ -310,7 +305,7 @@ namespace dx3d {
 			SWAP(velX_read, velX_write);
 			SWAP(velY_read, velY_write);
 			dC->CSSetShader(DivergenceCS);
-			dC->CSSetSRVS({ velX_read->srv.Get(), velY_read->srv.Get()});
+			dC->CSSetSRVS({ velX_read->srv.Get(), velY_read->srv.Get() });
 			dC->CSSetUAVS({ divergence->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
@@ -324,15 +319,15 @@ namespace dx3d {
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(pressure_read, pressure_write);
 				dC->CSSetShader(PressureCS);
-				dC->CSSetSRVS({pressure_read->srv.Get(), divergence->srv.Get() });
+				dC->CSSetSRVS({ pressure_read->srv.Get(), divergence->srv.Get() });
 				dC->CSSetUAVS({ pressure_write->uav.Get() });
 				dC->Dispatch(groupCount, groupCount, 1);
 				Clear();
 				GraphicsSetBnd(0, pressure_write.get());
 			}
 			dC->CSSetShader(ProjectionXCS);
-			dC->CSSetSRVS({ velX_read->srv.Get(), pressure_write->srv.Get()});
-			dC->CSSetUAVS({ velX_write->uav.Get()});
+			dC->CSSetSRVS({ velX_read->srv.Get(), pressure_write->srv.Get() });
+			dC->CSSetUAVS({ velX_write->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 			dC->CSSetShader(ProjectionYCS);
@@ -343,6 +338,17 @@ namespace dx3d {
 			GraphicsSetBnd(1, velX_write.get());
 			GraphicsSetBnd(2, velY_write.get());
 		}
+
+		//Completely CPU run
+		std::vector<float> pressure;
+		std::vector<float> div;
+		std::vector<float> oldvX;
+		std::vector<float> oldvY;
+		std::vector<float> vX;
+		std::vector<float> vY;
+		std::vector<vec4> colors;
+		std::vector<float> densities;
+		std::vector<float> oldDensities;
 		void CPUStart() {
 			UINT size = resolution + 2;
 			vX.resize(size * size, 0.0f);
@@ -375,7 +381,7 @@ namespace dx3d {
 		void TextureUpdate() {
 			for (int y = 1; y <= resolution; y++) {
 				for (int x = 1; x <= resolution; x++) {
-					colors.at((x-1) + (y-1) * resolution).a = densities.at(IX(x,y));
+					colors.at((x - 1) + (y - 1) * resolution).a = densities.at(IX(x, y));
 				}
 			}
 			GetComponent<Material>()->textures.at(0)->MapToTexture(colors, resolution);
@@ -399,8 +405,8 @@ namespace dx3d {
 		}
 		void AddToSmoke(Vector3D position, float radius, vec4 color, float xDir = 0, float yDir = 0) {
 			int arrayRad = radius * resolution;
-			int leftSide = std::clamp((int)position.x - arrayRad+1, 1, resolution);
-			int rightSide = std::clamp((int)position.x + arrayRad+1, 1, resolution);
+			int leftSide = std::clamp((int)position.x - arrayRad + 1, 1, resolution);
+			int rightSide = std::clamp((int)position.x + arrayRad + 1, 1, resolution);
 			int topSide = std::clamp((int)position.y + arrayRad + 1, 1, resolution);
 			int bottomSide = std::clamp((int)position.y - arrayRad + 1, 1, resolution);
 			float distance;
@@ -409,28 +415,12 @@ namespace dx3d {
 					distance = (Vector3D(x, y, 0) - position).mag();
 					if (distance <= arrayRad) {
 						float dens = (1.0f - distance / arrayRad);
-						densities.at(IX(x, y)) = std::clamp(densities.at(IX(x,y)) + dens * darkAmp * Time::deltaTime, 0.0f, 1.0f);
+						densities.at(IX(x, y)) = std::clamp(densities.at(IX(x, y)) + dens * darkAmp * Time::deltaTime, 0.0f, 1.0f);
 						vX.at(IX(x, y)) = std::clamp(vX.at(IX(x, y)) + dens * xDir * Time::deltaTime, -10.0f, 10.0f);
 						vY.at(IX(x, y)) = std::clamp(vY.at(IX(x, y)) + dens * yDir * Time::deltaTime, -10.0f, 10.0f);
 					}
 				}
 			}
-		}
-		virtual void onLeftMouseDown(const Point& mouse_pos) override {
-			
-		}
-		virtual void onHoldLeftMouseDown(const Point& mouse_pos) override {
-			Rect d = Display::get()->m_size;
-			float o = 1.1f;
-			float x = o / d.height * (mouse_pos.x - 0.5f * d.width) + 0.5f;
-			float y = (float)(mouse_pos.y - 0.5f * d.height) * o / d.height + 0.5f;
-			if (x < 0 || y < 0 || x >= 1 || y >= 1) {
-				return;
-			}
-			int coordX = x * resolution;
-			int coordY = y * resolution;
-			//AddToSmoke(Vector3D(coordX, coordY, 0), radius, vec4{ 0,0,0,1 });
-			GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
 		}
 		void Advect(float* newData, float* oldData, float* xVel, float* yVel, int b) {
 			for (int y = 1; y <= resolution; y++) {

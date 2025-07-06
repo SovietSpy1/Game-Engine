@@ -32,7 +32,7 @@ std::vector<D3D11_INPUT_ELEMENT_DESC> dx3d::VertexBuffer::LayoutFromSemantics(st
 	}
 	return layout_desc;
 }
-void dx3d::VertexBuffer::load(void* list_vertices, UINT size_vertex, UINT size_list, void*shader_byte_code, UINT size_byte_shader, std::vector<dx3d::IA> semantics)
+void dx3d::VertexBuffer::load(void* list_vertices, UINT size_vertex, size_t size_list, void*shader_byte_code, UINT size_byte_shader, std::vector<dx3d::IA> semantics)
 {
 	if (shader_byte_code == nullptr || size_byte_shader == 0) {
 		shader_byte_code = vertexLayoutBlob->GetBufferPointer();

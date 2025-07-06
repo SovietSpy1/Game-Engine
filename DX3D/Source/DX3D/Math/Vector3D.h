@@ -44,10 +44,10 @@ namespace dx3d {
 			return x * other.x + y * other.y + z * other.z;
 		}
 		float mag() const {
-			return sqrt(x * x + y * y + z * z);
+			return sqrtf(x * x + y * y + z * z);
 		}
 		Vector3D normalize() {
-			float magnitude = sqrt(x * x + y * y + z * z);
+			float magnitude = sqrtf(x * x + y * y + z * z);
 			if (magnitude > 0) {
 				x /= magnitude;
 				y /= magnitude;
