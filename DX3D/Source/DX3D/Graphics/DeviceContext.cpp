@@ -242,5 +242,5 @@ void dx3d::DeviceContext::setTexture(std::vector<std::shared_ptr<Texture>> textu
 
 void dx3d::DeviceContext::PSSetSRVS(std::vector<ID3D11ShaderResourceView*> srvs)
 {
-	m_device_context.PSSetShaderResources(1, srvs.size(), srvs.data());
+	m_device_context.PSSetShaderResources(1, (UINT)srvs.size(), srvs.data());
 }
