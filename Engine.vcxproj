@@ -70,6 +70,11 @@
       <Command>xcopy /E /Y /I "$(ProjectDir)Assets" "$(OutDir)Assets" 
 xcopy /E /Y /I "$(ProjectDir)DX3D/Shaders" "$(OutDir)DX3D/Shaders"</Command>
     </PostBuildEvent>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+      <ShaderType>
+      </ShaderType>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -93,6 +98,9 @@ xcopy /E /Y /I "$(ProjectDir)DX3D/Shaders" "$(OutDir)DX3D/Shaders"</Command>
       <Command>xcopy /E /Y /I "$(ProjectDir)Assets" "$(OutDir)Assets" 
 xcopy /E /Y /I "$(ProjectDir)DX3D/Shaders" "$(OutDir)DX3D/Shaders"</Command>
     </PostBuildEvent>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DX3D\Source\DX3D\Component\Component.cpp" />
@@ -240,9 +248,9 @@ xcopy /E /Y /I "$(ProjectDir)DX3D/Shaders" "$(OutDir)DX3D/Shaders"</Command>
     </FxCompile>
     <FxCompile Include="DX3D\Shaders\Smoke\Compute\GPUMap.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
     </FxCompile>
     <FxCompile Include="DX3D\Shaders\Smoke\Compute\Transfer.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

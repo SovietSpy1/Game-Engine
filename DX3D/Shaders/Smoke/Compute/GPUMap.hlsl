@@ -14,7 +14,7 @@ cbuffer constant : register(b0)
     int b;
 }
 StructuredBuffer<float> Density : register(t0);
-RWStructuredBuffer<float4> Colors : register(u0);
+RWTexture2D<float4> Colors : register(u0);
 
 [numthreads(BLOCK_SIZE, BLOCK_SIZE, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -24,5 +24,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
     uint2 coord = uint2(DTid.x, DTid.y);
-    Colors[0] = float4(0.0, 0.0, 0.0, Density[IX(DTid.x+1, DTid.y+1)]);
+    Colors[coord] = float4(0.0, 0.0, 0.0, Density[IX(DTid.x+1, DTid.y+1)]);
 }
