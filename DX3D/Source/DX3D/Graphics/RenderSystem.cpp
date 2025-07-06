@@ -13,7 +13,7 @@
 #include <DX3D/Graphics/StructuredBuffer/StructuredBuffer.h>
 #include <iostream>
 using namespace dx3d;
-dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
+dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc) : Base(desc.base)
 {
 	if (S == nullptr) {
 		S = this;
@@ -23,11 +23,16 @@ dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc): Base(desc.base)
 #ifdef _DEBUG
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-	DX3DGraphicsLogErrorAndThrow(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, NULL, 0, D3D11_SDK_VERSION, 
-		&m_d3dDevice,&featureLevel, &m_d3dContext), "Direct3D11 initialization failed.");
+	DX3DGraphicsLogErrorAndThrow(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, NULL, 0, D3D11_SDK_VERSION,
+		&m_d3dDevice, &featureLevel, &m_d3dContext), "Direct3D11 initialization failed.");
 	DX3DGraphicsLogErrorAndThrow(m_d3dDevice->QueryInterface(IID_PPV_ARGS(&m_dxgiDevice)), "Query Interface failed to retrieve IDXGIDevice;");
 	DX3DGraphicsLogErrorAndThrow(m_dxgiDevice->GetParent(IID_PPV_ARGS(&m_dxgiAdapter)), "GetParent failed to retrieve IDXGIAdapter;");
 	DX3DGraphicsLogErrorAndThrow(m_dxgiAdapter->GetParent(IID_PPV_ARGS(&m_dxgiFactory)), "GetParent failed to retrieve IDXGIFactory;");
+	switch (featureLevel) {
+	case D3D_FEATURE_LEVEL_11_1:
+		std::cout << "D3D 11_1";
+		break;
+	}
 }
 dx3d::RenderSystem::~RenderSystem()
 {

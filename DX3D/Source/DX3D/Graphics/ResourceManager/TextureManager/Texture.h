@@ -5,7 +5,7 @@ namespace dx3d {
 	{
 	public:
 		Texture(const wchar_t* full_path, const GraphicsResourceDesc& desc);
-		Texture(int resolution, const GraphicsResourceDesc& desc);
+		Texture(int resolution, bool t, const GraphicsResourceDesc& desc);
 		void MapToTexture(std::vector<vec4> data, int resolution);
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Resource> m_texture = nullptr;

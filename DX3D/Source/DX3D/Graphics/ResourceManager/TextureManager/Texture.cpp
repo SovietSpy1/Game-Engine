@@ -29,7 +29,7 @@ dx3d::Texture::Texture(const wchar_t* full_path, const GraphicsResourceDesc& des
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateSamplerState(&sampler_desc, m_sampler.GetAddressOf()), "CreateSamplerState failed.");
 }
 
-dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resource(desc)
+dx3d::Texture::Texture(int resolution, bool t, const GraphicsResourceDesc& desc) : Resource(desc)
 {
 	std::vector<vec4> initColors(resolution * resolution, vec4{0,0,0,100});
 	D3D11_SUBRESOURCE_DATA initValues{};
@@ -44,9 +44,17 @@ dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resou
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	texDesc.Usage = D3D11_USAGE_DYNAMIC;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	if (t == false) {
+		texDesc.Usage = D3D11_USAGE_DYNAMIC;
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	}
+	else if (t == true) {
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+		texDesc.CPUAccessFlags = 0;
+	}
+	
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture{};
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateTexture2D(&texDesc, &initValues, texture.GetAddressOf()), "Create Smoke Texture Failed!");
 	m_texture = texture;
@@ -59,6 +67,14 @@ dx3d::Texture::Texture(int resolution, const GraphicsResourceDesc& desc) : Resou
 	
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateShaderResourceView(m_texture.Get(), &shader_desc, m_srv.GetAddressOf()), "Create shaderResourceView failed.");
 
+	if (t)
+	{
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc{};
+		uav_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		uav_desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+		uav_desc.Texture2D.MipSlice = 0;
+		DX3DGraphicsLogErrorAndThrow(m_device.CreateUnorderedAccessView(m_texture.Get(), &uav_desc, m_uav.GetAddressOf()), "Create unorderedAccessView failed.");
+	}
 	D3D11_SAMPLER_DESC sampler_desc = {};
 	sampler_desc.Filter = D3D11_FILTER_ANISOTROPIC;
 	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;

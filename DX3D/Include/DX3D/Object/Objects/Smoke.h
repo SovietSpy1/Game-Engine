@@ -13,7 +13,7 @@
 #define IX(x,y) ((y) * (resolution+2) + x)
 #define SWAP(x0, x) {std::swap(x0, x);}
 namespace dx3d {
-	class Smoke : public GameObject{
+	class Smoke : public GameObject {
 	public:
 		//shared variables
 		DeviceContext* dC{};
@@ -27,7 +27,7 @@ namespace dx3d {
 		float maxSpeed = 5.0f;
 		int resolution;
 		//shared methods
-		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res){
+		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
 			InputSystem::get()->addListener(this);
 			//CPUStart();
 			GPUStart();
@@ -76,6 +76,7 @@ namespace dx3d {
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ProjectionXCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ProjectionYCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> MapCS;
+		Microsoft::WRL::ComPtr<ID3D11ComputeShader> GMapCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> TransferCS;
 		const WCHAR* sourceCP = L"DX3D/Shaders/Smoke/Compute/Source.hlsl";
 		const WCHAR* advectionCP = L"DX3D/Shaders/Smoke/Compute/Advection.hlsl";
@@ -87,6 +88,7 @@ namespace dx3d {
 		const WCHAR* projectionXCP = L"DX3D/Shaders/Smoke/Compute/ProjectionX.hlsl";
 		const WCHAR* projectionYCP = L"DX3D/Shaders/Smoke/Compute/ProjectionY.hlsl";
 		const WCHAR* mapCP = L"DX3D/Shaders/Smoke/Compute/Map.hlsl";
+		const WCHAR* gMapCP = L"DX3D/Shaders/Smoke/Compute/GPUMap.hlsl";
 		const WCHAR* transferCP = L"DX3D/Shaders/Smoke/Compute/Transfer.hlsl";
 		smokeConstantBufferDesc smokeBuffDesc{};
 		std::shared_ptr<StructuredBuffer> structuredBuffer;
@@ -132,6 +134,9 @@ namespace dx3d {
 			rS->compileComputeShader(mapCP, blob);
 			rS->createComputeShader(blob, MapCS);
 
+			rS->compileComputeShader(gMapCP, blob);
+			rS->createComputeShader(blob, GMapCS);
+
 			rS->compileComputeShader(transferCP, blob);
 			rS->createComputeShader(blob, TransferCS);
 			//loading buffers;
@@ -155,7 +160,7 @@ namespace dx3d {
 			tempBr = structuredBuffer->CreateBufferPair<float>(brSize);
 			color = structuredBuffer->CreateBufferPair<vec4>(smSize);
 			colorStaging = structuredBuffer->CreateStagingBuffer<vec4>(smSize);
-			
+
 			groupCount = (resolution + 9) / 10;
 			borderCount = (4 * resolution + 13) / 10;
 
@@ -179,8 +184,8 @@ namespace dx3d {
 		}
 		void Finalize() {
 			dC->CSSetShader(MapCS);
-			dC->CSSetSRVS({dens_write->srv.Get()});
-			dC->CSSetUAVS({ color->uav.Get()});
+			dC->CSSetSRVS({ dens_write->srv.Get() });
+			dC->CSSetUAVS({ color->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			dC->CopyResource(colorStaging.Get(), color->buffer.Get());
 			D3D11_MAPPED_SUBRESOURCE map{};
@@ -190,6 +195,13 @@ namespace dx3d {
 			std::copy(destPtr, destPtr + (resolution * resolution), colorData.begin());
 			GetComponent<Material>()->textures.at(0)->MapToTexture(colorData, resolution);
 			dC->UnMap(colorStaging);
+		}
+		void GPUFinalize() {
+			dC->CSSetShader(GMapCS);
+			dC->CSSetSRVS({ dens_write->srv.Get() });
+			dC->CSSetUAVS({ GetComponent<Material>()->textures.at(0)->m_uav.Get()});
+			dC->Dispatch(groupCount, groupCount, 1);
+			Clear();
 		}
 		void GraphicsAdvect() {
 			SWAP(dens_read, dens_write);
