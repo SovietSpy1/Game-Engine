@@ -19,18 +19,60 @@ dx3d::RenderSystem::RenderSystem(const RenderSystemDesc& desc) : Base(desc.base)
 		S = this;
 	}
 	D3D_FEATURE_LEVEL featureLevel{};
+	D3D_FEATURE_LEVEL featureLevels[] = {
+	D3D_FEATURE_LEVEL_12_2,
+	D3D_FEATURE_LEVEL_12_1,
+	D3D_FEATURE_LEVEL_12_0,
+	D3D_FEATURE_LEVEL_11_1,
+	D3D_FEATURE_LEVEL_11_0,
+	D3D_FEATURE_LEVEL_10_1,
+	D3D_FEATURE_LEVEL_10_0,
+	D3D_FEATURE_LEVEL_9_3,
+	D3D_FEATURE_LEVEL_9_2,
+	D3D_FEATURE_LEVEL_9_1
+	};
 	UINT createDeviceFlags{};
 #ifdef _DEBUG
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-	DX3DGraphicsLogErrorAndThrow(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, NULL, 0, D3D11_SDK_VERSION,
+	DX3DGraphicsLogErrorAndThrow(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION,
 		&m_d3dDevice, &featureLevel, &m_d3dContext), "Direct3D11 initialization failed.");
 	DX3DGraphicsLogErrorAndThrow(m_d3dDevice->QueryInterface(IID_PPV_ARGS(&m_dxgiDevice)), "Query Interface failed to retrieve IDXGIDevice;");
 	DX3DGraphicsLogErrorAndThrow(m_dxgiDevice->GetParent(IID_PPV_ARGS(&m_dxgiAdapter)), "GetParent failed to retrieve IDXGIAdapter;");
 	DX3DGraphicsLogErrorAndThrow(m_dxgiAdapter->GetParent(IID_PPV_ARGS(&m_dxgiFactory)), "GetParent failed to retrieve IDXGIFactory;");
 	switch (featureLevel) {
+	case D3D_FEATURE_LEVEL_12_2:
+		std::cout << "Feature Level: 12.2" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_12_1:
+		std::cout << "Feature Level: 12.1" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_12_0:
+		std::cout << "Feature Level: 12.0" << std::endl;
+		break;
 	case D3D_FEATURE_LEVEL_11_1:
-		std::cout << "D3D 11_1";
+		std::cout << "Feature Level: 11.1" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_11_0:
+		std::cout << "Feature Level: 11.0" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_10_1:
+		std::cout << "Feature Level: 10.1" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_10_0:
+		std::cout << "Feature Level: 10.0" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_9_3:
+		std::cout << "Feature Level: 9.3" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_9_2:
+		std::cout << "Feature Level: 9.2" << std::endl;
+		break;
+	case D3D_FEATURE_LEVEL_9_1:
+		std::cout << "Feature Level: 9.1" << std::endl;
+		break;
+	default:
+		std::cout << "Unknown or unsupported feature level." << std::endl;
 		break;
 	}
 }
