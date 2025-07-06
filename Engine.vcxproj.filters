@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game\main.cpp">
+    <ClCompile Include="DX3D\Game\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DX3D\Source\DX3D\Core\Base.cpp">
@@ -276,5 +276,6 @@
     <FxCompile Include="DX3D\Shaders\Smoke\VertexShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Grid\PixelShader.hlsl" />
     <FxCompile Include="DX3D\Shaders\Grid\VertexShader.hlsl" />
+    <FxCompile Include="DX3D\Shaders\Smoke\Compute\Transfer.hlsl" />
   </ItemGroup>
 </Project>

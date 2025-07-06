@@ -30,6 +30,19 @@ namespace dx3d {
 			float min = 0.0f;
 			int b = 0;
 		};
+		std::unique_ptr<BufferPair> dens_read;
+		std::unique_ptr<BufferPair> dens_write;
+		std::unique_ptr<BufferPair> velX_read;
+		std::unique_ptr<BufferPair> velX_write;
+		std::unique_ptr<BufferPair> velY_read;
+		std::unique_ptr<BufferPair> velY_write;
+		std::unique_ptr<BufferPair> color;
+		std::unique_ptr<BufferPair> pressure_read;
+		std::unique_ptr<BufferPair> pressure_write;
+		std::unique_ptr<BufferPair> divergence;
+		std::unique_ptr<BufferPair> tempBr;
+		std::unique_ptr<BufferPair> temp;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> colorStaging;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> SourceCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> AdvectionCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> DiffusionCS;
@@ -40,6 +53,7 @@ namespace dx3d {
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ProjectionXCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ProjectionYCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> MapCS;
+		Microsoft::WRL::ComPtr<ID3D11ComputeShader> TransferCS;
 		const WCHAR* sourceCP = L"DX3D/Shaders/Smoke/Compute/Source.hlsl";
 		const WCHAR* advectionCP = L"DX3D/Shaders/Smoke/Compute/Advection.hlsl";
 		const WCHAR* diffusionCP = L"DX3D/Shaders/Smoke/Compute/Diffuse.hlsl";
@@ -50,6 +64,7 @@ namespace dx3d {
 		const WCHAR* projectionXCP = L"DX3D/Shaders/Smoke/Compute/ProjectionX.hlsl";
 		const WCHAR* projectionYCP = L"DX3D/Shaders/Smoke/Compute/ProjectionY.hlsl";
 		const WCHAR* mapCP = L"DX3D/Shaders/Smoke/Compute/Map.hlsl";
+		const WCHAR* transferCP = L"DX3D/Shaders/Smoke/Compute/Transfer.hlsl";
 		DeviceContext* dC{};
 		RenderSystem* rS{};
 		smokeConstantBufferDesc smokeBuffDesc{};
@@ -86,8 +101,6 @@ namespace dx3d {
 			SmokeGraphicsUpdate();
 		}
 		void GPUStart() {
-			groupCount = (resolution + 9) / 10;
-			borderCount = (4 * resolution + 13) / 10;
 			dC = DeviceContext::get();
 			rS = RenderSystem::get();
 			constantBuffer = rS->createConstantBuffer();
@@ -123,8 +136,34 @@ namespace dx3d {
 
 			rS->compileComputeShader(mapCP, blob);
 			rS->createComputeShader(blob, MapCS);
-			structuredBuffer->loadSmokeBuffers(resolution);
-			UINT size = resolution + 2;
+
+			rS->compileComputeShader(transferCP, blob);
+			rS->createComputeShader(blob, TransferCS);
+			//loading buffers;
+			UINT width = resolution + 2;
+			UINT size = width * width;
+			UINT smSize = resolution * resolution;
+			UINT brSize = resolution * 4 + 4;
+			dens_read = structuredBuffer->CreateBufferPair<float>(size);
+			dens_write = structuredBuffer->CreateBufferPair<float>(size);
+
+			velX_read = structuredBuffer->CreateBufferPair<float>(size);
+			velX_write = structuredBuffer->CreateBufferPair<float>(size);
+
+			velY_read = structuredBuffer->CreateBufferPair<float>(size);
+			velY_write = structuredBuffer->CreateBufferPair<float>(size);
+
+			pressure_read = structuredBuffer->CreateBufferPair<float>(size);
+			pressure_write = structuredBuffer->CreateBufferPair<float>(size);
+			divergence = structuredBuffer->CreateBufferPair<float>(size);
+			temp = structuredBuffer->CreateBufferPair<float>(size);
+			tempBr = structuredBuffer->CreateBufferPair<float>(brSize);
+			color = structuredBuffer->CreateBufferPair<vec4>(smSize);
+			colorStaging = structuredBuffer->CreateStagingBuffer<vec4>(smSize);
+			
+			groupCount = (resolution + 9) / 10;
+			borderCount = (4 * resolution + 13) / 10;
+
 			smokeBuffDesc.dt = Time::deltaTime;
 			smokeBuffDesc.diff = diff;
 			smokeBuffDesc.visc = visc;
@@ -145,36 +184,33 @@ namespace dx3d {
 		}
 		void Finalize() {
 			dC->CSSetShader(MapCS);
-			dC->CSSetSRVS({ structuredBuffer->dens_srv_current.Get() });
-			dC->CSSetUAVS({ structuredBuffer->colors_uav.Get() });
+			dC->CSSetSRVS({dens_write->srv.Get()});
+			dC->CSSetUAVS({ color->uav.Get()});
 			dC->Dispatch(groupCount, groupCount, 1);
-			dC->CopyResource(structuredBuffer->colorsStaging.Get(), structuredBuffer->colors.Get());
+			dC->CopyResource(colorStaging.Get(), color->buffer.Get());
 			D3D11_MAPPED_SUBRESOURCE map{};
-			map = dC->GetReadableMap(structuredBuffer->colorsStaging);
+			map = dC->GetReadableMap(colorStaging);
 			vec4* destPtr = reinterpret_cast<vec4*>(map.pData);
 			std::vector<vec4> colorData(resolution * resolution);
 			std::copy(destPtr, destPtr + (resolution * resolution), colorData.begin());
 			GetComponent<Material>()->textures.at(0)->MapToTexture(colorData, resolution);
-			dC->UnMap(structuredBuffer->colorsStaging.Get());
+			dC->UnMap(colorStaging);
 		}
 		void GraphicsAdvect() {
-			SWAP(structuredBuffer->dens_uav_current, structuredBuffer->dens_uav_last);
-			SWAP(structuredBuffer->dens_srv_current, structuredBuffer->dens_srv_last);
-			SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
-			SWAP(structuredBuffer->velX_srv_current, structuredBuffer->velX_srv_last);
-			SWAP(structuredBuffer->velY_uav_current, structuredBuffer->velY_uav_last);
-			SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);
-			dC->CSSetSRVS({ structuredBuffer->dens_srv_last.Get(), structuredBuffer->velX_srv_current.Get(), structuredBuffer->velY_srv_current.Get()});
-			dC->CSSetUAVS({ structuredBuffer->dens_uav_current.Get() });
+			SWAP(dens_read, dens_write);
+			SWAP(velX_read, velX_write);
+			SWAP(velY_read, velY_write);
+			dC->CSSetSRVS({ dens_read->srv.Get(), velX_read->srv.Get(), velY_read->srv.Get()});
+			dC->CSSetUAVS({dens_write->uav.Get() });
 			dC->CSSetShader(AdvectionCS);
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			dC->CSSetSRVS({structuredBuffer->velX_srv_last.Get(), structuredBuffer->velX_srv_last.Get(), structuredBuffer->velY_srv_last.Get()});
-			dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
+			dC->CSSetSRVS({ velX_read->srv.Get(), velX_read->srv.Get(), velY_read->srv.Get() });
+			dC->CSSetUAVS({ velX_write->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get(), structuredBuffer->velX_srv_last.Get(), structuredBuffer->velY_srv_last.Get() });
-			dC->CSSetUAVS({ structuredBuffer->velY_uav_current.Get() });
+			dC->CSSetSRVS({ velY_read->srv.Get(), velX_read->srv.Get(), velY_read->srv.Get() });
+			dC->CSSetUAVS({ velY_write->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 		}
@@ -187,12 +223,9 @@ namespace dx3d {
 		void GraphicsAddToSmoke(Vector3D position, float radius, float dens, float xDir = 0, float yDir = 0) {
 			smokeBuffDesc.emissionPoint = vec2_int{ (int)position.x, (int)position.y };
 			smokeBuffDesc.emissionRadius = radius * resolution;
-			SWAP(structuredBuffer->dens_uav_current, structuredBuffer->dens_uav_last);
-			SWAP(structuredBuffer->dens_srv_current, structuredBuffer->dens_srv_last);
-			SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
-			SWAP(structuredBuffer->velX_srv_current, structuredBuffer->velX_srv_last);
-			SWAP(structuredBuffer->velY_uav_current, structuredBuffer->velY_uav_last);
-			SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);
+			SWAP(dens_read, dens_write);
+			SWAP(velX_read, velX_write);
+			SWAP(velY_read, velY_write);
 
 			smokeBuffDesc.emissionPoint = vec2_int{(int)position.x, (int)position.y};
 			smokeBuffDesc.emissionRadius = radius * resolution;
@@ -202,114 +235,113 @@ namespace dx3d {
 			
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
 			dC->CSSetShader(SourceCS);
-			dC->CSSetSRVS({ structuredBuffer->dens_srv_last.Get() });
-			dC->CSSetUAVS({ structuredBuffer->dens_uav_current.Get() });
+			dC->CSSetSRVS({ dens_read->srv.Get()});
+			dC->CSSetUAVS({ dens_write->uav.Get()});
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 			
-			dC->CSSetSRVS({structuredBuffer->velX_srv_last.Get()});
-			dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
+			dC->CSSetSRVS({velX_read->srv.Get()});
+			dC->CSSetUAVS({ velX_write->uav.Get()});
 			smokeBuffDesc.max = maxSpeed;
 			smokeBuffDesc.min = -maxSpeed;
 			smokeBuffDesc.emission = xDir;
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get() });
-			dC->CSSetUAVS({ structuredBuffer->velY_uav_current.Get() });
+			dC->CSSetSRVS({ velY_read->srv.Get()});
+			dC->CSSetUAVS({velY_write->uav.Get()});
 			smokeBuffDesc.emission = yDir;
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 		}
 		void Clear() {
-			dC->CSSetSRVS({ nullptr });
+			dC->CSSetSRVS({ nullptr, nullptr, nullptr });
 			dC->CSSetUAVS({ nullptr });
 		}
 		void GraphicsDiffuse() {
-			dC->CopyResource(structuredBuffer->dens_start.Get(), structuredBuffer->dens_current.Get());
-			dC->CopyResource(structuredBuffer->velX_start.Get(), structuredBuffer->velX_current.Get());
-			dC->CopyResource(structuredBuffer->velY_start.Get(), structuredBuffer->velY_current.Get());
+			dC->CopyResource(temp->buffer.Get(), dens_write->buffer.Get());
 			int adaptiveIterations = 20;
 			for (int k = 0; k < adaptiveIterations; k++) {
-				SWAP(structuredBuffer->dens_uav_current, structuredBuffer->dens_uav_last);
-				SWAP(structuredBuffer->dens_srv_current, structuredBuffer->dens_srv_last);
+				SWAP(dens_read, dens_write);
 				dC->CSSetShader(DiffusionCS);
-				dC->CSSetSRVS({ structuredBuffer->dens_srv_last.Get(), structuredBuffer->dens_srv_start.Get() });
-				dC->CSSetUAVS({ structuredBuffer->dens_uav_current.Get() });
+				dC->CSSetSRVS({ dens_read->srv.Get(), temp->srv.Get()});
+				dC->CSSetUAVS({ dens_write->uav.Get()});
 				dC->Dispatch(groupCount, groupCount, 1);
 				Clear();
-				GraphicsSetBnd(0, structuredBuffer->dens_srv_current, structuredBuffer->dens_uav_current);
+				GraphicsSetBnd(0, dens_write.get());
 			}
+			dC->CopyResource(temp->buffer.Get(), velX_write->buffer.Get());
 			for (int k = 0; k < adaptiveIterations; k++) {
-				SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
-				SWAP(structuredBuffer->velX_srv_current, structuredBuffer->velX_srv_last);
-				dC->CSSetSRVS({ structuredBuffer->velX_srv_last.Get(), structuredBuffer->velX_srv_start.Get() });
-				dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
+				SWAP(velX_read, velX_write);
+				dC->CSSetSRVS({ velX_read->srv.Get(), temp->srv.Get()});
+				dC->CSSetUAVS({ velX_write->uav.Get()});
 				dC->CSSetShader(DiffusionCS);
 				dC->Dispatch(groupCount, groupCount, 1);
 				Clear();
-			GraphicsSetBnd(1, structuredBuffer->velX_srv_current, structuredBuffer->velX_uav_current);
+				GraphicsSetBnd(1, velX_write.get());
 			}
+			dC->CopyResource(temp->buffer.Get(), velY_write->buffer.Get());
 			for (int k = 0; k < adaptiveIterations; k++) {
-				SWAP(structuredBuffer->velY_uav_current, structuredBuffer->velY_uav_last);
-				SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);
+				SWAP(velY_read, velY_write);
 				dC->CSSetShader(DiffusionCS);
-				dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get() , structuredBuffer->velY_srv_start.Get()});
-				dC->CSSetUAVS({ structuredBuffer->velY_uav_current.Get() });
+				dC->CSSetSRVS({ velY_read->srv.Get(), temp->srv.Get()});
+				dC->CSSetUAVS({ velY_write->uav.Get()});
 				dC->Dispatch(groupCount, groupCount, 1);
 				Clear();
-				GraphicsSetBnd(2, structuredBuffer->velY_srv_current, structuredBuffer->velY_uav_current);
+				GraphicsSetBnd(2, velY_write.get());
 			}
 		}
-		void GraphicsSetBnd(int b, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> uav) {
+		void GraphicsSetBnd(int b, BufferPair* pair) {
 			smokeBuffDesc.b = b;
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
+			dC->CSSetShader(TransferCS);
+			dC->CSSetSRVS({ pair->srv.Get() });
+			dC->CSSetUAVS({ tempBr->uav.Get() });
+			dC->Dispatch(borderCount, 1, 1);
+			Clear();
 			dC->CSSetShader(BoundaryCS);
-			dC->CSSetSRVS({ srv.Get() });
-			dC->CSSetUAVS({ uav.Get() });
+			dC->CSSetSRVS({ tempBr->srv.Get()});
+			dC->CSSetUAVS({ pair->uav.Get() });
 			dC->Dispatch(borderCount, 1, 1);
 			Clear();
 		}
 		void GraphicsProject() {
+			SWAP(velX_read, velX_write);
+			SWAP(velY_read, velY_write);
 			dC->CSSetShader(DivergenceCS);
-			dC->CSSetSRVS({ structuredBuffer->velX_srv_current.Get(), structuredBuffer->velY_srv_current.Get() });
-			dC->CSSetUAVS({ structuredBuffer->div_uav.Get() });
+			dC->CSSetSRVS({ velX_read->srv.Get(), velY_read->srv.Get()});
+			dC->CSSetUAVS({ divergence->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			GraphicsSetBnd(0, structuredBuffer->div_srv, structuredBuffer->div_uav);
 			dC->CSSetShader(ClearCS);
-			dC->CSSetUAVS({ structuredBuffer->pressure_uav_current.Get() });
+			dC->CSSetUAVS({ pressure_write->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			GraphicsSetBnd(0, structuredBuffer->pressure_srv_current, structuredBuffer->pressure_uav_current);
+			GraphicsSetBnd(0, divergence.get());
+			GraphicsSetBnd(0, pressure_write.get());
 			int adaptiveIterations = 20;
 			for (int k = 0; k < adaptiveIterations; k++) {
-				SWAP(structuredBuffer->pressure_uav_current, structuredBuffer->pressure_uav_last);
-				SWAP(structuredBuffer->pressure_srv_current, structuredBuffer->pressure_srv_last);
+				SWAP(pressure_read, pressure_write);
 				dC->CSSetShader(PressureCS);
-				dC->CSSetSRVS({ structuredBuffer->pressure_srv_last.Get(), structuredBuffer->div_srv.Get() });
-				dC->CSSetUAVS({ structuredBuffer->pressure_uav_current.Get() });
+				dC->CSSetSRVS({pressure_read->srv.Get(), divergence->srv.Get() });
+				dC->CSSetUAVS({ pressure_write->uav.Get() });
 				dC->Dispatch(groupCount, groupCount, 1);
 				Clear();
-				GraphicsSetBnd(0, structuredBuffer->pressure_srv_current, structuredBuffer->pressure_uav_current);
+				GraphicsSetBnd(0, pressure_write.get());
 			}
-			SWAP(structuredBuffer->velX_srv_current, structuredBuffer->velX_srv_last);
-			SWAP(structuredBuffer->velX_uav_current, structuredBuffer->velX_uav_last);
-			SWAP(structuredBuffer->velY_srv_current, structuredBuffer->velY_srv_last);
-			SWAP(structuredBuffer->velY_uav_current, structuredBuffer->velY_uav_last);
 			dC->CSSetShader(ProjectionXCS);
-			dC->CSSetSRVS({ structuredBuffer->velX_srv_last.Get(), structuredBuffer->pressure_srv_current.Get() });
-			dC->CSSetUAVS({ structuredBuffer->velX_uav_current.Get() });
+			dC->CSSetSRVS({ velX_read->srv.Get(), pressure_write->srv.Get()});
+			dC->CSSetUAVS({ velX_write->uav.Get()});
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 			dC->CSSetShader(ProjectionYCS);
-			dC->CSSetSRVS({ structuredBuffer->velY_srv_last.Get(), structuredBuffer->pressure_srv_current.Get() });
-			dC->CSSetUAVS({ structuredBuffer->velY_uav_current.Get() });
+			dC->CSSetSRVS({ velY_read->srv.Get(), pressure_write->srv.Get() });
+			dC->CSSetUAVS({ velY_write->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			GraphicsSetBnd(1, structuredBuffer->velX_srv_current, structuredBuffer->velX_uav_current);
-			GraphicsSetBnd(2, structuredBuffer->velY_srv_current, structuredBuffer->velY_uav_current);
+			GraphicsSetBnd(1, velX_write.get());
+			GraphicsSetBnd(2, velY_write.get());
 		}
 		void CPUStart() {
 			UINT size = resolution + 2;
@@ -346,7 +378,6 @@ namespace dx3d {
 					colors.at((x-1) + (y-1) * resolution).a = densities.at(IX(x,y));
 				}
 			}
-			
 			GetComponent<Material>()->textures.at(0)->MapToTexture(colors, resolution);
 		}
 		void AdvectUpdate() {
@@ -398,7 +429,8 @@ namespace dx3d {
 			}
 			int coordX = x * resolution;
 			int coordY = y * resolution;
-			AddToSmoke(Vector3D(coordX, coordY, 0), radius, vec4{ 0,0,0,1 });
+			//AddToSmoke(Vector3D(coordX, coordY, 0), radius, vec4{ 0,0,0,1 });
+			GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
 		}
 		void Advect(float* newData, float* oldData, float* xVel, float* yVel, int b) {
 			for (int y = 1; y <= resolution; y++) {
@@ -430,8 +462,8 @@ namespace dx3d {
 						newData[IX(x, y)] = (oldData[IX(x, y)] + a * (newData[IX(x - 1, y)] + newData[IX(x + 1, y)] + newData[IX(x, y + 1)] + newData[IX(x, y - 1)])) / (4 * a + 1);
 					}
 				}
-				set_bnd(b, newData);
 			}
+			set_bnd(b, newData);
 		}
 		void Project(float* xVel, float* yVel, float* pressure, float* div) {
 			float h = (1.0f / (float)resolution);
@@ -450,8 +482,8 @@ namespace dx3d {
 						pressure[IX(x, y)] = (div[IX(x, y)] + pressure[IX(x + 1, y)] + pressure[IX(x - 1, y)] + pressure[IX(x, y + 1)] + pressure[IX(x, y - 1)]) / 4.0f;
 					}
 				}
-				set_bnd(0, pressure);
 			}
+			set_bnd(0, pressure);
 			for (UINT y = 1; y <= resolution; y++) {
 				for (UINT x = 1; x <= resolution; x++) {
 					xVel[IX(x, y)] -= (pressure[IX(x + 1, y)] - pressure[IX(x - 1, y)]) * 0.5f / h;
@@ -470,10 +502,10 @@ namespace dx3d {
 				x[IX(i, 0)] = b == 2 ? -1 * x[IX(i, 1)] : x[IX(i, 1)];
 				x[IX(i, resolution + 1)] = b == 2 ? -1 * x[IX(i, resolution)] : x[IX(i, resolution)];
 			}
-			x[IX(0, 0)] = 0.5 * (x[IX(1, 0)] + x[IX(0, 1)]);
-			x[IX(0, resolution + 1)] = 0.5 * (x[IX(1, resolution + 1)] + x[IX(0, resolution)]);
-			x[IX(resolution + 1, 0)] = 0.5 * (x[IX(resolution, 0)] + x[IX(resolution + 1, 1)]);
-			x[IX(resolution + 1, resolution + 1)] = 0.5 * (x[IX(resolution, resolution + 1)] + x[IX(resolution + 1, resolution)]);
+			x[IX(0, 0)] = b != 0? -x[IX(1, 1)] : x[IX(1,1)];
+			x[IX(0, resolution + 1)] = b != 0? -x[IX(1, resolution)] : x[IX(1,resolution)];
+			x[IX(resolution + 1, 0)] = b != 0 ? -x[IX(resolution, 1)] : x[IX(resolution, 1)];
+			x[IX(resolution + 1, resolution + 1)] = b != 0 ? -x[IX(resolution, resolution)] : x[IX(resolution, resolution)];
 		}
 
 	};

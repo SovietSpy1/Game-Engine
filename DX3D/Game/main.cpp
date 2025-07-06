@@ -1,4 +1,3 @@
-#include <vld.h>
 #include <DX3D/All.h>
 
 int main() {

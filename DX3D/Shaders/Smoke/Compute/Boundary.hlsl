@@ -19,39 +19,46 @@ RWStructuredBuffer<float> DataCurrent : register(u0);
 [numthreads(10, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    uint i = DTid.x % resolution + 1;
+    uint i = 0;
+    if (DTid.x > 4 * resolution + 3)
+    {
+        return;
+    }
+    float data = DataLast[DTid.x];
     if (DTid.x < resolution)
     {
-        DataCurrent[IX(0, i)] = b == 1 ? -1 * DataLast[IX(1, i)] : DataLast[IX(1, i)];
+        i = DTid.x + 1;
+        DataCurrent[IX(0, i)] = b == 1 ? -1 * data : data;
     }
-    else if (DTid.x < 2 * resolution)
+    else if (DTid.x < 2 * resolution) // top wall
     {
-        DataCurrent[IX(resolution + 1, i)] = b == 1 ? -1 * DataLast[IX(resolution, i)] : DataLast[IX(resolution, i)];
+        i = DTid.x - resolution + 1;
+        DataCurrent[IX(i, resolution + 1)] = b == 2 ? -1 * data : data;
     }
-    else if (DTid.x < 3 * resolution)
+    else if (DTid.x < 3 * resolution) // right wall
     {
-        DataCurrent[IX(i, 0)] = b == 2 ? -1 * DataLast[IX(i, 1)] : DataLast[IX(i, 1)];
+        i = DTid.x - 2 * resolution + 1;
+        DataCurrent[IX(resolution+ 1, i)] = b == 1 ? -1 * data : data;
     }
-    else if (DTid.x < 4 * resolution)
+    else if (DTid.x < 4 * resolution) // bottom wall
     {
-        DataCurrent[IX(i, resolution + 1)] = b == 2 ? -1 * DataLast[IX(i, resolution)] : DataLast[IX(i, resolution)];
+        i = DTid.x - 3 * resolution + 1;
+        DataCurrent[IX(i, 0)] = b == 2 ? -1 * data : data;
     }
-    AllMemoryBarrierWithGroupSync();
-    
-    if (DTid.x == resolution * 4)
+    else if (DTid.x == 4 * resolution)
     {
-        DataCurrent[IX(0, 0)] = 0.5 * (DataCurrent[IX(1, 0)] + DataCurrent[IX(0, 1)]);
+        DataCurrent[IX(0, 0)] = b != 0 ? -data : data;
     }
-    else if (DTid.x == resolution * 4 + 1)
+    else if (DTid.x == 4 * resolution + 1)
     {
-        DataCurrent[IX(0, resolution + 1)] = 0.5 * (DataCurrent[IX(1, resolution + 1)] + DataCurrent[IX(0, resolution)]);
+        DataCurrent[IX(0, resolution + 1)] = b != 0 ? -data : data;
     }
-    else if (DTid.x == resolution * 4 + 2)
+    else if (DTid.x == 4 * resolution + 2)
     {
-        DataCurrent[IX(resolution + 1,0)] = 0.5 * (DataCurrent[IX(resolution, 0)] + DataCurrent[IX(resolution + 1,1)]);
+        DataCurrent[IX(resolution + 1, resolution + 1)] = b != 0 ? -data : data;
     }
-    else if (DTid.x == resolution * 4 + 3)
+    else if (DTid.x == 4 * resolution + 3)
     {
-        DataCurrent[IX(resolution + 1, resolution + 1)] = 0.5 * (DataCurrent[IX(resolution, resolution + 1)] + DataCurrent[IX(resolution + 1, resolution)]);
+        DataCurrent[IX(resolution + 1, 0)] = b != 0 ? -data : data;
     }
 }

@@ -36,6 +36,7 @@ namespace dx3d {
 	class Smoke;
 	class Grid;
 	class StructuredBuffer;
+	struct BufferPair;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

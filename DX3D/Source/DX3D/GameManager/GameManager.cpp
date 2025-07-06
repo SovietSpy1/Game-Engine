@@ -35,7 +35,7 @@ dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 	}
 
 	camera = std::make_shared<Camera>(BaseDesc{ m_logger });
-	UINT resolution = 100;
+	UINT resolution = 64;
 	smokeHolder = std::make_shared<Smoke>(desc, resolution);
 	smokeHolder->radius = 0.05f;
 	smokeHolder->AddMaterial();

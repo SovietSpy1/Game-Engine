@@ -103,12 +103,12 @@
     <IncludePath>DX3D/Include;DX3D/Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>DX3D/Include;DX3D/Source;Libs/DirectXTex/include;C:\Program Files (x86)\Visual Leak Detector\include;Libs/tinyobjloader/include;$(IncludePath)</IncludePath>
-    <LibraryPath>Libs/DirectXTex/bin;C:\Program Files (x86)\Visual Leak Detector\lib\Win64;$(LibraryPath)</LibraryPath>
+    <IncludePath>DX3D/Include;DX3D/Source;Libs/DirectXTex/include;Libs/tinyobjloader/include;$(IncludePath)</IncludePath>
+    <LibraryPath>Libs/DirectXTex/bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>DX3D/Include;DX3D/Source;Libs/DirectXTex/include;C:\Program Files (x86)\Visual Leak Detector\include;Libs/tinyobjloader/include;$(IncludePath)</IncludePath>
-    <LibraryPath>Libs/DirectXTex/bin;C:\Program Files (x86)\Visual Leak Detector\lib\Win64;$(LibraryPath)</LibraryPath>
+    <IncludePath>DX3D/Include;DX3D/Source;Libs/DirectXTex/include;Libs/tinyobjloader/include;$(IncludePath)</IncludePath>
+    <LibraryPath>Libs/DirectXTex/bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -150,7 +150,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTexD.lib;vld.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTexD.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /E /Y /I "$(ProjectDir)Assets" "$(OutDir)Assets" 
@@ -173,7 +173,7 @@ xcopy /E /Y /I "$(ProjectDir)DX3D/Shaders" "$(OutDir)DX3D/Shaders"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;vld.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /E /Y /I "$(ProjectDir)Assets" "$(OutDir)Assets" 
@@ -227,7 +227,7 @@ xcopy /E /Y /I "$(ProjectDir)DX3D/Shaders" "$(OutDir)DX3D/Shaders"</Command>
     <ClCompile Include="DX3D\Source\DX3D\Object\GameObject.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Object\Transform.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\GameManager\GameManager.cpp" />
-    <ClCompile Include="Game\main.cpp" />
+    <ClCompile Include="DX3D\Game\main.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsEngine.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem.cpp" />
@@ -414,6 +414,20 @@ xcopy /E /Y /I "$(ProjectDir)DX3D/Shaders" "$(OutDir)DX3D/Shaders"</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DX3D\Shaders\Smoke\Compute\Transfer.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="DX3D\Shaders\Smoke\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
