@@ -19,10 +19,10 @@ void dx3d::Material::SetVertexShader(const wchar_t* vertex_shader_path)
 void dx3d::Material::SetTexture(const wchar_t* file_path)
 {
 	textures.clear();
-	textures.push_back(GraphicsEngine::get()->getTextureManager().createTextureFromFile(file_path));
+	textures.push_back(GraphicsEngine::get()->getTextureManager()->createTextureFromFile(file_path));
 }
 
 void dx3d::Material::AddTexture(const wchar_t* file_path)
 {
-	textures.push_back(GraphicsEngine::get()->getTextureManager().createTextureFromFile(file_path));
+	textures.push_back(GraphicsEngine::get()->getTextureManager()->createTextureFromFile(file_path));
 }

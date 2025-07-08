@@ -26,5 +26,13 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float h = 1.0f / (float) resolution;
     uint x = DTid.x + 1;
     uint y = DTid.y + 1;
-    DataCurrent[IX(x, y)] = DataLast[IX(x, y)] -((Pressure[IX(x + 1, y)] - Pressure[IX(x - 1, y)]) * 0.5f / h);
+    if (b == 1)
+    {
+        DataCurrent[IX(x, y)] = DataLast[IX(x, y)] - ((Pressure[IX(x + 1, y)] - Pressure[IX(x - 1, y)]) * 0.5f / h);
+    }
+    else if (b == 2)
+    {
+        DataCurrent[IX(x, y)] = DataLast[IX(x, y)] - ((Pressure[IX(x, y+1)] - Pressure[IX(x, y-1)]) * 0.5f / h);
+    }
+        
 }

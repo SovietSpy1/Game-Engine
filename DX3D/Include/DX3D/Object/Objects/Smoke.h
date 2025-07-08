@@ -13,6 +13,18 @@
 #define IX(x,y) ((y) * (resolution+2) + x)
 #define SWAP(x0, x) {std::swap(x0, x);}
 namespace dx3d {
+	struct smokeConstantBufferDesc {
+		int resolution;
+		float dt;
+		float diff;
+		float visc;
+		vec2_int emissionPoint;
+		int emissionRadius;
+		float emission;
+		float max = 1.0f;
+		float min = 0.0f;
+		int b = 0;
+	};
 	class Smoke : public GameObject {
 	public:
 		//shared variables
@@ -73,8 +85,7 @@ namespace dx3d {
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> PressureCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> BoundaryCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ClearCS;
-		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ProjectionXCS;
-		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ProjectionYCS;
+		Microsoft::WRL::ComPtr<ID3D11ComputeShader> ProjectionCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> MapCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> GMapCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> TransferCS;
@@ -85,8 +96,7 @@ namespace dx3d {
 		const WCHAR* pressureCP = L"DX3D/Shaders/Smoke/Compute/Pressure.hlsl";
 		const WCHAR* clearCP = L"DX3D/Shaders/Smoke/Compute/Clear.hlsl";
 		const WCHAR* boundaryCP = L"DX3D/Shaders/Smoke/Compute/Boundary.hlsl";
-		const WCHAR* projectionXCP = L"DX3D/Shaders/Smoke/Compute/ProjectionX.hlsl";
-		const WCHAR* projectionYCP = L"DX3D/Shaders/Smoke/Compute/ProjectionY.hlsl";
+		const WCHAR* projectionCP = L"DX3D/Shaders/Smoke/Compute/Projection.hlsl";
 		const WCHAR* mapCP = L"DX3D/Shaders/Smoke/Compute/Map.hlsl";
 		const WCHAR* gMapCP = L"DX3D/Shaders/Smoke/Compute/GPUMap.hlsl";
 		const WCHAR* transferCP = L"DX3D/Shaders/Smoke/Compute/Transfer.hlsl";
@@ -122,11 +132,8 @@ namespace dx3d {
 			rS->compileComputeShader(pressureCP, blob);
 			rS->createComputeShader(blob, PressureCS);
 
-			rS->compileComputeShader(projectionXCP, blob);
-			rS->createComputeShader(blob, ProjectionXCS);
-
-			rS->compileComputeShader(projectionYCP, blob);
-			rS->createComputeShader(blob, ProjectionYCS);
+			rS->compileComputeShader(projectionCP, blob);
+			rS->createComputeShader(blob, ProjectionCS);
 
 			rS->compileComputeShader(advectionCP, blob);
 			rS->createComputeShader(blob, AdvectionCS);
@@ -180,7 +187,7 @@ namespace dx3d {
 			GraphicsAddSource();
 			GraphicsDiffuse();
 			GraphicsProject();
-			Finalize();
+			GPUFinalize();
 		}
 		void Finalize() {
 			dC->CSSetShader(MapCS);
@@ -199,7 +206,7 @@ namespace dx3d {
 		void GPUFinalize() {
 			dC->CSSetShader(GMapCS);
 			dC->CSSetSRVS({ dens_write->srv.Get() });
-			dC->CSSetUAVS({ GetComponent<Material>()->textures.at(0)->m_uav.Get()});
+			dC->CSSetUAVS({ GetComponent<Material>()->textures.at(0)->uav.Get()});
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
 		}
@@ -228,8 +235,6 @@ namespace dx3d {
 			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, darkAmp, -10 + ranVelocityX, eVY);
 		}
 		void GraphicsAddToSmoke(Vector3D position, float radius, float dens, float xDir = 0, float yDir = 0) {
-			smokeBuffDesc.emissionPoint = vec2_int{ (int)position.x, (int)position.y };
-			smokeBuffDesc.emissionRadius = radius * resolution;
 			SWAP(dens_read, dens_write);
 			SWAP(velX_read, velX_write);
 			SWAP(velY_read, velY_write);
@@ -337,12 +342,16 @@ namespace dx3d {
 				Clear();
 				GraphicsSetBnd(0, pressure_write.get());
 			}
-			dC->CSSetShader(ProjectionXCS);
+			smokeBuffDesc.b = 1;
+			constantBuffer->UpdateSubresource(&smokeBuffDesc);
+			dC->CSSetShader(ProjectionCS);
 			dC->CSSetSRVS({ velX_read->srv.Get(), pressure_write->srv.Get() });
 			dC->CSSetUAVS({ velX_write->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
-			dC->CSSetShader(ProjectionYCS);
+			smokeBuffDesc.b = 2;
+			constantBuffer->UpdateSubresource(&smokeBuffDesc);
+			dC->CSSetShader(ProjectionCS);
 			dC->CSSetSRVS({ velY_read->srv.Get(), pressure_write->srv.Get() });
 			dC->CSSetUAVS({ velY_write->uav.Get() });
 			dC->Dispatch(groupCount, groupCount, 1);

@@ -4,9 +4,9 @@ std::shared_ptr<dx3d::Texture> dx3d::TextureManager::createTextureFromFile(const
 {
 	return std::static_pointer_cast<Texture>(createResourceFromFile(file_path));
 }
-std::shared_ptr<dx3d::Texture> dx3d::TextureManager::create2DSmokeTexture(int resolution, bool t)
+std::shared_ptr<dx3d::Texture> dx3d::TextureManager::createTexture()
 {
-	return std::make_shared<Texture>(resolution, t, GraphicsResourceDesc{ BaseDesc{m_logger}, m_renderSystem, m_device, m_factory });
+	return std::make_shared<Texture>(GraphicsResourceDesc{ BaseDesc{m_logger}, m_renderSystem, m_device, m_factory });
 }
 dx3d::Resource* dx3d::TextureManager::createResourceFromFileConcrete(const wchar_t* file_path)
 {

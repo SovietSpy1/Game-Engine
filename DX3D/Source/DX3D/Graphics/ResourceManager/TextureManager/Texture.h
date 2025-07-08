@@ -5,16 +5,15 @@ namespace dx3d {
 	{
 	public:
 		Texture(const wchar_t* full_path, const GraphicsResourceDesc& desc);
-		Texture(int resolution, bool t, const GraphicsResourceDesc& desc);
+		Texture(const GraphicsResourceDesc& desc);
 		void MapToTexture(std::vector<vec4> data, int resolution);
-	private:
-		Microsoft::WRL::ComPtr<ID3D11Resource> m_texture = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uav = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler = nullptr;
-		friend class DeviceContext;
-		friend class Smoke;
+		void Load2DSmokeTexture(int resolution, bool t);
+		void Load3DSmokeTexture(int resolution);
+		void Load3DFTex(int resolution);
+		Microsoft::WRL::ComPtr<ID3D11Resource> texture = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> uav = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler = nullptr;
 	};
-
 }
 

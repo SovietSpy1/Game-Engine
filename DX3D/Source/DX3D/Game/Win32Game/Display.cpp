@@ -29,12 +29,12 @@
 dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size))
 {
 	S = this;
-	constantBuffer = GraphicsEngine::get()->getRenderSystem().createConstantBuffer();
+	constantBuffer = GraphicsEngine::get()->getRenderSystem()->createConstantBuffer();
 	aspectRatio = static_cast<float>(m_size.width) / static_cast<float>(m_size.height);
 	HWND console = GetConsoleWindow();
 	ShowWindow(console, SW_MINIMIZE);
-	m_swapChain = desc.rendererSystem.createSwapChain({ m_handle, m_size });
-	m_device_context = desc.rendererSystem.createDeviceContext();
+	m_swapChain = desc.rendererSystem->createSwapChain({ m_handle, m_size });
+	m_device_context = desc.rendererSystem->createDeviceContext();
 	m_device_context->SetViewportSize(m_size.width, m_size.height);
 	m_device_context->createTransparentBlendState();
 	m_device_context->setBlendState();

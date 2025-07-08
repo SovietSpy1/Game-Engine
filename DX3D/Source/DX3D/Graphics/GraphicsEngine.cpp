@@ -25,19 +25,19 @@ GraphicsEngine* dx3d::GraphicsEngine::get()
 	return S;
 }
 
-RenderSystem& dx3d::GraphicsEngine::getRenderSystem() const noexcept
+RenderSystem* dx3d::GraphicsEngine::getRenderSystem() const noexcept
 {
-	return *m_renderSystem;
+	return m_renderSystem.get();
 }
 
-TextureManager& dx3d::GraphicsEngine::getTextureManager() const noexcept
+TextureManager* dx3d::GraphicsEngine::getTextureManager() const noexcept
 {
-	return *m_textureManager;
+	return m_textureManager.get();
 }
 
-MeshManager& dx3d::GraphicsEngine::getMeshManager() const noexcept
+MeshManager* dx3d::GraphicsEngine::getMeshManager() const noexcept
 {
-	return *m_meshManager;
+	return m_meshManager.get();
 }
 
 std::shared_ptr<GameObject> dx3d::GraphicsEngine::createGameObject() const

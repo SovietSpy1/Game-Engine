@@ -10,14 +10,14 @@ namespace dx3d {
 			if (vertexShader == nullptr) {
 				const WCHAR* vertexShaderPath = L"DX3D/Shaders/Grid/VertexShader.hlsl";
 				Microsoft::WRL::ComPtr<ID3DBlob> vertexBlob;
-				GraphicsEngine::get()->getRenderSystem().compileVertexShader(vertexShaderPath, vertexBlob);
-				GraphicsEngine::get()->getRenderSystem().createVertexShader(vertexBlob, vertexShader);
+				GraphicsEngine::get()->getRenderSystem()->compileVertexShader(vertexShaderPath, vertexBlob);
+				GraphicsEngine::get()->getRenderSystem()->createVertexShader(vertexBlob, vertexShader);
 			}
 			if (pixelShader == nullptr) {
 				const WCHAR* pixelShaderPath = L"DX3D/Shaders/Grid/PixelShader.hlsl";
 				Microsoft::WRL::ComPtr<ID3DBlob> pixelBlob;
-				GraphicsEngine::get()->getRenderSystem().compilePixelShader(pixelShaderPath, pixelBlob);
-				GraphicsEngine::get()->getRenderSystem().createPixelShader(pixelBlob, pixelShader);
+				GraphicsEngine::get()->getRenderSystem()->compilePixelShader(pixelShaderPath, pixelBlob);
+				GraphicsEngine::get()->getRenderSystem()->createPixelShader(pixelBlob, pixelShader);
 			}
 		}
 		void LoadGrid(int cellCount) {
@@ -40,7 +40,7 @@ namespace dx3d {
 			}
 			std::vector<vec4_32> colors(lines.size(), vec4_32{255,0,0,255});
 			vertices = VertexBuffer::FillInVertexData({ {IA::POSITION, lines}, {IA::COLOR, colors} });
-			vertexBuffer = GraphicsEngine::get()->getRenderSystem().createVertexBuffer();
+			vertexBuffer = GraphicsEngine::get()->getRenderSystem()->createVertexBuffer();
 			vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
 		}
 		void LoadBorder() {
@@ -64,7 +64,7 @@ namespace dx3d {
 			lines.push_back(temp);
 			std::vector<vec4_32> colors(lines.size(), vec4_32{ 0,0,255,255 });
 			vertices = VertexBuffer::FillInVertexData({ {IA::POSITION, lines}, {IA::COLOR, colors} });
-			vertexBuffer = GraphicsEngine::get()->getRenderSystem().createVertexBuffer();
+			vertexBuffer = GraphicsEngine::get()->getRenderSystem()->createVertexBuffer();
 			vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
 		}
 		static inline Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader{};

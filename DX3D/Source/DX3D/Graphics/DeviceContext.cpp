@@ -232,8 +232,8 @@ void dx3d::DeviceContext::setTexture(std::vector<std::shared_ptr<Texture>> textu
 	ID3D11ShaderResourceView* srvs[32];
 	ID3D11SamplerState* samplers[32];
 	for (size_t i = 0; i < textures.size(); ++i) {
-		srvs[i] = textures[i]->m_srv.Get();
-		samplers[i] = textures[i]->m_sampler.Get();
+		srvs[i] = textures[i]->srv.Get();
+		samplers[i] = textures[i]->sampler.Get();
 	}
 
 	m_device_context.PSSetShaderResources(0, (UINT)textures.size(), srvs);

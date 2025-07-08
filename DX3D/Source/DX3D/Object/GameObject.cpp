@@ -29,18 +29,18 @@ void dx3d::GameObject::Update()
 }
 void dx3d::GameObject::AddMeshFromFile(const wchar_t* file_path)
 {
-	std::shared_ptr<Mesh> mesh = GraphicsEngine::get()->getMeshManager().createMeshFromFile(file_path);
+	std::shared_ptr<Mesh> mesh = GraphicsEngine::get()->getMeshManager()->createMeshFromFile(file_path);
 	AddComponent<Mesh>(mesh);
 }
 void dx3d::GameObject::AddMesh(const wchar_t* name)
 {
-	std::shared_ptr<Mesh> mesh = GraphicsEngine::get()->getMeshManager().createMesh(name);
+	std::shared_ptr<Mesh> mesh = GraphicsEngine::get()->getMeshManager()->createMesh(name);
 	AddComponent<Mesh>(mesh);
 }
 
 void dx3d::GameObject::AddMaterial()
 {
-	std::shared_ptr<Material> material =  GraphicsEngine::get()->getRenderSystem().createMaterial();
+	std::shared_ptr<Material> material =  GraphicsEngine::get()->getRenderSystem()->createMaterial();
 	AddComponent<Material>(material);
 }
 

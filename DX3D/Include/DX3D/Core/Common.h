@@ -9,21 +9,23 @@
 #include <chrono>
 #include <cmath>
 #include <vector>
+#include <wrl.h>
 namespace dx3d {
 	struct vec2_int {
 		int x, y;
 	};
-	struct smokeConstantBufferDesc {
-		int resolution;
-		float dt;
-		float diff;
-		float visc;
-		vec2_int emissionPoint;
-		int emissionRadius;
-		float emission;
-		float max = 1.0f;
-		float min = 0.0f;
-		int b = 0;
+	struct vec3_int {
+		int x, y, z;
+	};
+	struct TexturePair {
+		Microsoft::WRL::ComPtr<ID3D11Texture3D> texture;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+		Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> uav;
+	};
+	struct BufferPair {
+		Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+		Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> uav;
 	};
 	enum class RasterizerStateType {
 		BackFace,
@@ -57,7 +59,7 @@ namespace dx3d {
 	};
 	struct DisplayDesc {
 		WindowDesc window;
-		RenderSystem& rendererSystem;
+		RenderSystem* rendererSystem;
 	};
 	struct GraphicsEngineDesc {
 		BaseDesc base;

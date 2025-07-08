@@ -11,18 +11,18 @@ dx3d::Collider::Collider(const BaseDesc& desc, GameObject* owner, ColliderType c
 	if (vertexShader == nullptr) {
 		const WCHAR* vertexShaderPath = L"DX3D/Shaders/Collider/VertexShader.hlsl";
 		Microsoft::WRL::ComPtr<ID3DBlob> vertexBlob;  
-		GraphicsEngine::get()->getRenderSystem().compileVertexShader(vertexShaderPath, vertexBlob);
-		GraphicsEngine::get()->getRenderSystem().createVertexShader(vertexBlob, vertexShader);
+		GraphicsEngine::get()->getRenderSystem()->compileVertexShader(vertexShaderPath, vertexBlob);
+		GraphicsEngine::get()->getRenderSystem()->createVertexShader(vertexBlob, vertexShader);
 	}
 	if (pixelShader == nullptr) {
 		const WCHAR* pixelShaderPath = L"DX3D/Shaders/Collider/PixelShader.hlsl";
 		Microsoft::WRL::ComPtr<ID3DBlob> pixelBlob;
-		GraphicsEngine::get()->getRenderSystem().compilePixelShader(pixelShaderPath, pixelBlob);
-		GraphicsEngine::get()->getRenderSystem().createPixelShader(pixelBlob, pixelShader);
+		GraphicsEngine::get()->getRenderSystem()->compilePixelShader(pixelShaderPath, pixelBlob);
+		GraphicsEngine::get()->getRenderSystem()->createPixelShader(pixelBlob, pixelShader);
 	}
-	vertexBuffer = GraphicsEngine::get()->getRenderSystem().createVertexBuffer();
-	indexBuffer = GraphicsEngine::get()->getRenderSystem().createIndexBuffer();
-	constantBuffer = GraphicsEngine::get()->getRenderSystem().createConstantBuffer();
+	vertexBuffer = GraphicsEngine::get()->getRenderSystem()->createVertexBuffer();
+	indexBuffer = GraphicsEngine::get()->getRenderSystem()->createIndexBuffer();
+	constantBuffer = GraphicsEngine::get()->getRenderSystem()->createConstantBuffer();
 	switch (colliderType)
 	{
 	case ColliderType::Box:

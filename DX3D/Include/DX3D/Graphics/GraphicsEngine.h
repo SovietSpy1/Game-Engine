@@ -7,9 +7,9 @@ namespace dx3d {
 		explicit GraphicsEngine(const GraphicsEngineDesc& desc);
 		virtual ~GraphicsEngine() override;
 		static GraphicsEngine* get();
-		RenderSystem& getRenderSystem() const noexcept;
-		TextureManager& getTextureManager() const noexcept;
-		MeshManager& getMeshManager() const noexcept;
+		RenderSystem* getRenderSystem() const noexcept;
+		TextureManager* getTextureManager() const noexcept;
+		MeshManager* getMeshManager() const noexcept;
 		std::shared_ptr<GameObject> createGameObject() const;
 		std::shared_ptr<Axis> createAxis(const AxisDesc& desc) const;
 	public:
