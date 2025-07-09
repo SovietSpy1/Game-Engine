@@ -40,7 +40,7 @@ dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 	smokeHolder->radius = 0.05f;
 	smokeHolder->AddMaterial();
 	std::shared_ptr<Texture> tex = GraphicsEngine::get()->getTextureManager()->createTexture();
-	tex->Load2DSmokeTexture(resolution, true);
+	tex->Load2DSmokeTexture(resolution, false);
 	smokeHolder->GetComponent<Material>()->textures.push_back(tex);
 	smokeHolder->GetComponent<Material>()->SetPixelShader(L"DX3D/Shaders/Smoke/PixelShader.hlsl");
 	smokeHolder->GetComponent<Material>()->SetVertexShader(L"DX3D/Shaders/Smoke/VertexShader.hlsl");

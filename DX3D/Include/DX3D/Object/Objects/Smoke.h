@@ -41,12 +41,12 @@ namespace dx3d {
 		//shared methods
 		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
 			InputSystem::get()->addListener(this);
-			//CPUStart();
-			GPUStart();
+			CPUStart();
+			//GPUStart();
 		}
 		void Update() override {
-			//SmokeUpdate();
-			SmokeGraphicsUpdate();
+			SmokeUpdate();
+			//SmokeGraphicsUpdate();
 		}
 		virtual void onLeftMouseDown(const Point& mouse_pos) override {
 
@@ -61,8 +61,8 @@ namespace dx3d {
 			}
 			int coordX = x * resolution;
 			int coordY = y * resolution;
-			//AddToSmoke(Vector3D(coordX, coordY, 0), radius, vec4{ 0,0,0,1 });
-			GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
+			AddToSmoke(Vector3D(coordX, coordY, 0), radius);
+			//GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
 		}
 		//GPU Variables
 		std::unique_ptr<BufferPair> dens_read;
@@ -385,10 +385,10 @@ namespace dx3d {
 			colors = baseColors;
 		}
 		void SmokeUpdate() {
-			AdvectUpdate();
+			//AdvectUpdate();
 			AddSource();
-			Diffuse();
-			VelUpdate();
+			//Diffuse();
+			//VelUpdate();
 			TextureUpdate();
 		}
 		void Diffuse() {
@@ -419,26 +419,33 @@ namespace dx3d {
 			UINT xPos = 0.5f * resolution;
 			UINT yPos = 0.1f * resolution;
 			float ranVelocityX = std::rand() % 20;
-			AddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, vec4{ 0,0,0,1 }, -10 + ranVelocityX, eVY);
+			AddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, -10 + ranVelocityX, eVY);
 		}
 		void VelUpdate() {
 			Project(vX.data(), vY.data(), pressure.data(), div.data());
 		}
-		void AddToSmoke(Vector3D position, float radius, vec4 color, float xDir = 0, float yDir = 0) {
-			int arrayRad = radius * resolution;
-			int leftSide = std::clamp((int)position.x - arrayRad + 1, 1, resolution);
-			int rightSide = std::clamp((int)position.x + arrayRad + 1, 1, resolution);
-			int topSide = std::clamp((int)position.y + arrayRad + 1, 1, resolution);
-			int bottomSide = std::clamp((int)position.y - arrayRad + 1, 1, resolution);
+		void AddToSmoke(Vector3D position, float radius, float xDir = 0, float yDir = 0) {
+			float gridRad = radius * resolution;
+			int arrayRad = gridRad+0.99f;
+			int leftSide = std::clamp((int)position.x - arrayRad, 0, resolution-1);
+			int rightSide = std::clamp((int)position.x + arrayRad, 0, resolution-1);
+			int topSide = std::clamp((int)position.y + arrayRad, 0, resolution-1);
+			int bottomSide = std::clamp((int)position.y - arrayRad, 0, resolution-1);
 			float distance;
 			for (int y = bottomSide; y <= topSide; y++) {
 				for (int x = leftSide; x <= rightSide; x++) {
-					distance = (Vector3D(x, y, 0) - position).mag();
-					if (distance <= arrayRad) {
-						float dens = (1.0f - distance / arrayRad);
-						densities.at(IX(x, y)) = std::clamp(densities.at(IX(x, y)) + dens * darkAmp * Time::deltaTime, 0.0f, 1.0f);
-						vX.at(IX(x, y)) = std::clamp(vX.at(IX(x, y)) + dens * xDir * Time::deltaTime, -10.0f, 10.0f);
-						vY.at(IX(x, y)) = std::clamp(vY.at(IX(x, y)) + dens * yDir * Time::deltaTime, -10.0f, 10.0f);
+					int i = x + 1;
+					int j = y + 1;
+					Vector3D offset = Vector3D(x, y, 0) - position;
+					if (offset.x == 1 && offset.y == 3) {
+
+					}
+					distance = offset.mag();
+					if (distance <= gridRad) {
+						float dens = (1.0f - distance / (gridRad > 0? gridRad : 1));
+						densities.at(IX(i, j)) = std::clamp(densities.at(IX(i, j)) + dens * darkAmp * Time::deltaTime, 0.0f, 1.0f);
+						vX.at(IX(i, j)) = std::clamp(vX.at(IX(i, j)) + dens * xDir * Time::deltaTime, -10.0f, 10.0f);
+						vY.at(IX(i, j)) = std::clamp(vY.at(IX(i, j)) + dens * yDir * Time::deltaTime, -10.0f, 10.0f);
 					}
 				}
 			}
