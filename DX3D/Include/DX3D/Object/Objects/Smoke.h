@@ -38,6 +38,9 @@ namespace dx3d {
 		float radius = 0.1f;
 		float maxSpeed = 5.0f;
 		int resolution;
+		
+
+		
 		//shared methods
 		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
 			InputSystem::get()->addListener(this);
@@ -185,10 +188,10 @@ namespace dx3d {
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
 			GraphicsAdvect();
 			GraphicsAddSource();
-			GraphicsDiffuse();
+			//GraphicsDiffuse();
 			GraphicsProject();
-			Finalize();
-			//GPUFinalize();
+			//Finalize();
+			GPUFinalize();
 		}
 		void Finalize() {
 			dC->CSSetShader(MapCS);
@@ -233,7 +236,7 @@ namespace dx3d {
 			UINT xPos = 0.5f * resolution;
 			UINT yPos = 0.1f * resolution;
 			float ranVelocityX = std::rand() % 21;
-			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.1f, darkAmp, -10 + ranVelocityX, eVY);
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), radius, darkAmp, -10 + ranVelocityX, eVY);
 		}
 		void GraphicsAddToSmoke(Vector3D position, float radius, float dens, float xDir = 0, float yDir = 0) {
 			SWAP(dens_read, dens_write);
@@ -274,7 +277,12 @@ namespace dx3d {
 		}
 		void GraphicsDiffuse() {
 			dC->CopyResource(temp->buffer.Get(), dens_write->buffer.Get());
-			int adaptiveIterations = 20;
+			
+			// Scale diffusion iterations with resolution for proper convergence
+			int baseIterations = 20;
+			int adaptiveIterations = baseIterations + (resolution / 64) * 10;
+			adaptiveIterations = std::min(adaptiveIterations, 100);
+			
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(dens_read, dens_write);
 				dC->CSSetShader(DiffusionCS);
@@ -333,7 +341,13 @@ namespace dx3d {
 			Clear();
 			GraphicsSetBnd(0, divergence.get());
 			GraphicsSetBnd(0, pressure_write.get());
-			int adaptiveIterations = 20;
+			
+			// Scale pressure solver iterations with resolution for proper convergence
+			// At higher resolutions, we need more iterations to achieve the same convergence
+			int baseIterations = 20;
+			int adaptiveIterations = baseIterations + (resolution / 64) * 10; // Scale with resolution
+			adaptiveIterations = std::min(adaptiveIterations, 100); // Cap at reasonable limit
+			
 			for (int k = 0; k < adaptiveIterations; k++) {
 				SWAP(pressure_read, pressure_write);
 				dC->CSSetShader(PressureCS);
@@ -386,10 +400,10 @@ namespace dx3d {
 			colors = baseColors;
 		}
 		void SmokeUpdate() {
-			AdvectUpdate();
+			//AdvectUpdate();
 			AddSource();
-			Diffuse();
-			VelUpdate();
+			//Diffuse();
+			//VelUpdate();
 			TextureUpdate();
 		}
 		void Diffuse() {
@@ -419,8 +433,8 @@ namespace dx3d {
 		void AddSource() {
 			UINT xPos = 0.5f * resolution;
 			UINT yPos = 0.1f * resolution;
-			float ranVelocityX = std::rand() % 20;
-			AddToSmoke(Vector3D(xPos, yPos, 0), 0.1f, -10 + ranVelocityX, eVY);
+			float ranVelocityX = std::rand() % 21;
+			AddToSmoke(Vector3D(xPos, yPos, 0), radius, -10 + ranVelocityX, eVY);
 		}
 		void VelUpdate() {
 			Project(vX.data(), vY.data(), pressure.data(), div.data());
@@ -471,7 +485,12 @@ namespace dx3d {
 		}
 		void Diffuse(float* newData, float* oldData, float diff, int b) {
 			float a = resolution * resolution * diff * Time::deltaTime;
-			int adaptiveIterations = 20;
+			
+			// Scale diffusion iterations with resolution for proper convergence
+			int baseIterations = 20;
+			int adaptiveIterations = baseIterations + (resolution / 64) * 10;
+			adaptiveIterations = std::min(adaptiveIterations, 100);
+			
 			for (int k = 0; k < adaptiveIterations; k++) {
 				for (int y = 1; y <= resolution; y++) {
 					for (int x = 1; x <= resolution; x++) {
@@ -491,7 +510,12 @@ namespace dx3d {
 			}
 			set_bnd(0, div); 
 			set_bnd(0, pressure);
-			int adaptiveIterations = 20;
+			
+			// Scale pressure solver iterations with resolution for proper convergence
+			int baseIterations = 20;
+			int adaptiveIterations = baseIterations + (resolution / 64) * 10;
+			adaptiveIterations = std::min(adaptiveIterations, 100);
+			
 			for (int k = 0; k < adaptiveIterations; k++) {
 				for (UINT y = 1; y <= resolution; y++) {
 					for (UINT x = 1; x <= resolution; x++) {

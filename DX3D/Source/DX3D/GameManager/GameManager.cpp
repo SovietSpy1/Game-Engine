@@ -35,12 +35,12 @@ dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 	}
 
 	camera = std::make_shared<Camera>(BaseDesc{ m_logger });
-	UINT resolution = 64;
+	UINT resolution = 300;
 	smokeHolder = std::make_shared<Smoke>(desc, resolution);
-	smokeHolder->radius = 0.05f;
+	smokeHolder->radius = 0.1f;
 	smokeHolder->AddMaterial();
 	std::shared_ptr<Texture> tex = GraphicsEngine::get()->getTextureManager()->createTexture();
-	tex->Load2DSmokeTexture(resolution, false);
+	tex->Load2DSmokeTexture(resolution, true);
 	smokeHolder->GetComponent<Material>()->textures.push_back(tex);
 	smokeHolder->GetComponent<Material>()->SetPixelShader(L"DX3D/Shaders/Smoke/PixelShader.hlsl");
 	smokeHolder->GetComponent<Material>()->SetVertexShader(L"DX3D/Shaders/Smoke/VertexShader.hlsl");
