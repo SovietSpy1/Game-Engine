@@ -7,7 +7,7 @@ cbuffer constant : register(b0)
     float diff;
     float visc;
     uint2 emissionPoint;
-    int emissionRadius;
+    float emissionRadius;
     float emission;
     float max;
     float min;

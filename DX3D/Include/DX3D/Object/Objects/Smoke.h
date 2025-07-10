@@ -19,7 +19,7 @@ namespace dx3d {
 		float diff;
 		float visc;
 		vec2_int emissionPoint;
-		int emissionRadius;
+		float emissionRadius;
 		float emission;
 		float max = 1.0f;
 		float min = 0.0f;
@@ -41,12 +41,12 @@ namespace dx3d {
 		//shared methods
 		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
 			InputSystem::get()->addListener(this);
-			CPUStart();
-			//GPUStart();
+			//CPUStart();
+			GPUStart();
 		}
 		void Update() override {
-			SmokeUpdate();
-			//SmokeGraphicsUpdate();
+			//SmokeUpdate();
+			SmokeGraphicsUpdate();
 		}
 		virtual void onLeftMouseDown(const Point& mouse_pos) override {
 
@@ -61,8 +61,8 @@ namespace dx3d {
 			}
 			int coordX = x * resolution;
 			int coordY = y * resolution;
-			AddToSmoke(Vector3D(coordX, coordY, 0), radius);
-			//GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
+			//AddToSmoke(Vector3D(coordX, coordY, 0), radius);
+			GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
 		}
 		//GPU Variables
 		std::unique_ptr<BufferPair> dens_read;
@@ -187,7 +187,8 @@ namespace dx3d {
 			GraphicsAddSource();
 			GraphicsDiffuse();
 			GraphicsProject();
-			GPUFinalize();
+			Finalize();
+			//GPUFinalize();
 		}
 		void Finalize() {
 			dC->CSSetShader(MapCS);
@@ -231,8 +232,8 @@ namespace dx3d {
 		void GraphicsAddSource() {
 			UINT xPos = 0.5f * resolution;
 			UINT yPos = 0.1f * resolution;
-			float ranVelocityX = std::rand() % 20;
-			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, darkAmp, -10 + ranVelocityX, eVY);
+			float ranVelocityX = std::rand() % 21;
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.1f, darkAmp, -10 + ranVelocityX, eVY);
 		}
 		void GraphicsAddToSmoke(Vector3D position, float radius, float dens, float xDir = 0, float yDir = 0) {
 			SWAP(dens_read, dens_write);
@@ -385,10 +386,10 @@ namespace dx3d {
 			colors = baseColors;
 		}
 		void SmokeUpdate() {
-			//AdvectUpdate();
+			AdvectUpdate();
 			AddSource();
-			//Diffuse();
-			//VelUpdate();
+			Diffuse();
+			VelUpdate();
 			TextureUpdate();
 		}
 		void Diffuse() {
@@ -419,14 +420,14 @@ namespace dx3d {
 			UINT xPos = 0.5f * resolution;
 			UINT yPos = 0.1f * resolution;
 			float ranVelocityX = std::rand() % 20;
-			AddToSmoke(Vector3D(xPos, yPos, 0), 0.05f, -10 + ranVelocityX, eVY);
+			AddToSmoke(Vector3D(xPos, yPos, 0), 0.1f, -10 + ranVelocityX, eVY);
 		}
 		void VelUpdate() {
 			Project(vX.data(), vY.data(), pressure.data(), div.data());
 		}
 		void AddToSmoke(Vector3D position, float radius, float xDir = 0, float yDir = 0) {
 			float gridRad = radius * resolution;
-			int arrayRad = gridRad+0.99f;
+			int arrayRad = gridRad;
 			int leftSide = std::clamp((int)position.x - arrayRad, 0, resolution-1);
 			int rightSide = std::clamp((int)position.x + arrayRad, 0, resolution-1);
 			int topSide = std::clamp((int)position.y + arrayRad, 0, resolution-1);
@@ -437,9 +438,6 @@ namespace dx3d {
 					int i = x + 1;
 					int j = y + 1;
 					Vector3D offset = Vector3D(x, y, 0) - position;
-					if (offset.x == 1 && offset.y == 3) {
-
-					}
 					distance = offset.mag();
 					if (distance <= gridRad) {
 						float dens = (1.0f - distance / (gridRad > 0? gridRad : 1));

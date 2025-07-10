@@ -6,7 +6,7 @@ cbuffer constant : register(b0)
     float diff;
     float visc;
     uint2 emissionPoint;
-    int emissionRadius;
+    float emissionRadius;
     float emission;
     float max;
     float min;
@@ -26,12 +26,10 @@ void main( uint3 DTid : SV_DispatchThreadID )
         return;
     }
     DataCurrent[IX(x, y)] = DataLast[IX(x, y)];
-    float dist = distance(uint3(DTid.x, DTid.y, DTid.z), uint3(emissionPoint, 1));
+    float dist = distance(uint3(DTid.x, DTid.y, 0), uint3(emissionPoint, 0));
     if ( dist <= emissionRadius)
     {
-        float dens = (1.0f - dist / (float) emissionRadius);
-        uint x = DTid.x + 1;
-        uint y = DTid.y + 1;
+        float dens = (1.0f - dist / (emissionRadius > 0.0 ? emissionRadius : 1));
         DataCurrent[IX(x, y)] = clamp(DataLast[IX(x, y)] + dens * emission * dt, min, max);
     }
 }
