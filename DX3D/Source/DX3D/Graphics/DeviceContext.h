@@ -6,6 +6,13 @@ namespace dx3d {
 	public:
 		explicit DeviceContext(const DeviceContextDesc& desc, const GraphicsResourceDesc& gDesc);
 		void clearRenderTargetColor(std::shared_ptr<SwapChain> swap_chain,vec4_32 rgba);
+		template <typename T>
+		void clearRenderTarget(Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv, T val) {
+			m_device_context.ClearRenderTargetView(rtv.Get(), &val);
+		}
+		void SetRTV(Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv, Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv = nullptr) {
+			m_device_context.OMSetRenderTargets(1, rtv.GetAddressOf(), dsv.Get());
+		}
 		void setVertexBuffer(std::shared_ptr<VertexBuffer> vertex_buffer);
 		void drawTriangleList(UINT vertex_count, UINT start_vertex_index);
 		void drawTriangleStrip(UINT vertex_count, UINT start_vertex_index);

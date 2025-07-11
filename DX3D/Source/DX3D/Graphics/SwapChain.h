@@ -16,6 +16,7 @@ namespace dx3d {
 		Rect m_windowSize{};
 	private:
 		friend class DeviceContext;
+		friend class Display;
 	};
 }
 

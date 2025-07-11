@@ -256,6 +256,160 @@ void dx3d::Mesh::LoadCubeMesh()
 	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
 }
 
+void dx3d::Mesh::Load3DCubeMesh()
+{
+	topology = TopologyType::TriangleList;
+	//set positions
+	std::vector<Vector3D>positions = {
+		Vector3D(-0.5f, -0.5f, -0.5f),
+		Vector3D(-0.5f, 0.5f, -0.5f),
+		Vector3D(0.5f, 0.5f, -0.5f),
+		Vector3D(0.5f, -0.5f, -0.5f),
+		Vector3D(0.5f, -0.5f, 0.5f),
+		Vector3D(0.5f, 0.5f, 0.5f),
+		Vector3D(-0.5f, 0.5f, 0.5f),
+		Vector3D(-0.5f, -0.5f, 0.5f)
+	};
+	//set indexes
+	indices =
+	{
+		//front
+		0,1,2, // first tri
+		2,3,0, //second tri
+		//back
+		4,5,6,
+		6,7,4,
+		//top
+		8,9,10,
+		10,11,8,
+		//bottom
+		12,13,14,
+		14,15,12,
+		//right
+		16,17,18,
+		18,19,16,
+		//left
+		20,21,22,
+		22,23,20
+	};
+
+	//set uvs
+	std::vector<Vector2D>uvs = {
+		Vector2D(0.0f, 0.0f),
+		Vector2D(0.0f, 1.0f),
+		Vector2D(1.0f, 0.0f),
+		Vector2D(1.0f, 1.0f)
+	};
+
+	//set vertices
+	std::vector<Vector3D> vPositions = {
+		// front face
+		positions[0],
+		positions[1],
+		positions[2],
+		positions[3],
+
+		// back face
+		positions[4],
+		positions[5],
+		positions[6],
+		positions[7],
+
+		positions[1],
+		positions[6],
+		positions[5],
+		positions[2],
+
+		positions[7],
+		positions[0],
+		positions[3],
+		positions[4],
+
+		positions[3],
+		positions[2],
+		positions[5],
+		positions[4],
+
+		positions[7],
+		positions[6],
+		positions[1],
+		positions[0]
+	};
+	std::vector<Vector2D> vUvs = {
+		// front face
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		// back face
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3],
+
+		uvs[1],
+		uvs[0],
+		uvs[2],
+		uvs[3]
+	};
+	std::vector<Vector3D> vNormals = {
+		// front face
+		Vector3D(0.0f, 0.0f, -1.0f),
+		Vector3D(0.0f, 0.0f, -1.0f),
+		Vector3D(0.0f, 0.0f, -1.0f),
+		Vector3D(0.0f, 0.0f, -1.0f),
+
+		// back face
+		Vector3D(0.0f, 0.0f, 1.0f),
+		Vector3D(0.0f, 0.0f, 1.0f),
+		Vector3D(0.0f, 0.0f, 1.0f),
+		Vector3D(0.0f, 0.0f, 1.0f),
+
+		// top face
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+		Vector3D(0.0f, 1.0f, 0.0f),
+
+		// bottom face
+		Vector3D(0.0f, -1.0f, 0.0f),
+		Vector3D(0.0f, -1.0f, 0.0f),
+		Vector3D(0.0f, -1.0f, 0.0f),
+		Vector3D(0.0f, -1.0f, 0.0f),
+
+		// right face
+		Vector3D(1.0f, 0.0f, 0.0f),
+		Vector3D(1.0f, 0.0f, 0.0f),
+		Vector3D(1.0f, 0.0f, 0.0f),
+		Vector3D(1.0f, 0.0f, 0.0f),
+
+		// left face
+		Vector3D(-1.0f, 0.0f, 0.0f),
+		Vector3D(-1.0f, 0.0f, 0.0f),
+		Vector3D(-1.0f, 0.0f, 0.0f),
+		Vector3D(-1.0f, 0.0f, 0.0f)
+	};
+	vertices = VertexBuffer::FillInVertexData({ {IA::POSITION, vPositions}, {IA::TEXCOORD, vUvs} , {IA::NORMAL, vNormals} });
+	indexBuffer->load(indices.data(), indices.size());
+	vertexBuffer->load(vertices.data(), sizeof(vertex), vertices.size());
+}
+
 void dx3d::Mesh::LoadQuadMesh()
 {
 	std::vector<Vector3D> positions = {

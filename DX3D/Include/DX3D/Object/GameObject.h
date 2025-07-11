@@ -20,6 +20,8 @@ namespace dx3d {
 		void AddCollider(ColliderType colliderType);
 		void SetPosition(float x, float y, float z);
 		void SetRotation(float x, float y, float z);
+		virtual void PreDraw() {};
+		virtual void PostDraw() {};
 		//variables
 		std::unordered_map<std::type_index, std::shared_ptr<ComponentBase>> components;
 		template <typename ComponentType>

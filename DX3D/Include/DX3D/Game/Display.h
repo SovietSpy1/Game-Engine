@@ -14,6 +14,8 @@ namespace dx3d {
 		void onFocus() override;
 		void onKillFocus() override;
 		void Draw(std::shared_ptr<GameObject> currentObject);
+		void BuiltInChecks(std::shared_ptr<GameObject> currentObject);
+		void BuiltInDraws(std::shared_ptr<GameObject> currentObject);
 		static Display* get();
 		virtual ~Display() override;
 		virtual void onResize(const Rect& new_size) override;

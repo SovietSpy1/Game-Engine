@@ -17,7 +17,6 @@ void dx3d::DeviceContext::clearRenderTargetColor(std::shared_ptr<SwapChain> swap
 	FLOAT clear_color[] = { rgba.r/255.0f, rgba.g/255.0f, rgba.b/255.0f, rgba.a/255.0f};
 	m_device_context.ClearRenderTargetView(swap_chain->m_rtv.Get(), clear_color);
 	m_device_context.ClearDepthStencilView(swap_chain->m_dsv.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	m_device_context.OMSetRenderTargets(1, swap_chain->m_rtv.GetAddressOf(), swap_chain->m_dsv.Get());
 }
 
 void dx3d::DeviceContext::setVertexBuffer(std::shared_ptr<VertexBuffer> vertex_buffer)

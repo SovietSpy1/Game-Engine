@@ -111,26 +111,26 @@ void dx3d::Texture::Load3DSmokeTexture(int resolution)
 	texDesc.Height = resolution;
 	texDesc.Width = resolution;
 	texDesc.Depth = resolution;
-	texDesc.MipLevels = 0;
-	texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	texDesc.MipLevels = 1;
+	texDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	texDesc.CPUAccessFlags = 0;
-	texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	texDesc.MiscFlags = 0;
 	Microsoft::WRL::ComPtr<ID3D11Texture3D> tex{};
-	DX3DGraphicsLogErrorAndThrow(m_device.CreateTexture3D(&texDesc, nullptr, tex.GetAddressOf()), "Create Smoke Texture Failed!");
-	texture = texture;
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateTexture3D(&texDesc, nullptr, tex.GetAddressOf()), "Create 3D smoke Tex failed");
+	texture = tex;
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shader_desc{};
-	shader_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	shader_desc.Format = DXGI_FORMAT_R32_FLOAT;
 	shader_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
-	shader_desc.Texture3D.MipLevels = -1;
+	shader_desc.Texture3D.MipLevels = 1;
 	shader_desc.Texture3D.MostDetailedMip = 0;
 
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateShaderResourceView(texture.Get(), &shader_desc, srv.GetAddressOf()), "Create shaderResourceView failed.");
 
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc{};
-	uav_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	uav_desc.Format = DXGI_FORMAT_R32_FLOAT;
 	uav_desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
 	uav_desc.Texture3D.FirstWSlice = 0;
 	uav_desc.Texture3D.MipSlice = 0;

@@ -44,6 +44,7 @@ dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.
 void dx3d::Display::Update()
 {
 	m_device_context->clearRenderTargetColor(m_swapChain, currentCol);
+	m_device_context->SetRTV(m_swapChain->m_rtv, m_swapChain->m_dsv);
 	GameManager::get()->Update();
 	m_swapChain->present(true);
 }
@@ -66,6 +67,19 @@ dx3d::Display* dx3d::Display::get()
 void dx3d::Display::Draw(std::shared_ptr<GameObject> currentObject)
 {
 	//preparing
+	BuiltInChecks(currentObject);
+	//per object before draw
+	currentObject->PreDraw();
+	m_device_context->SetRTV(m_swapChain->m_rtv, m_swapChain->m_dsv);
+	//drawing 
+	BuiltInDraws(currentObject);
+	//per object after draw
+	currentObject->PostDraw();
+}
+
+void dx3d::Display::BuiltInChecks(std::shared_ptr<GameObject> currentObject)
+{
+	//preparing
 	constantBuffers.clear();
 	Transform* transform = currentObject->GetComponent<Transform>();
 	cBuff.m_world = transform->Get();
@@ -79,8 +93,11 @@ void dx3d::Display::Draw(std::shared_ptr<GameObject> currentObject)
 		}
 	}
 	m_device_context->setConstantBuffers(constantBuffers);
-	
-	//drawing 
+}
+
+void dx3d::Display::BuiltInDraws(std::shared_ptr<GameObject> currentObject)
+{
+	Collider* collider = currentObject->GetComponent<Collider>();
 	Material* material = currentObject->GetComponent<Material>();
 	Mesh* mesh = currentObject->GetComponent<Mesh>();
 	if (material != nullptr && mesh != nullptr) {
@@ -93,7 +110,7 @@ void dx3d::Display::Draw(std::shared_ptr<GameObject> currentObject)
 		}
 		m_device_context->drawIndexedTriangleList(mesh->indexBuffer->getSizeIndexList(), 0, 0);
 	}
-	if(collider != nullptr) {
+	if (collider != nullptr) {
 		if (collider->show) {
 			m_device_context->setVertexBuffer(collider->vertexBuffer);
 			m_device_context->setIndexBuffer(collider->indexBuffer);
@@ -115,6 +132,7 @@ void dx3d::Display::Draw(std::shared_ptr<GameObject> currentObject)
 	}
 }
 
+
 void dx3d::Display::CameraUpdate(Matrix4X4 lightRot, Camera* cam, float fov)
 {
 	Transform* transform = cam->GetComponent<Transform>();
@@ -122,7 +140,8 @@ void dx3d::Display::CameraUpdate(Matrix4X4 lightRot, Camera* cam, float fov)
 	cBuff.elapsedTime = Time::elapsedTime;
 	cBuff.camPosition = transform->position.getTranslation();
 	cBuff.m_view = transform->Get().inverse();
-	cBuff.m_proj.SetOrthoLH(1.1f * aspectRatio, 1.1f, 0, 10);
+	cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.1f, 100.0f);
+	//cBuff.m_proj.SetOrthoLH(1.1f * aspectRatio, 1.1f, 0, 10);
 }
 
 dx3d::Display::~Display()

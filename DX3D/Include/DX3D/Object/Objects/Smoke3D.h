@@ -60,6 +60,7 @@ namespace dx3d {
 		std::shared_ptr<Texture> divergence;
 		std::shared_ptr<BufferPair> tempBr;
 		std::shared_ptr<Texture> temp;
+		std::shared_ptr<Texture> 
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> SourceCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> AdvectionCS;
 		Microsoft::WRL::ComPtr<ID3D11ComputeShader> DiffusionCS;
@@ -87,6 +88,17 @@ namespace dx3d {
 		UINT groupCount;
 		UINT borderCount;
 		//GPU Methods
+		virtual void PreDraw() override {
+			Material* material = GetComponent<Material>();
+			Mesh* mesh = GetComponent<Mesh>();
+			dC->clearRenderTarget(material->textures.at(1)->m_rtv, vec4(0, 0, 0, 1));
+			dC->SetRTV(material->textures.at(1)->rtv);
+			dC->setRasterizerState(RasterizerStateType::BackFace);
+			dC->setVertexBuffer(mesh->vertexBuffer);
+			dC->setIndexBuffer(mesh->indexBuffer);
+			dC->loadShaders(material->vertexShader, material->pixelShader);
+			dC->drawIndexedTriangleList(mesh->indexBuffer->getSizeIndexList(), 0, 0);
+		}
 		Smoke3D(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
 			InputSystem::get()->addListener(this);
 			//GPUStart();

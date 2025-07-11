@@ -40,16 +40,15 @@ dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 	smokeHolder->radius = 0.1f;
 	smokeHolder->AddMaterial();
 	std::shared_ptr<Texture> tex = GraphicsEngine::get()->getTextureManager()->createTexture();
-	tex->Load2DSmokeTexture(resolution, true);
+	tex->Load3DSmokeTexture(resolution);
 	smokeHolder->GetComponent<Material>()->textures.push_back(tex);
-	smokeHolder->GetComponent<Material>()->SetPixelShader(L"DX3D/Shaders/Smoke/PixelShader.hlsl");
-	smokeHolder->GetComponent<Material>()->SetVertexShader(L"DX3D/Shaders/Smoke/VertexShader.hlsl");
-	smokeHolder->AddMesh(L"Quad");
-	smokeHolder->GetComponent<Transform>()->rotation.SetRotationX(PI / 2.0f);
+	std::shared_ptr<Texture> rtvTex = GraphicsEngine::get()->getTextureManager()->createTexture();
+	rtvTex->LoadRTVTexture(Display::get()->m_size.width, Display::get()->m_size.height);
+	smokeHolder->GetComponent<Material>()->textures.push_back(rtvTex);
+	smokeHolder->GetComponent<Material>()->SetPixelShader(L"DX3D/Shaders/Smoke3D/PixelShader.hlsl");
+	smokeHolder->GetComponent<Material>()->SetVertexShader(L"DX3D/Shaders/Smoke3D/VertexShader.hlsl");
+	smokeHolder->AddMesh(L"Cube");
 	smokeHolder->GetComponent<Transform>()->position.Translate(Vector3D(0, 0, 1));
-	std::shared_ptr<Grid> grid = std::make_shared<Grid>();
-	grid->LoadBorder();
-	smokeHolder->AddComponent<Grid>(grid);
 	gameObjects.push_back(smokeHolder);
 }
 

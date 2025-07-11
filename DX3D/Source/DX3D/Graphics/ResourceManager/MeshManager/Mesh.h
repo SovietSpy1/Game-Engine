@@ -19,6 +19,7 @@ namespace dx3d {
 		Mesh(const wchar_t* full_path, const GraphicsResourceDesc& desc);
 		Mesh(const GraphicsResourceDesc& gDesc, MeshType meshType);
 		void LoadCubeMesh();
+		void Load3DCubeMesh();
 		void LoadQuadMesh();
 		void Demo();
 		std::vector<vertex> vertices;
