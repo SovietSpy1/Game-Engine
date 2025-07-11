@@ -100,7 +100,6 @@ namespace dx3d {
 			dC->drawIndexedTriangleList(mesh->indexBuffer->getSizeIndexList(), 0, 0);
 		}
 		Smoke3D(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
-			InputSystem::get()->addListener(this);
 			//GPUStart();
 		}
 		void Update() override {

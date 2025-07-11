@@ -18,7 +18,7 @@ dx3d::GameObject::GameObject(const BaseDesc& desc) :Base(desc)
 {
 std::shared_ptr<Transform> transform = std::make_shared<Transform>();
 	AddComponent<Transform>(transform);
-	//InputSystem::get()->addListener(this);
+	InputSystem::get()->addListener(this);
 }
 dx3d::GameObject::GameObject(const GameObject& object) : Base(BaseDesc{ object.m_logger })
 {

@@ -25,6 +25,7 @@
 #include <string>
 #include <DX3D/Object/Objects/Smoke.h>
 #include <DX3D/Object/Objects/Grid.h>
+#include <DX3D/Game/Game.h>
 dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 {
 	if (S == nullptr) {
@@ -34,29 +35,23 @@ dx3d::GameManager::GameManager(const BaseDesc& desc) : Base(desc)
 		DX3DLogErrorAndThrow("Game Manager has already been asigned!");
 	}
 
-	camera = std::make_shared<Camera>(BaseDesc{ m_logger });
-	UINT resolution = 128;
-	smokeHolder = std::make_shared<Smoke>(desc, resolution);
-	smokeHolder->radius = 0.1f;
-	smokeHolder->AddMaterial();
-	std::shared_ptr<Texture> tex = GraphicsEngine::get()->getTextureManager()->createTexture();
-	tex->Load3DSmokeTexture(resolution);
-	smokeHolder->GetComponent<Material>()->textures.push_back(tex);
-	std::shared_ptr<Texture> rtvTex = GraphicsEngine::get()->getTextureManager()->createTexture();
-	rtvTex->LoadRTVTexture(Display::get()->m_size.width, Display::get()->m_size.height);
-	smokeHolder->GetComponent<Material>()->textures.push_back(rtvTex);
-	smokeHolder->GetComponent<Material>()->SetPixelShader(L"DX3D/Shaders/Smoke3D/PixelShader.hlsl");
-	smokeHolder->GetComponent<Material>()->SetVertexShader(L"DX3D/Shaders/Smoke3D/VertexShader.hlsl");
-	smokeHolder->AddMesh(L"Cube");
-	smokeHolder->GetComponent<Transform>()->position.Translate(Vector3D(0, 0, 1));
-	gameObjects.push_back(smokeHolder);
+	switch (Game::mode) {
+	case 1:
+		LoadSmokeScene();
+		break;
+	case 2:
+		LoadBasicScene();
+		break;
+	}
 }
 
 void dx3d::GameManager::Update()
 {
-	InputSystem::get()->Update();
+	if (InputSystem::get() != nullptr) {
+		InputSystem::get()->Update();
+	}
 	PhysicsEngine::get()->Update();
-	//camera->Update();
+	camera->Update();
 	CameraUpdate();
 	for (int i = 0; i < gameObjects.size(); i++) {
 		currentObject = gameObjects[i];
@@ -85,19 +80,6 @@ void dx3d::GameManager::CameraUpdate()
 
 void dx3d::GameManager::LoadBasicScene()
 {
-	/*currentObject = GraphicsEngine::get()->createGameObject();
-	currentObject->AddMesh(L"Cube");
-	currentObject->AddCollider(ColliderType::Box);
-	currentObject->AddRigidBody();
-	currentObject->AddMaterial();
-	currentObject->material->SetPixelShader(L"DX3D/Shaders/Lighting/SphereTex/PixelShader.hlsl");
-	currentObject->material->SetVertexShader(L"DX3D/Shaders/Lighting/VertexShader.hlsl");
-	currentObject->material->SetTexture(L"Assets/Textures/brick.png");
-	currentObject->collider->show = true;
-	currentObject->transform->scale.SetScale(Vector3D(1, 1, 1));
-	currentObject->transform->position.SetTranslate(Vector3D(0, 10, 0));
-	gameObjects.push_back(currentObject);*/
-
 
 	currentObject = std::make_shared<Player>(BaseDesc{ m_logger });
 	currentObject->AddMesh(L"Cube");
@@ -118,7 +100,6 @@ void dx3d::GameManager::LoadBasicScene()
 	transform = camera->GetComponent<Transform>();
 	transform->SetParent(parent);
 	transform->position.SetTranslate(Vector3D(0, 1, -1));
-	//gameObjects.push_back(std::static_pointer_cast<GameObject>(camera));
 
 	currentObject = std::make_shared<SkyBox>(BaseDesc{ m_logger }, camera.get());
 	currentObject->AddMeshFromFile(L"Assets/Meshes/sphere.obj");
@@ -131,8 +112,6 @@ void dx3d::GameManager::LoadBasicScene()
 	transform = currentObject->GetComponent<Transform>();
 	transform->scale.SetScale(Vector3D(1, 1, 1) * 99);
 	gameObjects.push_back(std::static_pointer_cast<GameObject>(currentObject));
-	//Per Game Object
-	//setting up mesh with the heart vertices and heart shaders
 
 	currentObject = GraphicsEngine::get()->createGameObject();
 	currentObject->AddMesh(L"Quad");
@@ -208,6 +187,24 @@ void dx3d::GameManager::LoadBasicScene()
 	transform->scale.SetScale(Vector3D(0.2f, 1, 0.2f));
 	transform->position.SetTranslate(Vector3D(-10, -2, -10));
 	gameObjects.push_back(currentObject);
+}
+
+void dx3d::GameManager::LoadSmokeScene()
+{
+	camera = std::make_shared<Camera>(BaseDesc{ m_logger });
+	UINT resolution = 128;
+	smokeHolder = std::make_shared<Smoke>(BaseDesc{m_logger}, resolution);
+	smokeHolder->radius = 0.1f;
+	smokeHolder->AddMaterial();
+	std::shared_ptr<Texture> tex = GraphicsEngine::get()->getTextureManager()->createTexture();
+	tex->Load2DSmokeTexture(resolution, true);
+	smokeHolder->GetComponent<Material>()->textures.push_back(tex);
+	smokeHolder->GetComponent<Material>()->SetPixelShader(L"DX3D/Shaders/Smoke/PixelShader.hlsl");
+	smokeHolder->GetComponent<Material>()->SetVertexShader(L"DX3D/Shaders/Smoke/VertexShader.hlsl");
+	smokeHolder->AddMesh(L"Quad");
+	smokeHolder->GetComponent<Transform>()->rotation.SetRotationX(PI / 2.0f);
+	smokeHolder->GetComponent<Transform>()->position.Translate(Vector3D(0, 0, 1));
+	gameObjects.push_back(smokeHolder);
 }
 
 void dx3d::GameManager::SmokeTest2DUpdate()

@@ -8,6 +8,7 @@ namespace dx3d {
 		explicit Game(const GameDesc& desc);
 		virtual ~Game() override;
 		virtual void run() final;
+		static inline int mode{};
 	private:
 		std::unique_ptr<Logger> m_loggerPtr{};
 		std::unique_ptr<GraphicsEngine> m_graphicsEngine{};

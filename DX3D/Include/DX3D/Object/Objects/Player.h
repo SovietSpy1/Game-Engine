@@ -14,6 +14,10 @@ namespace dx3d {
 				Vector3D moveDir = transform->rotation.getZDirection() * forward + transform->rotation.getXDirection() * rightward;
 				rigidBody->SetVelocity(Vector3D(velocity * moveDir.x, rigidBody->velocity.y, velocity * moveDir.z));
 			}
+			transform->rotation.SetIdentity();
+			Matrix4X4 temp{};
+			temp.SetRotationY(yRot);
+			transform->rotation *= temp;
 		}
 		void Jump() {
 			RigidBody* rigidBody = GetComponent<RigidBody>();
@@ -48,19 +52,15 @@ namespace dx3d {
 			rightward = 0;
 		}
 		void onMouseMove(const Point& mouse_pos) override {
-			InputSystem::get()->setCursorPosition(Point(Display::get()->m_size.width / 2.0f, Display::get()->m_size.height / 2.0f));
-			xRot -= (mouse_pos.y - (Display::get()->m_size.height / 2.0f)) * Time::deltaTime * 0.1f;
-			yRot -= (mouse_pos.x - (Display::get()->m_size.width / 2.0f)) * Time::deltaTime * 0.1f;
-			if (xRot > PI / 2.0f) xRot = PI / 2.0f;
-			if (xRot < -PI / 2.0f) xRot = -PI / 2.0f;
-			Transform* transform = GetComponent<Transform>();
-			transform->rotation.SetIdentity();
-			Matrix4X4 temp{};
-			temp.SetRotationY(yRot);
-			transform->rotation *= temp;
+			if (lastPos.x == 0 && lastPos.y == 0) {
+				lastPos = mouse_pos;
+			}
+			float deltaX = mouse_pos.x - lastPos.x;
+			yRot += deltaX * 0.001f;
 		}
-		float forward = 1.0f;
-		float rightward = 1.0f;
+		Point lastPos{0,0};
+		float forward = 0.0f;
+		float rightward = 0.0f;
 		float velocity = 2;
 		float xRot{};
 		float yRot{};

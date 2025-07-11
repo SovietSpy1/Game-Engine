@@ -28,7 +28,9 @@ void dx3d::Game::run()
 				}
 				if (msg.wParam == VK_SPACE) {
 					m_paused = !m_paused;
-					InputSystem::get()->showCursor(m_paused);
+					if (InputSystem::get() != nullptr) {
+   						InputSystem::get()->showCursor(m_paused);
+					}
 				}
 			}
 			TranslateMessage(&msg);

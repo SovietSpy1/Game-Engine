@@ -26,6 +26,7 @@
 #include <DX3D/Object/Objects/Grid.h>
 #include <DX3D/Object/Objects/Smoke.h>
 #include <DX3D/Graphics/StructuredBuffer/StructuredBuffer.h>
+#include <DX3D/Game/Game.h>
 dx3d::Display::Display(const DisplayDesc& desc) : Window(WindowDesc(desc.window.base, desc.window.size))
 {
 	S = this;
@@ -51,12 +52,16 @@ void dx3d::Display::Update()
 
 void dx3d::Display::onFocus()
 {
-	InputSystem::get()->listening = true;
+	if (InputSystem::get() != nullptr) {
+		InputSystem::get()->listening = true;
+	}
 }
 
 void dx3d::Display::onKillFocus()
 {
-	InputSystem::get()->listening = false;
+	if (InputSystem::get() != nullptr) {
+		InputSystem::get()->listening = false;
+	}
 }
 
 dx3d::Display* dx3d::Display::get()
@@ -140,8 +145,14 @@ void dx3d::Display::CameraUpdate(Matrix4X4 lightRot, Camera* cam, float fov)
 	cBuff.elapsedTime = Time::elapsedTime;
 	cBuff.camPosition = transform->position.getTranslation();
 	cBuff.m_view = transform->Get().inverse();
-	cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.1f, 100.0f);
-	//cBuff.m_proj.SetOrthoLH(1.1f * aspectRatio, 1.1f, 0, 10);
+	switch (Game::mode) {
+	case 1:
+		cBuff.m_proj.SetOrthoLH(1.1f * aspectRatio, 1.1f, 0, 10);
+		break;
+	case 2:
+		cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.1f, 100.0f);
+		break;
+	}
 }
 
 dx3d::Display::~Display()

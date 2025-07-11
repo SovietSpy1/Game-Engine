@@ -43,7 +43,6 @@ namespace dx3d {
 		
 		//shared methods
 		Smoke(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
-			InputSystem::get()->addListener(this);
 			//CPUStart();
 			GPUStart();
 		}
@@ -65,7 +64,7 @@ namespace dx3d {
 			int coordX = x * resolution;
 			int coordY = y * resolution;
 			//AddToSmoke(Vector3D(coordX, coordY, 0), radius);
-			GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), radius, darkAmp, 0, 0);
+			GraphicsAddToSmoke(Vector3D(coordX, coordY, 0), 0.05f, darkAmp, 0, 0);
 		}
 		//GPU Variables
 		std::unique_ptr<BufferPair> dens_read;
@@ -234,7 +233,7 @@ namespace dx3d {
 		}
 		void GraphicsAddSource() {
 			UINT xPos = 0.5f * resolution;
-			UINT yPos = 0.1f * resolution;
+			UINT yPos = 0.0f * resolution;
 			float ranVelocityX = std::rand() % 21;
 			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), radius, darkAmp, -10 + ranVelocityX, eVY);
 		}

@@ -18,6 +18,7 @@ namespace dx3d {
 		void GameObjectUpdate();
 		void CameraUpdate();
 		void LoadBasicScene();
+		void LoadSmokeScene();
 		void SmokeTest2DUpdate();
 		static GameManager* get() {
 			return S;
