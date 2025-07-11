@@ -149,6 +149,52 @@ void dx3d::Texture::Load3DSmokeTexture(int resolution)
 	DX3DGraphicsLogErrorAndThrow(m_device.CreateSamplerState(&sampler_desc, sampler.GetAddressOf()), "CreateSamplerState failed.");
 }
 
+void dx3d::Texture::LoadRTVTexture(int width, int height)
+{
+	D3D11_TEXTURE2D_DESC texDesc{};
+	texDesc.Height = height;
+	texDesc.Width = width;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_RENDER_TARGET;
+	texDesc.CPUAccessFlags = 0;
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> tex{};
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateTexture2D(&texDesc, nullptr, tex.GetAddressOf()), "Create Smoke Texture Failed!");
+	texture = tex;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shader_desc{};
+	shader_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	shader_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shader_desc.Texture2D.MipLevels = 1;
+	shader_desc.Texture2D.MostDetailedMip = 0;
+
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateShaderResourceView(texture.Get(), &shader_desc, srv.GetAddressOf()), "Create shaderResourceView failed.");
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc{};
+	uav_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	uav_desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+	uav_desc.Texture2D.MipSlice = 0;
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateUnorderedAccessView(texture.Get(), &uav_desc, uav.GetAddressOf()), "Create unorderedAccessView failed.");
+	D3D11_SAMPLER_DESC sampler_desc = {};
+	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.MaxAnisotropy = 1;
+	sampler_desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampler_desc.MinLOD = 0;
+	sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateSamplerState(&sampler_desc, sampler.GetAddressOf()), "CreateSamplerState failed.");
+
+	DX3DGraphicsLogErrorAndThrow(m_device.CreateRenderTargetView(texture.Get(), NULL, rtv.GetAddressOf()), "CreateRenderTargetView failed.");
+}
+
 void dx3d::Texture::Load3DFTex(int resolution)
 {
 	D3D11_TEXTURE3D_DESC texDesc{};

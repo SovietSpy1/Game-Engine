@@ -188,7 +188,7 @@ namespace dx3d {
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
 			GraphicsAdvect();
 			GraphicsAddSource();
-			//GraphicsDiffuse();
+			GraphicsDiffuse();
 			GraphicsProject();
 			//Finalize();
 			GPUFinalize();

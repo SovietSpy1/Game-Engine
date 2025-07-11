@@ -9,7 +9,9 @@ namespace dx3d {
 		void MapToTexture(std::vector<vec4> data, int resolution);
 		void Load2DSmokeTexture(int resolution, bool t);
 		void Load3DSmokeTexture(int resolution);
+		void LoadRTVTexture(int width, int height);
 		void Load3DFTex(int resolution);
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11Resource> texture = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> uav = nullptr;

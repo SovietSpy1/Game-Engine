@@ -89,10 +89,10 @@ namespace dx3d {
 		//GPU Methods
 		Smoke3D(const BaseDesc& basedesc, int res) : GameObject(basedesc), resolution(res) {
 			InputSystem::get()->addListener(this);
-			GPUStart();
+			//GPUStart();
 		}
 		void Update() override {
-			SmokeGraphicsUpdate();
+			//SmokeGraphicsUpdate();
 		}
 		virtual void onLeftMouseDown(const Point& mouse_pos) override {
 
