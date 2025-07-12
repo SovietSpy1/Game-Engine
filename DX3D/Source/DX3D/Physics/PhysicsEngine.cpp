@@ -4,6 +4,7 @@
 #include <DX3D/Object/GameObject.h>
 #include <DX3D/Object/Transform.h>
 #include <cfloat>
+#include <cmath>
 dx3d::PhysicsEngine::PhysicsEngine(const BaseDesc& desc) : Base(desc)
 {
 	if (S == nullptr) {
@@ -98,11 +99,11 @@ bool dx3d::PhysicsEngine::IntersectCheck(const std::shared_ptr<Collider>& collid
 	std::vector<Vector3D> edges1 = collider1->edges;
 	std::vector<Vector3D> edges2 = collider2->edges;
 	Vector3D leastDistAxis;
-	float leastDist;
+	float leastDist = FLT_MAX; // Initialize to maximum value
 	if (vertices1.empty() || vertices2.empty() || normals1.empty() || normals2.empty()) {
 		return false;
 	}
-	auto checkAxis = [&](const auto& axis) {
+			auto checkAxis = [&](const auto& axis) {
 		float min1 = FLT_MAX, min2 = FLT_MAX, max1 = -FLT_MAX, max2 = -FLT_MAX;
 		for (const auto& v : vertices1) {
 			float d = axis.dot(v);
@@ -114,17 +115,20 @@ bool dx3d::PhysicsEngine::IntersectCheck(const std::shared_ptr<Collider>& collid
 			min2 = std::min(min2, d);
 			max2 = std::max(max2, d);
 		}
-		if (!(max1 < min2 || max2 < min1)) {
+		
+		// Use consistent floating-point comparison with epsilon
+		const float epsilon = 0.0001f;
+		if (!(max1 + epsilon < min2 || max2 + epsilon < min1)) {
 			float least;
 			float dist = min2 - max1;
 			float dist2 = max2 - min1;
-			if (abs(dist) > abs(dist2)) {
+			if (std::abs(dist) > std::abs(dist2)) {
 				least = dist2;
 			}
 			else {
 				least = dist;
 			}
-			if (abs(least) < abs(leastDist)) {
+			if (std::abs(least) < std::abs(leastDist)) {
 				leastDist = least;
 				leastDistAxis = axis;
 			}
@@ -144,8 +148,13 @@ bool dx3d::PhysicsEngine::IntersectCheck(const std::shared_ptr<Collider>& collid
 	for (const auto& e1 : edges1) {
 		for (const auto& e2 : edges2) {
 			Vector3D crossedEdge = e1.cross(e2);
+			// Use consistent floating-point comparison
 			if (crossedEdge.mag() >= 0.001f) {
-				crossedEdges.push_back(crossedEdge.normalize());
+				Vector3D normalized = crossedEdge.normalize();
+				// Check for valid normalized vector
+				if (normalized.mag() > 0.5f) {
+					crossedEdges.push_back(normalized);
+				}
 			}
 		}
 	}

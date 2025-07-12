@@ -70,6 +70,14 @@ void dx3d::Game::run()
 		m_display->Update();
 		QueryPerformanceCounter(&Time::temp);
 		Time::deltaTime = static_cast<float>(Time::temp.QuadPart - Time::end.QuadPart) / Time::frequency.QuadPart;
+		
+		// Cap deltaTime to prevent large jumps in Release mode
+		const float maxDeltaTime = 1.0f / 30.0f; // Cap at 30 FPS equivalent
+		if (Time::deltaTime > maxDeltaTime) {
+			Time::deltaTime = maxDeltaTime;
+		}
+		
+		// Ensure minimum frame time for consistent physics
 		while (Time::deltaTime < 1.0f / 60.0f) {
 			QueryPerformanceCounter(&Time::temp);
 			Time::deltaTime = static_cast<float>(Time::temp.QuadPart - Time::end.QuadPart) / Time::frequency.QuadPart;

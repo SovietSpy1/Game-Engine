@@ -91,7 +91,14 @@ void dx3d::Window::toggleFullScreen()
 		fullScreen = false;
 		m_size = m_windowedSize;
 		SetWindowLong(static_cast<HWND>(m_handle), GWL_STYLE, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU);
-		SetWindowPos(static_cast<HWND>(m_handle), HWND_TOP, 100, 100, m_size.width, m_size.height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		
+		// Calculate window size including decorations
+		RECT rc{ 0, 0, m_size.width, m_size.height };
+		AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, false);
+		SetWindowPos(static_cast<HWND>(m_handle), HWND_TOP, 100, 100, rc.right - rc.left, rc.bottom - rc.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		
+		// Force the window to update its position
+		UpdateWindow(static_cast<HWND>(m_handle));
 	}
 	else {
 		fullScreen = true;
@@ -104,6 +111,9 @@ void dx3d::Window::toggleFullScreen()
 
 void dx3d::Window::onResize(const Rect& new_size)
 {
+	// Force the window to update its position and size
+	UpdateWindow(static_cast<HWND>(m_handle));
+	
 	// Notify input system of window resize
 	if (InputSystem::get() != nullptr) {
 		InputSystem::get()->onWindowResized();

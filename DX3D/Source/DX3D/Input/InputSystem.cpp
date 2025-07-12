@@ -2,6 +2,8 @@
 #include <DX3D/Input/InputListener.h>
 #include <DX3D/Game/Display.h>
 #include <DX3D/Game/Game.h>
+#include <algorithm>
+#include <Windows.h>
 
 dx3d::InputSystem::InputSystem(const BaseDesc& desc) : Base(desc)
 {
@@ -78,8 +80,21 @@ void dx3d::InputSystem::onWindowResized()
 		// Get current mouse position relative to new client area
 		POINT mouse_point{};
 		::GetCursorPos(&mouse_point);
-		Point clientPos = Display::get()->GetClientPosition();
-		mouse_pos = { mouse_point.x - clientPos.x, Display::get()->m_size.height - (mouse_point.y - clientPos.y) };
+		POINT clientPoint = mouse_point;
+		if (ScreenToClient(static_cast<HWND>(Display::get()->m_handle), &clientPoint)) {
+			mouse_pos = { clientPoint.x, Display::get()->m_size.height - clientPoint.y };
+		} else {
+			// Fallback: calculate client position manually
+			RECT windowRect, clientRect;
+			GetWindowRect(static_cast<HWND>(Display::get()->m_handle), &windowRect);
+			GetClientRect(static_cast<HWND>(Display::get()->m_handle), &clientRect);
+			
+			// Calculate client area offset
+			int clientX = windowRect.left + ((windowRect.right - windowRect.left) - clientRect.right) / 2;
+			int clientY = windowRect.top + (windowRect.bottom - windowRect.top) - clientRect.bottom;
+			
+			mouse_pos = { mouse_point.x - clientX, Display::get()->m_size.height - (mouse_point.y - clientY) };
+		}
 		last_mouse_pos = mouse_pos;
 	}
 	
@@ -93,10 +108,29 @@ void dx3d::InputSystem::Update()
 	}
 	POINT mouse_point{};
 	::GetCursorPos(&mouse_point);
-	Point clientPos = Display::get()->GetClientPosition();
+	
 	switch (Game::mode) {
 	case 1:
-		mouse_pos = { mouse_point.x - clientPos.x, Display::get()->m_size.height - (mouse_point.y - clientPos.y) };
+		// Use ScreenToClient for accurate coordinate conversion
+		POINT clientPoint = mouse_point;
+		if (ScreenToClient(static_cast<HWND>(Display::get()->m_handle), &clientPoint)) {
+			mouse_pos = { clientPoint.x, Display::get()->m_size.height - clientPoint.y };
+		} else {
+			// Fallback: calculate client position manually
+			RECT windowRect, clientRect;
+			GetWindowRect(static_cast<HWND>(Display::get()->m_handle), &windowRect);
+			GetClientRect(static_cast<HWND>(Display::get()->m_handle), &clientRect);
+			
+			// Calculate client area offset
+			int clientX = windowRect.left + ((windowRect.right - windowRect.left) - clientRect.right) / 2;
+			int clientY = windowRect.top + (windowRect.bottom - windowRect.top) - clientRect.bottom;
+			
+			mouse_pos = { mouse_point.x - clientX, Display::get()->m_size.height - (mouse_point.y - clientY) };
+		}
+		
+		// Clamp mouse position to window bounds
+		mouse_pos.x = std::max(0, std::min(mouse_pos.x, (int)Display::get()->m_size.width));
+		mouse_pos.y = std::max(0, std::min(mouse_pos.y, (int)Display::get()->m_size.height));
 		break;
 	case 2:
 		mouse_pos = { mouse_point.x, mouse_point.y };
