@@ -54,6 +54,7 @@ void dx3d::Display::onFocus()
 {
 	if (InputSystem::get() != nullptr) {
 		InputSystem::get()->listening = true;
+		InputSystem::get()->onFocusGained();
 	}
 }
 
@@ -61,6 +62,7 @@ void dx3d::Display::onKillFocus()
 {
 	if (InputSystem::get() != nullptr) {
 		InputSystem::get()->listening = false;
+		InputSystem::get()->onFocusLost();
 	}
 }
 

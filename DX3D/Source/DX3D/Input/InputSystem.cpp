@@ -1,6 +1,8 @@
 #include "DX3D/Input/InputSystem.h"
 #include <DX3D/Input/InputListener.h>
 #include <DX3D/Game/Display.h>
+#include <DX3D/Game/Game.h>
+
 dx3d::InputSystem::InputSystem(const BaseDesc& desc) : Base(desc)
 {
 	S = this;
@@ -26,6 +28,34 @@ void dx3d::InputSystem::setCursorPosition(const Point& pos)
 	::SetCursorPos(pos.x, pos.y);
 }
 
+void dx3d::InputSystem::onFocusGained()
+{
+	// Reset cursor state when application gains focus
+	if (Game::mode == 2) {
+		// For FPS mode, hide cursor and center it
+		showCursor(false);
+		// Center the cursor immediately
+		Point centerPos = {
+			(int)Display::get()->m_size.width / 2,
+			(int)Display::get()->m_size.height / 2
+		};
+		setCursorPosition(centerPos);
+		// Reset mouse position to center to prevent immediate movement
+		mouse_pos = centerPos;
+		last_mouse_pos = centerPos;
+		first_call = true;
+	} else {
+		// For other modes, show cursor
+		showCursor(true);
+	}
+}
+
+void dx3d::InputSystem::onFocusLost()
+{
+	// Show cursor when application loses focus
+	showCursor(true);
+}
+
 void dx3d::InputSystem::Update()
 {
 	if (!listening) {
@@ -34,7 +64,16 @@ void dx3d::InputSystem::Update()
 	POINT mouse_point{};
 	::GetCursorPos(&mouse_point);
 	Point clientPos = Display::get()->GetClientPosition();
-	mouse_pos = { mouse_point.x - clientPos.x, Display::get()->m_size.height - (mouse_point.y - clientPos.y)};
+	switch (Game::mode) {
+	case 1:
+		mouse_pos = { mouse_point.x - clientPos.x, Display::get()->m_size.height - (mouse_point.y - clientPos.y) };
+		break;
+	case 2:
+		mouse_pos = { mouse_point.x, mouse_point.y };
+		::SetCursorPos((int)Display::get()->m_size.width / 2.0f, (int)Display::get()->m_size.height / 2.0f);
+		break;
+	}
+	
 	if (first_call) {
 		last_mouse_pos = mouse_pos;
 		first_call = false;
