@@ -54,6 +54,36 @@ void dx3d::InputSystem::onFocusLost()
 {
 	// Show cursor when application loses focus
 	showCursor(true);
+	// Reset first_call flag so cursor state is properly restored when focus is regained
+	first_call = true;
+}
+
+void dx3d::InputSystem::onWindowResized()
+{
+	// Reset mouse position and cursor state when window is resized
+	Point centerPos = {
+		(int)Display::get()->m_size.width / 2,
+		(int)Display::get()->m_size.height / 2
+	};
+	
+	if (Game::mode == 2) {
+		// For FPS mode, hide cursor and center it
+		showCursor(false);
+		setCursorPosition(centerPos);
+		mouse_pos = centerPos;
+		last_mouse_pos = centerPos;
+	} else {
+		// For other modes, show cursor but reset position
+		showCursor(true);
+		// Get current mouse position relative to new client area
+		POINT mouse_point{};
+		::GetCursorPos(&mouse_point);
+		Point clientPos = Display::get()->GetClientPosition();
+		mouse_pos = { mouse_point.x - clientPos.x, Display::get()->m_size.height - (mouse_point.y - clientPos.y) };
+		last_mouse_pos = mouse_pos;
+	}
+	
+	first_call = true;
 }
 
 void dx3d::InputSystem::Update()

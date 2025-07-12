@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <stdexcept>
 #include <DX3D/Game/Display.h>
+#include <DX3D/Input/InputSystem.h>
 #include <dwmapi.h>
 static LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -103,6 +104,10 @@ void dx3d::Window::toggleFullScreen()
 
 void dx3d::Window::onResize(const Rect& new_size)
 {
+	// Notify input system of window resize
+	if (InputSystem::get() != nullptr) {
+		InputSystem::get()->onWindowResized();
+	}
 }
 
 dx3d::Point dx3d::Window::GetClientPosition()

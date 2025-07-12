@@ -29,7 +29,23 @@ void dx3d::Game::run()
 				if (msg.wParam == VK_SPACE) {
 					m_paused = !m_paused;
 					if (InputSystem::get() != nullptr) {
-   						InputSystem::get()->showCursor(m_paused);
+						if (m_paused) {
+							// Show cursor when paused
+							InputSystem::get()->showCursor(true);
+						} else {
+							// Restore cursor state based on game mode when unpaused
+							if (Game::mode == 2) {
+								InputSystem::get()->showCursor(false);
+								// Re-center cursor for FPS mode
+								Point centerPos = {
+									(int)Display::get()->m_size.width / 2,
+									(int)Display::get()->m_size.height / 2
+								};
+								InputSystem::get()->setCursorPosition(centerPos);
+							} else {
+								InputSystem::get()->showCursor(true);
+							}
+						}
 					}
 				}
 			}
@@ -42,6 +58,10 @@ void dx3d::Game::run()
 		if (m_display->pause) {
 			m_paused = true;
 			m_display->pause = false;
+			// Show cursor when display is paused
+			if (InputSystem::get() != nullptr) {
+				InputSystem::get()->showCursor(true);
+			}
 		}
 		if (m_paused) {
 			QueryPerformanceCounter(&Time::end);

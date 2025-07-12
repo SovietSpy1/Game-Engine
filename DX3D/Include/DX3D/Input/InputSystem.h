@@ -19,6 +19,7 @@ namespace dx3d {
 		}
 		void onFocusGained();
 		void onFocusLost();
+		void onWindowResized();
 		bool listening = true;
 	private:
 		static inline InputSystem* S = nullptr;
