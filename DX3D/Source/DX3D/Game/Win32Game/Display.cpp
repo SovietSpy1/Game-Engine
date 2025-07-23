@@ -48,6 +48,10 @@ void dx3d::Display::Update()
 	m_device_context->SetRTV(m_swapChain->m_rtv, m_swapChain->m_dsv);
 	GameManager::get()->Update();
 	m_swapChain->present(true);
+	if (first) {
+		pause = true;
+	}
+	first = false;
 }
 
 void dx3d::Display::onFocus()
@@ -149,7 +153,7 @@ void dx3d::Display::CameraUpdate(Matrix4X4 lightRot, Camera* cam, float fov)
 	cBuff.m_view = transform->Get().inverse();
 	switch (Game::mode) {
 	case 1:
-		cBuff.m_proj.SetOrthoLH(1.1f * aspectRatio, 1.1f, 0, 10);
+		cBuff.m_proj.SetOrthoLH(1 * aspectRatio, 1, 0, 10);
 		break;
 	case 2:
 		cBuff.m_proj.SetPerspectiveLH(fov, aspectRatio, 0.1f, 100.0f);

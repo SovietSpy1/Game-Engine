@@ -21,6 +21,7 @@ namespace dx3d {
 		virtual void onResize(const Rect& new_size) override;
 	public:
 		bool pause = false;
+		bool first = true;
 	private:
 		SwapChainPtr m_swapChain;
 		std::shared_ptr<DeviceContext> m_device_context;

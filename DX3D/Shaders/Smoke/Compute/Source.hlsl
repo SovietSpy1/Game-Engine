@@ -27,9 +27,22 @@ void main( uint3 DTid : SV_DispatchThreadID )
     }
     DataCurrent[IX(x, y)] = DataLast[IX(x, y)];
     float dist = distance(uint3(DTid.x, DTid.y, 0), uint3(emissionPoint, 0));
-    if ( dist <= emissionRadius)
+    if (b != 10)
     {
-        float dens = (1.0f - dist / (emissionRadius > 0.0 ? emissionRadius : 1));
-        DataCurrent[IX(x, y)] = clamp(DataLast[IX(x, y)] + dens * emission * dt, min, max);
+        if (dist <= emissionRadius)
+        {
+            float dens = (1.0f - dist / (emissionRadius > 0.0 ? emissionRadius : 1));
+            DataCurrent[IX(x, y)] = clamp(DataLast[IX(x, y)] + dens * emission * dt, min, max);
+        }
+    }
+    else
+    {
+        int xDist = DTid.x - emissionPoint.x;
+        int yDist = DTid.y - emissionPoint.y;
+        if ((xDist < emissionRadius && xDist >=0)  && yDist < 10)
+        {
+            float dens = 1.0f;
+            DataCurrent[IX(x, y)] = clamp(DataLast[IX(x, y)] + dens * emission * dt, min, max);
+        }
     }
 }

@@ -19,6 +19,12 @@ dx3d::Game::Game(const GameDesc& desc) : Base({ std::make_unique<Logger>(desc.lo
 	std::cout << "2: Lighting and Physics Demo" << std::endl;
 	while (!valid) {
 		std::cin >> demoChoice;
+		if (std::cin.fail()) {
+			std::cin.clear(); // Clear error flags
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+			DX3DLogWarning("Invalid input, please enter a number (1 or 2).");
+			continue;
+		}
 		if (demoChoice != 1 && demoChoice != 2) {
 			DX3DLogWarning("Invalid choice, please choose 1 or 2.");
 		}
@@ -26,7 +32,7 @@ dx3d::Game::Game(const GameDesc& desc) : Base({ std::make_unique<Logger>(desc.lo
 			valid = true;
 			mode = demoChoice;
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
 	}
 	switch (mode) {
 	case 1:

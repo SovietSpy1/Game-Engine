@@ -55,7 +55,7 @@ namespace dx3d {
 		}
 		virtual void onHoldLeftMouseDown(const Point& mouse_pos) override {
 			Rect d = Display::get()->m_size;
-			float o = 1.1f;
+			float o = 1;
 			float x = o / d.height * (mouse_pos.x - 0.5f * d.width) + 0.5f;
 			float y = (float)(mouse_pos.y - 0.5f * d.height) * o / d.height + 0.5f;
 			if (x < 0 || y < 0 || x >= 1 || y >= 1) {
@@ -232,16 +232,30 @@ namespace dx3d {
 			Clear();
 		}
 		void GraphicsAddSource() {
+			/*UINT xPos = 0.0f * resolution;
+			UINT yPos = 0.0f * resolution;
+			float ranVelocityX = std::rand() % 11 - 5;
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.25f, darkAmp, ranVelocityX, eVY * 3);
+			xPos = 0.25f * resolution;
+			ranVelocityX = std::rand() % 21 - 7;
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.25f, darkAmp, ranVelocityX, eVY * 3);
+			xPos = 0.5f * resolution;
+			ranVelocityX = std::rand() % 21 - 15;
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.25f, darkAmp, ranVelocityX, eVY * 3);
+			xPos = 0.75f * resolution;
+			ranVelocityX = std::rand() % 11 - 5;
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), 0.25f, darkAmp, ranVelocityX, eVY * 3);
+			*/
 			UINT xPos = 0.5f * resolution;
 			UINT yPos = 0.0f * resolution;
-			float ranVelocityX = std::rand() % 21;
-			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), radius, darkAmp, -10 + ranVelocityX, eVY);
+			float ranVelocityX = std::rand() % 11 - 5;
+			GraphicsAddToSmoke(Vector3D(xPos, yPos, 0), radius, darkAmp, ranVelocityX, eVY);
 		}
 		void GraphicsAddToSmoke(Vector3D position, float radius, float dens, float xDir = 0, float yDir = 0) {
 			SWAP(dens_read, dens_write);
 			SWAP(velX_read, velX_write);
 			SWAP(velY_read, velY_write);
-
+			smokeBuffDesc.b = 1;
 			smokeBuffDesc.emissionPoint = vec2_int{(int)position.x, (int)position.y};
 			smokeBuffDesc.emissionRadius = radius * resolution;
 			smokeBuffDesc.max = 1.0f;
@@ -269,6 +283,7 @@ namespace dx3d {
 			constantBuffer->UpdateSubresource(&smokeBuffDesc);
 			dC->Dispatch(groupCount, groupCount, 1);
 			Clear();
+			smokeBuffDesc.b = 0;
 		}
 		void Clear() {
 			dC->CSSetSRVS({ nullptr, nullptr, nullptr });
@@ -399,10 +414,10 @@ namespace dx3d {
 			colors = baseColors;
 		}
 		void SmokeUpdate() {
-			//AdvectUpdate();
+			AdvectUpdate();
 			AddSource();
-			//Diffuse();
-			//VelUpdate();
+			Diffuse();
+			VelUpdate();
 			TextureUpdate();
 		}
 		void Diffuse() {

@@ -194,7 +194,7 @@ void dx3d::GameManager::LoadSmokeScene()
 	camera = std::make_shared<Camera>(BaseDesc{ m_logger });
 	UINT resolution = 128;
 	smokeHolder = std::make_shared<Smoke>(BaseDesc{m_logger}, resolution);
-	smokeHolder->radius = 0.1f;
+	smokeHolder->radius = 0.10f;
 	smokeHolder->AddMaterial();
 	std::shared_ptr<Texture> tex = GraphicsEngine::get()->getTextureManager()->createTexture();
 	tex->Load2DSmokeTexture(resolution, true);
